@@ -56,6 +56,8 @@ export function writePacket(
     recentComics?: Record<string, unknown>[];
     /** Pin the genre so the repeat rule doesn't refuse a round's shared genre. */
     pinGenre?: boolean;
+    /** Scenes per genre id, when the Tracetoon under test has a scene library. */
+    sceneOptions?: Record<string, unknown[]>;
   },
 ): string[] {
   const problems = caseProblems(caseDir);
@@ -68,6 +70,7 @@ export function writePacket(
     genres: [readGenre(opts.genre)],
     ...(opts.recentComics ? { recentComics: opts.recentComics } : {}),
     ...(opts.pinGenre ? { pinnedGenre: readGenre(opts.genre).id } : {}),
+    ...(opts.sceneOptions ? { sceneOptions: opts.sceneOptions } : {}),
     skillFiles: opts.skillFiles.map((f) => resolve(f)),
     patchPath: resolve(caseDir, 'changes.patch'),
     out: { comic: join(out, 'comic.json'), design: join(out, 'comic-design.json') },
@@ -207,10 +210,15 @@ if (import.meta.main) {
     } else if (cmd === 'calibrate') {
       const round = positional[0];
       const tracetoon = flags.get('tracetoon')?.[0];
-      if (!round || !tracetoon) throw new Error('usage: comicbench calibrate <round> --tracetoon <dir> [--cases 5]');
-      const { runCalibration } = await import('./calibrate.ts');
-      const r = await runCalibration({ round: resolve(round), tracetoon: resolve(tracetoon), cases: Number(flags.get('cases')?.[0] ?? 5), jobs: Number(flags.get('jobs')?.[0] ?? 3) });
-      console.log(Object.entries(r.controls).map(([k, v]) => `${k}: ${v.hits}/${v.of} noticed (${v.expect})${v.pass ? '' : ' — UNCALIBRATED'}`).join('\n'));
+      if (!round || !tracetoon) throw new Error('usage: comicbench calibrate <round> --tracetoon <dir> [--cases 5] [--pairwise true]');
+      const cal = await import('./calibrate.ts');
+      if (flags.get('pairwise')?.[0] === 'true') {
+        const r = await cal.runPairwiseCalibration({ round: resolve(round), tracetoon: resolve(tracetoon), jobs: Number(flags.get('jobs')?.[0] ?? 3) });
+        console.log(Object.entries(r.controls).map(([k, v]) => `${k}: the original won ${v.won}/${v.of} on ${v.target}${v.pass ? '' : ' (UNCALIBRATED)'}`).join('\n'));
+      } else {
+        const r = await cal.runCalibration({ round: resolve(round), tracetoon: resolve(tracetoon), cases: Number(flags.get('cases')?.[0] ?? 5), jobs: Number(flags.get('jobs')?.[0] ?? 3) });
+        console.log(Object.entries(r.controls).map(([k, v]) => `${k}: ${v.hits}/${v.of} noticed (${v.expect})${v.pass ? '' : ' (UNCALIBRATED)'}`).join('\n'));
+      }
     } else if (cmd === 'anchors') {
       const [sub, target] = positional;
       const tracetoon = flags.get('tracetoon')?.[0];
@@ -225,15 +233,50 @@ if (import.meta.main) {
         const r = await cal.checkAnchors({ dir: resolve(target), tracetoon: resolve(tracetoon), label });
         console.log(Object.entries(r.drift).map(([k, v]) => `${k}: ${fmt2(v.mean)}${v.flagged ? ' DRIFT' : ''}`).join('\n'));
       }
+    } else if (cmd === 'arena') {
+      const [a, b] = positional;
+      if (!a || !b) throw new Error('usage: comicbench arena <round-a> <round-b> [--out <dir>] [--model-2 <model>] [--share-2 0.3] [--only a,b]');
+      const { runArena, ARENA_CRITERIA } = await import('./arena.ts');
+      const m2 = flags.get('model-2')?.[0];
+      const { out, report } = await runArena({
+        a: resolve(a),
+        b: resolve(b),
+        ...(flags.get('out')?.[0] ? { out: resolve(flags.get('out')![0]!) } : {}),
+        ...(m2 ? { model2: m2, share2: Number(flags.get('share-2')?.[0] ?? 0.3) } : {}),
+        ...(flags.get('only')?.[0] ? { only: flags.get('only')![0]!.split(',') } : {}),
+        jobs: Number(flags.get('jobs')?.[0] ?? 3),
+      });
+      console.log(`${report.b} vs ${report.a} over ${report.pairs} pairs (win rate of ${report.b}; ties count half):`);
+      for (const c of ARENA_CRITERIA) {
+        const r = report.criteria[c.id]!;
+        console.log(`  ${c.id}: ${(100 * r.winRate).toFixed(0)}% [${(100 * r.ci[0]).toFixed(0)}, ${(100 * r.ci[1]).toFixed(0)}]  (${r.wins} won, ${r.losses} lost, ${r.ties} tied, ${r.flips} flipped with order)`);
+      }
+      if (report.secondJudge) console.log(`  second judge ${report.secondJudge.model}: kappa ${Object.entries(report.secondJudge.kappa).map(([k, v]) => `${k} ${fmt2(v as number)}`).join(', ')}`);
+      if (report.errors.length) console.log(`  errors: ${report.errors.length}`);
+      console.log(`Arena: ${join(out, 'arena.json')}`);
+    } else if (cmd === 'checklist') {
+      const round = positional[0];
+      if (!round) throw new Error('usage: comicbench checklist <round> [--jobs 3]');
+      const { runChecklist } = await import('./checklist.ts');
+      const s = await runChecklist({ round: resolve(round), jobs: Number(flags.get('jobs')?.[0] ?? 3) });
+      const pct = (x: number) => `${(100 * x).toFixed(0)}%`;
+      console.log(
+        `${s.round}: ${s.comics} comics; office-like ${pct(s.officeLike)}, deadpan ${pct(s.deadpan)}, image carries joke ${pct(s.imageCarriesJoke)}; medium index ${fmt2(s.mediumIndex)} of 6\n` +
+          `  medium: ${Object.entries(s.medium).map(([k, v]) => `${k} ${pct(v)}`).join(', ')}\n` +
+          `  settings: ${Object.entries(s.settings).map(([k, v]) => `${k} ${v}`).join(', ')} (entropy ${fmt2(s.settingEntropy)})\n` +
+          `  punchlines: ${Object.entries(s.punchlines).map(([k, v]) => `${k} ${v}`).join(', ')}${s.errors.length ? `\n  errors: ${s.errors.length}` : ''}`,
+      );
     } else if (cmd === 'review') {
       const round = positional[0];
-      if (!round) throw new Error('usage: comicbench review <round> [--compare <round>] [--tracetoon <dir>] [--out <dir>]');
+      if (!round) throw new Error('usage: comicbench review <round> [<round>...] [--arena <arena-dir>...] [--tracetoon <dir>] [--out <dir>]');
       const { buildReview } = await import('./review.ts');
       const compare = flags.get('compare')?.[0];
       const tracetoon = flags.get('tracetoon')?.[0];
       const out = buildReview({
         round: resolve(round),
         ...(compare ? { compare: resolve(compare) } : {}),
+        rounds: positional.slice(1).map((r) => resolve(r)),
+        arenas: (flags.get('arena') ?? []).map((a) => resolve(a)),
         ...(tracetoon ? { tracetoon: resolve(tracetoon) } : {}),
         out: resolve(flags.get('out')?.[0] ?? join(round, 'review')),
       });

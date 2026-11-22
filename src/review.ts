@@ -17,6 +17,8 @@ import { loadCases } from './cases.ts';
 import { authorChecks, authorStats, compareRounds } from './compare.ts';
 import { CRITERIA, GATES, RUBRIC_VERSION, SET_CRITERIA } from './rubric.ts';
 import { comicScore, type ComicJudgment } from './score.ts';
+import { ARENA_CRITERIA } from './arena.ts';
+import { MEDIUM_ITEMS } from './checklist.ts';
 
 const readJson = <T = any>(f: string): T | undefined => {
   try {
@@ -172,6 +174,7 @@ function armData(round: string, out: string) {
           reason: design?.why ?? design?.reason ?? design?.choiceReason ?? '',
         },
         recent: readJson<string[]>(join(dir, 'recent.json')) ?? [],
+        checklist: readJson(join(dir, 'checklist.json')) ?? null,
       });
     }
   const caseInfo = Object.fromEntries(
@@ -215,6 +218,7 @@ function armData(round: string, out: string) {
       layouts,
     },
     calibration: calibration?.controls ?? null,
+    checklist: readJson(join(round, 'checklist.json')) ?? null,
     reliability: reliability
       ? { model2: reliability.model2, second: reliability.secondJudge, repeat: reliability.repeat }
       : null,
@@ -223,18 +227,26 @@ function armData(round: string, out: string) {
   };
 }
 
-export function buildReview(o: { round: string; compare?: string; out: string; tracetoon?: string }): string {
+export function buildReview(o: { round: string; compare?: string; rounds?: string[]; arenas?: string[]; out: string; tracetoon?: string }): string {
   mkdirSync(o.out, { recursive: true });
-  const arms = [armData(o.round, o.out), ...(o.compare ? [armData(o.compare, o.out)] : [])];
+  const rounds = [o.round, ...(o.compare ? [o.compare] : []), ...(o.rounds ?? [])];
+  const arms = rounds.map((r) => armData(r, o.out));
   let comparison: any = null;
-  if (o.compare && existsSync(join(o.round, 'judgments')) && existsSync(join(o.compare, 'judgments'))) {
+  if (rounds.length >= 2 && existsSync(join(rounds[0]!, 'judgments')) && existsSync(join(rounds[1]!, 'judgments'))) {
     try {
-      comparison = compareRounds(o.round, o.compare);
+      comparison = compareRounds(rounds[0]!, rounds[1]!);
     } catch {
       comparison = null;
     }
   }
+  const arenas = (o.arenas ?? []).flatMap((d) => {
+    const r = readJson(existsSync(join(d, 'arena.json')) ? join(d, 'arena.json') : d);
+    return r ? [{ a: r.a, b: r.b, pairs: r.pairs, criteria: r.criteria, secondJudge: r.secondJudge, results: r.results }] : [];
+  });
   const data = {
+    arenas,
+    arenaCriteria: ARENA_CRITERIA.map(({ id, question }) => ({ id, question })),
+    mediumItems: MEDIUM_ITEMS.map(({ id, question }) => ({ id, question })),
     rubricVersion: RUBRIC_VERSION,
     builtAt: new Date().toISOString(),
     criteria: CRITERIA.map(({ id, name, weight, stage, question, anchors }) => ({ id, name, weight, stage, question, anchors })),
@@ -245,17 +257,22 @@ export function buildReview(o: { round: string; compare?: string; out: string; t
     cases: Object.assign({}, ...arms.map((a) => a.caseInfo)),
     comparison,
   };
-  writeFileSync(join(o.out, 'data.json'), JSON.stringify(data));
+  // A script, not JSON: browsers load <script src> from file:// but block fetch.
+  writeFileSync(join(o.out, 'data.js'), `window.REVIEW_DATA = ${JSON.stringify(data).replace(/<\/(script)/gi, '<\\/$1')};\n`);
   let lockup = '';
   if (o.tracetoon && existsSync(join(o.tracetoon, 'plugin', 'assets', 'tracetoon.svg')))
     lockup = readFileSync(join(o.tracetoon, 'plugin', 'assets', 'tracetoon.svg'), 'utf8').replace(/<\?xml[^>]*>/, '').replace(/<svg /, '<svg class="mark" aria-hidden="true" ');
-  writeFileSync(join(o.out, 'index.html'), PAGE.replace('<!--MARK-->', lockup));
+  // A whole document, so it opens from disk; data.js beside it holds the data.
+  const body = PAGE.replace('<!--MARK-->', lockup).replace('<div class="wrap">', '</head>\n<body>\n<div class="wrap">');
+  writeFileSync(
+    join(o.out, 'index.html'),
+    `<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width,initial-scale=1">\n${body}</body>\n</html>\n`,
+  );
   return o.out;
 }
 
 /** The page. Everything it shows comes from data.json beside it. */
 const PAGE = String.raw`<title>Comicbench Round Review</title>
-<meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:wght@400;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap">
 <style>
@@ -323,7 +340,7 @@ button:focus-visible, select:focus-visible, textarea:focus-visible, summary:focu
 .score { font: 400 2.2rem/1 var(--display); font-variant-numeric: tabular-nums }
 .score small { font: 600 .8rem var(--body); color: var(--muted) }
 .comicimg { display: block; width: 100%; max-width: 100%; height: auto; border: 2px solid var(--ink); border-radius: 3px; cursor: zoom-in; background: var(--rule) }
-body.phone .comicimg { width: 360px; max-width: 100% }
+body.narrow .comicimg { width: 760px; max-width: 100% }
 .noimg { padding: 30px; text-align: center; color: var(--muted); border: 2px dashed var(--rule); border-radius: 4px }
 .meta { display: flex; flex-wrap: wrap; gap: 6px }
 .gates { display: flex; flex-wrap: wrap; gap: 6px }
@@ -373,6 +390,8 @@ dialog::backdrop { background: rgba(20,19,15,.7) }
   </header>
   <div class="notice">Your notes are for reviewing the judges. They never change a score.</div>
 
+  <section id="arena-pairs"></section>
+  <section id="checklist"></section>
   <section id="summary"></section>
   <section id="criteria"></section>
   <section id="variety"></section>
@@ -386,15 +405,18 @@ dialog::backdrop { background: rgba(20,19,15,.7) }
       <option value="case">By pull request</option><option value="delta">Biggest arm difference first</option><option value="low">Lowest score first</option><option value="high">Highest score first</option></select></label>
     <label for="f-q">Find <input id="f-q" type="search" placeholder="case, name, layout" size="16"></label>
     <span style="flex:1"></span>
-    <button id="v-pr" aria-pressed="true" type="button">PR width · 760</button>
-    <button id="v-phone" aria-pressed="false" type="button">Phone · 360</button>
+    <button id="v-pr" aria-pressed="true" type="button">Full width</button>
+    <button id="v-phone" aria-pressed="false" type="button">PR column · 760</button>
     <button id="export" type="button">Export notes</button>
+    <button id="import" type="button">Import notes</button>
+    <input id="import-file" type="file" accept="application/json,.json" hidden>
     <span class="saved" id="store"></span>
   </div>
   <section id="comics"></section>
 </div>
 <dialog id="zoom" aria-label="Comic at full size"><img alt="" id="zoomimg"></dialog>
 
+<script src="data.js"></script>
 <script>
 (function () {
   const $ = (s, r = document) => r.querySelector(s);
@@ -403,44 +425,23 @@ dialog::backdrop { background: rgba(20,19,15,.7) }
   const f2 = (n) => (n == null || Number.isNaN(n) ? 'n/a' : Number(n).toFixed(2));
   let D = null;
   const notes = {};            // key -> { marks: {criterion: 'agree'|'disagree'}, text, at }
-  let store = null;            // artifact database, when published
+  // Notes live in this browser's storage (per file, so a rebuilt page in the
+  // same folder keeps them); Export and Import move them as notes.json.
   const LS = 'comicbench-notes-v1';
-  const local = { load() { try { return JSON.parse(localStorage.getItem(LS) || '{}'); } catch { return {}; } },
-                  save() { try { localStorage.setItem(LS, JSON.stringify(notes)); } catch {} } };
+  let storageOk = true;
+  const local = { load() { try { return JSON.parse(localStorage.getItem(LS) || '{}'); } catch { storageOk = false; return {}; } },
+                  save() { try { localStorage.setItem(LS, JSON.stringify(notes)); } catch { storageOk = false; } } };
 
   function setStore(msg) { $('#store').textContent = msg; }
 
-  async function connectStore() {
+  function connectStore() {
     Object.assign(notes, local.load());
-    setStore('Notes saved in this browser');
-    // Inside the artifact viewer a page can't hand out files; notes go to its database instead.
-    if (window.claude) $('#export').hidden = true;
-    if (!window.claude || !window.claude.use) return;
-    try {
-      const db = await window.claude.use('db');
-      if (!db) return;
-      store = db.collection('notes');
-      const timer = setTimeout(() => setStore('Notes saved in this browser (shared notes did not load)'), 10000);
-      store.onSnapshot((snap) => {
-        clearTimeout(timer);
-        for (const d of snap.docs) { const v = d.data(); if (v) notes[v.key || d.id] = v; }
-        setStore('Notes saved to this page for Claude to read');
-        render();
-      }, () => { clearTimeout(timer); store = null; setStore('Notes saved in this browser (shared notes unavailable)'); });
-      $('#export').hidden = true;
-    } catch { store = null; }
+    setStore(storageOk ? 'Notes are kept in this browser; export them to share' : 'This browser blocks storage here: export your notes before closing');
   }
 
-  const pending = new Map();
   function saveNote(key) {
-    const n = notes[key];
-    n.at = new Date().toISOString();
+    notes[key].at = new Date().toISOString();
     local.save();
-    if (!store) return;
-    clearTimeout(pending.get(key));
-    pending.set(key, setTimeout(() => {
-      store.doc(key).set({ key, marks: n.marks || {}, text: n.text || '', at: n.at }).catch(() => setStore('Could not save to the page; kept in this browser'));
-    }, 600));
   }
 
   function pips(score) {
@@ -568,7 +569,7 @@ dialog::backdrop { background: rgba(20,19,15,.7) }
     const img = x.img ? '<img class="comicimg" src="' + esc(x.img) + '" alt="' + esc(m ? m.altText || m.title : x.key) + '" loading="lazy" data-zoom>' : '<div class="noimg">' + (x.status === 'gated' && !x.img ? 'Not drawn: the script failed the check' : 'No image yet') + '</div>';
     return '<article class="card inked" id="' + esc(x.key) + '"><div class="cardtop"><div><div class="who">' + esc(x.arm) + ' · sample ' + x.sample + '</div>' +
       (m && m.title ? '<h3>' + esc(m.title) + '</h3>' : '') + '</div><div class="score">' + (x.total == null ? '—' : x.total.toFixed(0)) + '<small> / 100</small></div></div>' +
-      img + meta + gates +
+      img + meta + checkChips(x.checklist) + gates +
       (x.judge ? '<div class="said"><b>The cold reader saw:</b> ' + esc(x.judge.observation) + '<br><b>The joke, in its words:</b> ' + esc(x.judge.joke) + '</div>' : '') +
       '<div class="crit">' + crit + '</div>' +
       (gateReasons ? '<details open><summary>Gate reasons</summary><ul class="tight">' + gateReasons + '</ul></details>' : '') +
@@ -611,6 +612,70 @@ dialog::backdrop { background: rgba(20,19,15,.7) }
     }).join('') : '<p class="empty">No comics match these filters.</p>');
   }
 
+  function checkChips(cl) {
+    if (!cl) return '';
+    const yes = D.mediumItems.filter((m) => cl[m.id] && cl[m.id].yes);
+    return '<div class="meta"><span class="chip ' + (cl.setting === 'office-like interior' ? 'warn' : 'plain') + '" title="' + esc(cl.settingDescription) + '">' + esc(cl.setting) + '</span><span class="chip plain">' + esc(cl.punchline) + '</span>' +
+      D.mediumItems.map((m) => '<span class="chip ' + (cl[m.id] && cl[m.id].yes ? 'ok' : 'plain') + '" title="' + esc(cl[m.id] ? cl[m.id].evidence : '') + '">' + (cl[m.id] && cl[m.id].yes ? '✓ ' : '· ') + esc(m.id) + '</span>').join('') +
+      '<span class="chip plain">medium ' + yes.length + '/6</span></div>';
+  }
+  const pct = (x) => (x == null || Number.isNaN(x) ? 'n/a' : Math.round(100 * x) + '%');
+  const imgOf = (arm, id) => {
+    const [cs, n] = id.split('#');
+    const a = D.arms.find((x) => x.arm === arm);
+    const c = a && a.comics.find((x) => x.case === cs && String(x.sample) === n);
+    return c && c.img ? c.img : null;
+  };
+
+  // Head to head: the headline. Win rate of B over A per criterion, then every pair.
+  function arena() {
+    if (!D.arenas || !D.arenas.length) { $('#arena-pairs').innerHTML = ''; return; }
+    const tables = D.arenas.map((r) => {
+      const rows = D.arenaCriteria.map((c) => {
+        const v = r.criteria[c.id];
+        const sig = v.ci[0] > 0.5 ? 'ok' : v.ci[1] < 0.5 ? 'bad' : 'plain';
+        return '<tr><td><b>' + esc(c.id) + '</b><div class="legend">' + esc(c.question) + '</div></td><td class="num"><span class="chip ' + sig + '">' + pct(v.winRate) + '</span></td><td class="num">[' + pct(v.ci[0]) + ', ' + pct(v.ci[1]) + ']</td><td class="num">' + v.wins + ' / ' + v.losses + ' / ' + v.ties + '</td><td class="num">' + v.flips + '</td>' +
+          (r.secondJudge ? '<td class="num">' + (Number.isNaN(r.secondJudge.kappa[c.id]) || r.secondJudge.kappa[c.id] == null ? 'n/a' : r.secondJudge.kappa[c.id].toFixed(2)) + '</td>' : '') + '</tr>';
+      }).join('');
+      return '<article class="arm inked" style="padding:12px 14px"><h3>' + esc(r.b) + ' vs ' + esc(r.a) + '</h3><p class="legend">' + r.pairs + ' pairs, each judged in both orders. Win rate is ' + esc(r.b) + '\'s share (a tie counts half); green means its interval stays above 50%, orange below.</p><div class="scroll"><table><thead><tr><th>Criterion</th><th>' + esc(r.b) + ' wins</th><th>95% interval</th><th>won / lost / tied</th><th>flipped with order</th>' + (r.secondJudge ? '<th>2nd judge κ</th>' : '') + '</tr></thead><tbody>' + rows + '</tbody></table></div></article>';
+    }).join('');
+    const pairs = D.arenas.map((r) => {
+      const items = r.results.map((p) => {
+        const ia = imgOf(r.a, p.a), ib = imgOf(r.b, p.b);
+        const verdicts = D.arenaCriteria.map((c) => {
+          const v = p.verdicts[c.id];
+          const who = v.result === 1 ? r.a : v.result === -1 ? r.b : 'tie';
+          return '<div class="c" style="grid-template-columns:90px 120px 1fr"><div class="n">' + esc(c.id) + '</div><div><span class="chip ' + (v.result === 0 ? 'plain' : 'warn') + '">' + esc(who) + (v.flipped ? ' · flipped' : '') + '</span></div><div class="r">' + esc(v.reasons[0]) + '<div class="alt">Swapped order: ' + esc(v.reasons[1]) + '</div></div>' + critique('arena--' + r.a + '--' + r.b + '--' + p.a + '--' + p.b, c.id) + '</div>';
+        }).join('');
+        return '<details class="pair"><summary>' + esc(p.case) + ': ' + esc(r.a) + ' #' + esc(p.a.split('#')[1]) + ' vs ' + esc(r.b) + ' #' + esc(p.b.split('#')[1]) + ' · overall: ' + esc(p.verdicts.overall.result === 1 ? r.a : p.verdicts.overall.result === -1 ? r.b : 'tie') + '</summary>' +
+          '<div class="row" style="--card:360px">' + [[r.a, p.a, ia, p.summaries.a[0]], [r.b, p.b, ib, p.summaries.b[0]]].map(([arm, id, img, sum]) => '<div class="card inked"><div class="who">' + esc(arm) + ' · ' + esc(id) + '</div>' + (img ? '<img class="comicimg" src="' + esc(img) + '" alt="' + esc(id) + '" loading="lazy" data-zoom>' : '<div class="noimg">image not in this page</div>') + '<div class="said">' + esc(sum) + '</div></div>').join('') + '</div>' +
+          '<div class="crit">' + verdicts + '</div></details>';
+      }).join('');
+      return '<h3 style="margin-top:18px">' + esc(r.b) + ' vs ' + esc(r.a) + ': every pair</h3>' + items;
+    }).join('');
+    $('#arena-pairs').innerHTML = '<h2>Head to head</h2><p class="legend">Each pair is two comics for the same pull request, judged twice with the order swapped. A criterion goes to one comic only when both orders agree; otherwise it is a tie and counts as a flip. Because both comics share a PR, the PR itself can\'t tilt the result.</p><div class="arms">' + tables + '</div>' + pairs;
+  }
+
+  // The craft checklist per arm: what the comics actually do.
+  function checklist() {
+    const arms = D.arms.filter((a) => a.checklist);
+    if (!arms.length) return;
+    const items = D.mediumItems;
+    const head = '<tr><th>Measure</th>' + arms.map((a) => '<th>' + esc(a.arm) + '</th>').join('') + '</tr>';
+    const row = (label, f) => '<tr><td>' + label + '</td>' + arms.map((a) => '<td class="num">' + f(a.checklist) + '</td>').join('') + '</tr>';
+    const rows = [
+      row('<b>Medium use index</b> (of 6)', (s) => s.mediumIndex.toFixed(2)),
+      ...items.map((m) => row(esc(m.id) + '<div class="legend">' + esc(m.question) + '</div>', (s) => pct(s.medium[m.id]))),
+      row('Office-like interior (bridge, console, desk)', (s) => pct(s.officeLike)),
+      row('Deadpan punchline', (s) => pct(s.deadpan)),
+      row('The picture carries the joke', (s) => pct(s.imageCarriesJoke)),
+      row('Setting variety (entropy, bits)', (s) => s.settingEntropy.toFixed(2)),
+      row('Settings', (s) => Object.entries(s.settings).sort((x, y) => y[1] - x[1]).map(([k, v]) => esc(k) + ' ' + v).join('<br>')),
+      row('Punchlines', (s) => Object.entries(s.punchlines).sort((x, y) => y[1] - x[1]).map(([k, v]) => esc(k) + ' ' + v).join('<br>')),
+    ].join('');
+    $('#checklist').innerHTML = '<h2>Craft checklist</h2><p class="legend">Yes/no facts per comic from a judge looking at the image, each with evidence on the comic\'s card. These explain why an arm wins head to head.</p><div class="scroll inked" style="padding:6px 8px"><table><thead>' + head + '</thead><tbody>' + rows + '</tbody></table></div>';
+  }
+
   function render() {
     if (!D) return;
     const y = window.scrollY;
@@ -643,22 +708,42 @@ dialog::backdrop { background: rgba(20,19,15,.7) }
     saveNote(key);
   });
   ['#f-arm', '#f-status', '#f-sort', '#f-q'].forEach((s) => $(s).addEventListener('input', render));
-  $('#v-pr').addEventListener('click', () => { document.body.classList.remove('phone'); $('#v-pr').setAttribute('aria-pressed', 'true'); $('#v-phone').setAttribute('aria-pressed', 'false'); });
-  $('#v-phone').addEventListener('click', () => { document.body.classList.add('phone'); $('#v-phone').setAttribute('aria-pressed', 'true'); $('#v-pr').setAttribute('aria-pressed', 'false'); });
+  $('#v-pr').addEventListener('click', () => { document.body.classList.remove('narrow'); $('#v-pr').setAttribute('aria-pressed', 'true'); $('#v-phone').setAttribute('aria-pressed', 'false'); });
+  $('#v-phone').addEventListener('click', () => { document.body.classList.add('narrow'); $('#v-phone').setAttribute('aria-pressed', 'true'); $('#v-pr').setAttribute('aria-pressed', 'false'); });
   $('#export').addEventListener('click', () => {
     const blob = new Blob([JSON.stringify({ exportedAt: new Date().toISOString(), notes }, null, 2)], { type: 'application/json' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob); a.download = 'notes.json'; a.click();
   });
 
-  fetch('data.json').then((r) => r.json()).then((data) => {
+  $('#import').addEventListener('click', () => $('#import-file').click());
+  $('#import-file').addEventListener('change', (e) => {
+    const f = e.target.files && e.target.files[0];
+    if (!f) return;
+    f.text().then((t) => {
+      const got = JSON.parse(t);
+      const incoming = got.notes || got;
+      let n = 0;
+      for (const [k, v] of Object.entries(incoming)) { if (v && typeof v === 'object') { notes[k] = v; n++; } }
+      local.save();
+      setStore('Imported notes for ' + n + ' comics');
+      render();
+    }).catch(() => setStore('That file is not a notes.json export'));
+    e.target.value = '';
+  });
+
+  // data.js (a script tag, not fetch) so the page opens straight from disk.
+  const data = window.REVIEW_DATA;
+  if (!data) {
+    $('#lede').textContent = 'data.js is missing beside this page. Rebuild it with: comicbench review <round> --out <this folder>';
+  } else {
     D = data;
+    connectStore();
     for (const a of D.arms) { const o = document.createElement('option'); o.value = a.arm; o.textContent = a.arm; $('#f-arm').appendChild(o); }
     const total = D.arms.reduce((s, a) => s + a.comics.length, 0);
-    $('#lede').textContent = D.arms.map((a) => a.arm).join(' vs ') + ' · ' + total + ' comics · rubric v' + D.rubricVersion + ' · built ' + D.builtAt.slice(0, 16).replace('T', ' ') + ' UTC. Every score below comes with the judge\'s own reason; mark the ones you disagree with.';
-    summary(); criteria(); variety(); comics();
-    connectStore();
-  }).catch(() => { $('#lede').textContent = 'Could not load data.json. Open this page through a local web server (for example: bunx serve) or from its published link.'; });
+    $('#lede').textContent = D.arms.map((a) => a.arm).join(' vs ') + ' · ' + total + ' comics · built ' + D.builtAt.slice(0, 16).replace('T', ' ') + ' UTC. Head-to-head verdicts lead; every score comes with the judge\'s own reason. Mark the ones you disagree with.';
+    arena(); checklist(); summary(); criteria(); variety(); comics();
+  }
 })();
 </script>
 `;

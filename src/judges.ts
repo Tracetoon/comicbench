@@ -58,7 +58,7 @@ First write \`observation\`: what happens in each panel, who says what, and what
 ${SCALE}
 ${CRITERIA.filter((c) => c.stage === 'blind').map(anchors).join('\n')}
 
-Gate \`punchUp\`: pass is false if the comic punches at people (a user, contributors, a real company) rather than at a problem, or shows a specific existing work's characters, insignia or marks; otherwise true.
+Gate \`punchUp\`: pass is false only if the comic mocks or demeans real people (a user, contributors, a real company or person) rather than a problem, or copies a specific existing character's design, name or insignia. Showing the pull request's own tools, product names or logos is fine, and so is parody of a genre's familiar tropes and settings; otherwise true.
 
 Reply only with JSON matching the schema.`;
 }

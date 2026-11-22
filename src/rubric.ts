@@ -4,7 +4,14 @@
  * a criterion, an anchor, a gate or a weight changes; runs compare only when
  * their rubric versions match.
  */
-export const RUBRIC_VERSION = 2;
+export const RUBRIC_VERSION = 3;
+
+/**
+ * v3 (round 3): the 1-5 scores are diagnostics; the arena (src/arena.ts) and
+ * the craft checklist (src/checklist.ts) are the headline. Comics are made for
+ * a desktop PR now, so the phone reader no longer runs, and punchUp no longer
+ * fires on a PR's own product names or on genre parody.
+ */
 
 /**
  * v2 (round 2): v1's judges sat at the ceiling (art style 4.97-5.00,
@@ -118,8 +125,8 @@ export const CRITERIA: Criterion[] = [
 /** Pass/fail checks; a failed gate scores the comic 0 whatever its points. */
 export const GATES = [
   { id: 'factualIntegrity', question: 'Nothing contradicts the brief, the facts or the diff.' },
-  { id: 'phoneLegibility', question: 'Every required word reads at 360 px (host-checked).' },
-  { id: 'punchUp', question: 'Punches at problems, not people; no franchise characters or marks.' },
+  { id: 'phoneLegibility', question: 'Retired in v3 (desktop comics): always passes.' },
+  { id: 'punchUp', question: 'Punches at problems, not people; no copied character designs (genre parody is fine).' },
   { id: 'outputContract', question: 'A valid comic.json and a drawn image exist.' },
 ] as const;
 export type GateId = (typeof GATES)[number]['id'];

@@ -63,6 +63,7 @@ const EDITS = {
   flat: 'Rewrite only the punchline (the last panel\'s dialogue and captions) so it states what happened plainly, with no joke, no twist and no wordplay. Keep everything else identical.',
   swap: 'Rewrite the comic so its joke is about the OTHER pull request below instead: change the anchor, the signs and the dialogue to that change, keeping the cast, layout, style and genre. Nothing of the original pull request may remain.',
   wrongFact: 'Change exactly one fact the comic states or shows (a name, a number, a tool or an outcome) so that it contradicts the evidence brief below, in a way a reader would take as a real claim. Keep everything else identical.',
+  bland: 'Keep the same joke, words and cast, but restage it as blandly as possible: every panel in one plain office-like room, characters standing or sitting and talking at medium distance, equal rectangular panels stacked in a column, no action, no sound effects, no special balloons, no motion lines, no unusual angles. Set composition to the vertical family and remove any frames, effects, camera or sfx entries.',
 } as const;
 
 function editPrompt(id: keyof typeof EDITS, script: any, brief: string, otherBrief?: string): string {
@@ -277,4 +278,75 @@ export async function checkAnchors(o: { dir: string; tracetoon: string; label: s
   const result = { label: o.label, rubricVersion: RUBRIC_VERSION, anchorsRubric: file.rubricVersion, drift: drift(file.items.map((it: any) => it.reference), now) };
   writeFileSync(join(o.dir, `check-${o.label}.json`), JSON.stringify(result, null, 2) + '\n');
   return result;
+}
+
+/**
+ * Pairwise calibration (v3): each broken copy faces its original head to head
+ * in both orders; the original must win the criterion the break targets.
+ * Reuses the copies `calibrate` drew, and draws the `bland` copy (the same joke
+ * restaged as a static, single-room scene) to check the medium criterion.
+ */
+export const PAIRWISE_TARGETS = { flat: 'funnier', swap: 'aboutPr', wrongFact: 'aboutPr', offStyle: 'visual', bland: 'medium' } as const;
+export const PAIRWISE_TARGET_RATE = 0.9;
+
+export async function runPairwiseCalibration(o: { round: string; tracetoon: string; jobs?: number; model?: string }) {
+  const { tracetoonModules } = await import('./round.ts');
+  const { arenaPrompt, judgePair, combine } = await import('./arena.ts');
+  const tt = await tracetoonModules(o.tracetoon);
+  const { manifest, comics } = drawnComics(o.round);
+  const genreText = readFileSync(manifest.genre.path, 'utf8');
+  const genre = /^name:\s*(.+)$/m.exec(genreText)?.[1] ?? 'the round genre';
+  const root = join(o.round, 'calibration');
+  const picked = existsSync(root) ? readdirSync(root).filter((d) => existsSync(join(root, d, 'flat'))) : [];
+  const controls = Object.keys(PAIRWISE_TARGETS) as (keyof typeof PAIRWISE_TARGETS)[];
+  const tasks = picked.flatMap((d) => controls.map((control) => ({ d, control })));
+  const rows: { case: string; control: string; target: string; result: number | null; error?: string }[] = [];
+  await pool(tasks, o.jobs ?? 3, async ({ d, control }) => {
+    const id = d.replace(/-(\d+)$/, '#$1');
+    const c = comics.find((x) => x.id === id);
+    const row: (typeof rows)[number] = { case: id, control, target: PAIRWISE_TARGETS[control], result: null };
+    try {
+      if (!c) throw new Error('original not found');
+      const dir = join(root, d, control);
+      mkdirSync(dir, { recursive: true });
+      if (control === 'bland' && !existsSync(join(dir, 'comic.json'))) {
+        const r = await codexExec({ prompt: editPrompt('bland', c.script, readFileSync(join(c.caseDir, 'brief.md'), 'utf8')), cwd: dir, logDir: join(dir, 'edit'), model: o.model });
+        const m = /\{[\s\S]*\}/.exec(r.text);
+        if (!r.ok || !m) throw new Error(`edit failed: ${r.error ?? 'no JSON'}`);
+        writeFileSync(join(dir, 'comic.json'), JSON.stringify(JSON.parse(m[0]), null, 2) + '\n');
+      }
+      const art = join(dir, 'art');
+      let page = existsSync(art) ? readdirSync(art).find((f) => /^page\.(png|jpe?g|webp)$/.test(f)) : undefined;
+      if (!page) {
+        await tt.draw(JSON.parse(readFileSync(join(dir, 'comic.json'), 'utf8')), art, { provider: 'codex' });
+        page = readdirSync(art).find((f) => /^page\.(png|jpe?g|webp)$/.test(f));
+        if (!page) throw new Error('no page image');
+      }
+      const prompt = arenaPrompt({
+        brief: readFileSync(join(c.caseDir, 'brief.md'), 'utf8'),
+        description: readFileSync(join(c.caseDir, 'description.md'), 'utf8'),
+        facts: readFileSync(join(c.caseDir, 'facts.json'), 'utf8'),
+        genre,
+      });
+      const pairDir = join(dir, 'pairwise');
+      mkdirSync(pairDir, { recursive: true });
+      const j = await judgePair({ dir: pairDir, a: { id, case: id, image: c.full }, b: { id: `${id}:${control}`, case: id, image: join(art, page) }, prompt, model: o.model });
+      const target = PAIRWISE_TARGETS[control];
+      row.result = combine(j.ab.verdicts[target].winner, j.ba.verdicts[target].winner).result;
+    } catch (e) {
+      row.error = (e as Error).message.slice(0, 300);
+    }
+    rows.push(row);
+    console.log(`${id} ${control}: ${row.result === 1 ? 'original won' : row.result === -1 ? 'broken copy won' : row.result === 0 ? 'tie' : `error ${row.error}`}`);
+  });
+  const summary = Object.fromEntries(
+    controls.map((control) => {
+      const rs = rows.filter((r) => r.control === control && r.result !== null);
+      const won = rs.filter((r) => r.result === 1).length;
+      return [control, { target: PAIRWISE_TARGETS[control], won, of: rs.length, rate: rs.length ? won / rs.length : Number.NaN, pass: rs.length > 0 && won / rs.length >= PAIRWISE_TARGET_RATE }];
+    }),
+  );
+  const out = { target: PAIRWISE_TARGET_RATE, controls: summary, rows };
+  writeFileSync(join(o.round, 'calibration-pairwise.json'), JSON.stringify(out, null, 2) + '\n');
+  return out;
 }

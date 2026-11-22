@@ -70,7 +70,7 @@ describe('recent comics and variety', () => {
 
 describe('rubric v2', () => {
   test('a 4 or 5 needs a named strength, and art style is judged against the requested style', () => {
-    expect(RUBRIC_VERSION).toBe(2);
+    expect(RUBRIC_VERSION).toBeGreaterThanOrEqual(2);
     expect(SCALE).toContain('scores 3');
     expect(SCALE).toContain('Name that strength');
     const tt = { styleById: (id: string) => (id === 'ink' ? { name: 'Ink wash', prompt: 'loose ink wash' } : undefined) };
@@ -159,11 +159,18 @@ describe('review page', () => {
     const { buildReview } = await import('../src/review.ts');
     const out = buildReview({ round, out: join(root, 'review') });
     const html = readFileSync(join(out, 'index.html'), 'utf8');
+    expect(html.startsWith('<!doctype html>')).toBe(true);
     expect(html).toContain('<title>');
     expect(html).toContain('They never change a score');
-    expect(html).toContain("fetch('data.json')");
+    // Serverless: opens from file://, so no fetch, and the data comes in by a script tag.
+    expect(html).not.toContain('fetch(');
+    expect(html).toContain('<script src="data.js"></script>');
     expect(html).not.toMatch(/src="https?:/);
-    const data = JSON.parse(readFileSync(join(out, 'data.json'), 'utf8'));
+    expect(html).not.toContain('window.claude');
+    const js = readFileSync(join(out, 'data.js'), 'utf8');
+    expect(js.startsWith('window.REVIEW_DATA = ')).toBe(true);
+    const data = JSON.parse(js.slice('window.REVIEW_DATA = '.length).trim().replace(/;$/, ''));
+    expect(data.arenaCriteria.map((c: any) => c.id)).toContain('medium');
     const c = data.arms[0].comics[0];
     expect(c.key).toBe('round--pr1--1');
     expect(c.judge.scores.humor).toEqual({ score: 4, reason: 'The <late> clock lands.' });

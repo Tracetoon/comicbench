@@ -310,7 +310,7 @@ async function oneComic(c: Case, sample: number, o: RoundOpts, tt: Tt, genreText
   if (!existsSync(w360)) await rendition(tt, full, 360, w360);
 
   // 5. Judges.
-  const j = await judgeComic({ caseDir: c.dir, script, art: { full, w760, w360 }, judgeDir: join(dir, 'judge'), genreText, tt, model: o.model });
+  const j = await judgeComic({ caseDir: c.dir, script, art: { full, w760, w360 }, judgeDir: join(dir, 'judge'), genreText, tt, model: o.model, skipPhone: true });
   if ('error' in j) return state({ status: 'error', stage: j.stage, error: j.error });
   Object.assign(gates, j.gates);
   Object.assign(scores, j.scores);

@@ -17,7 +17,7 @@
  * round resumes where it stopped.
  */
 import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
-import { basename, join, resolve } from 'node:path';
+import { basename, dirname, join, resolve } from 'node:path';
 import { loadCases, sha256, type Case } from './cases.ts';
 import { codexExec } from './codex.ts';
 import { writePacket } from './cli.ts';
@@ -49,7 +49,22 @@ export interface RoundOpts {
   jobs: number;
   model?: string;
   only?: string[];
+  /** sandbox (default): Codex workspace-write; inline: files inlined, read-only. */
+  author?: 'sandbox' | 'inline';
 }
+
+/** Tracetoon's CLI bundled into one file (built once per round), for the author's packet. */
+export function checkBundle(o: Pick<RoundOpts, 'out' | 'tracetoon'>): string {
+  const file = join(o.out, '.tools', 'tracetoon-check.js');
+  if (existsSync(file)) return file;
+  mkdirSync(dirname(file), { recursive: true });
+  const r = Bun.spawnSync(['bun', 'build', join(o.tracetoon, 'src', 'cli.ts'), '--target=bun', '--outfile', file], { stdout: 'pipe', stderr: 'pipe' });
+  if (r.exitCode !== 0) throw new Error(`could not bundle the Tracetoon checker: ${r.stderr.toString().slice(-400)}`);
+  return file;
+}
+
+/** Codex didn't give the author the sandbox it asked for: the round stops. */
+export class SandboxError extends Error {}
 
 const DIFF_LIMIT = 40_000;
 /** Author tries: the first draft plus up to two rounds of check feedback. */
@@ -107,30 +122,37 @@ export function treeHash(path: string): string {
   return sha256(files.join('\n'));
 }
 
-async function tracetoonModules(root: string) {
-  const [draw, raster, judging, script, styles, compose] = await Promise.all([
+export async function tracetoonModules(root: string) {
+  const [draw, raster, judging, script, styles, compose, composition] = await Promise.all([
     import(join(root, 'scripts', 'comic-draw.ts')),
     import(join(root, 'src', 'comic', 'raster.ts')),
     import(join(root, 'src', 'comic', 'judging.ts')),
     import(join(root, 'src', 'comic', 'script.ts')),
     import(join(root, 'src', 'comic', 'styles.ts')),
     import(join(root, 'src', 'comic', 'compose.ts')),
+    import(join(root, 'src', 'comic', 'composition.ts')),
   ]);
-  return { draw: draw.draw, svgToPng: raster.svgToPng, phoneGate: judging.phoneGate, PHONE_SCHEMA: judging.PHONE_SCHEMA, pageText: script.pageText, styleById: styles.styleById, imageSize: compose.imageSize };
+  return { draw: draw.draw, svgToPng: raster.svgToPng, phoneGate: judging.phoneGate, PHONE_SCHEMA: judging.PHONE_SCHEMA, pageText: script.pageText, styleById: styles.styleById, imageSize: compose.imageSize, comicSummary: composition.comicSummary };
 }
 type Tt = Awaited<ReturnType<typeof tracetoonModules>>;
 
-/** The genre's art sheet for the blind judge: setting plus the styles it names. */
-function artSheet(genreText: string, tt: Tt): string {
+/**
+ * The blind judge's art sheet: the genre's name and setting, and the one style
+ * this comic's script asked for (a preset's own prompt, or the custom phrase).
+ */
+export function artSheet(genreText: string, tt: Pick<Tt, 'styleById'>, script: { style?: string; styleFamily?: string }): string {
   const name = /^name:\s*(.+)$/m.exec(genreText)?.[1] ?? 'unnamed genre';
   const setting = /^setting:\s*(.+)$/m.exec(genreText)?.[1] ?? '';
-  const styles = [...genreText.matchAll(/^styles:\s*\n((?:\s+-\s+.+\n?)+)/gm)]
-    .flatMap((m) => m[1]!.split('\n').map((l) => l.replace(/^\s*-\s*/, '').trim()).filter(Boolean));
-  const described = styles.map((id) => tt.styleById(id)).filter(Boolean).map((s: any) => `- ${s.name}: ${s.prompt}`);
-  return `Genre: ${name}${setting ? `, set in ${setting}` : ''}.\nArt styles that suit it (any one is fine):\n${described.join('\n') || '- a drawn comic style that suits the genre'}`;
+  const preset = script.style ? tt.styleById(script.style) : undefined;
+  const style = preset
+    ? `${preset.name}: ${preset.prompt}`
+    : script.style
+      ? `a custom style: ${script.style}${script.styleFamily ? ` (${script.styleFamily} family)` : ''}`
+      : 'no style named; any drawn comic style that suits the genre';
+  return `Genre: ${name}${setting ? `, set in ${setting}` : ''}.\nRequested art style: ${style}`;
 }
 
-async function rendition(tt: Tt, page: string, width: number, out: string) {
+export async function rendition(tt: Tt, page: string, width: number, out: string) {
   const data = readFileSync(page);
   const mime = page.endsWith('.jpeg') || page.endsWith('.jpg') ? 'image/jpeg' : page.endsWith('.webp') ? 'image/webp' : 'image/png';
   // The page at its own size, so the rendition keeps its aspect with no padding.
@@ -148,7 +170,13 @@ interface ComicState {
   error?: string;
 }
 
-async function oneComic(c: Case, sample: number, o: RoundOpts, tt: Tt, genreText: string): Promise<ComicState> {
+/** The arm's finished comics, newest first: what the next packet sees as recentComics. */
+export interface Recent {
+  list: { id: string; summary: Record<string, unknown> }[];
+}
+export const RECENT_COUNT = 5;
+
+async function oneComic(c: Case, sample: number, o: RoundOpts, tt: Tt, genreText: string, recent: Recent): Promise<ComicState> {
   const id = c.meta.id;
   const dir = join(o.out, 'comics', id, String(sample));
   const packet = join(dir, 'packet');
@@ -162,16 +190,49 @@ async function oneComic(c: Case, sample: number, o: RoundOpts, tt: Tt, genreText
   // 1. Packet: the diff is copied in so the author's packet points inside it.
   if (!existsSync(join(packet, 'instructions.md'))) {
     cpSync(join(c.dir, 'changes.patch'), join(packet, 'changes.patch'));
-    const checkCommand = `${cli.join(' ')} comic check --file ${comicJson} --context ${join(packet, 'context.json')} --evidence ${join(packet, 'brief.md')} ${join(packet, 'changes.patch')}`;
-    writePacket(c.dir, { skillFiles: [join(o.skill, 'SKILL.md')], genre: o.genre, out: packet, checkCommand });
+    // The author's copy of the checker: one bundled file inside the packet,
+    // since Bun can't load scripts from outside Codex's writable folders on
+    // Windows. The runner's recorded check below runs the untouched checkout.
+    cpSync(checkBundle(o), join(packet, 'tracetoon-check.js'));
+    const checkCommand = `bun ${join(packet, 'tracetoon-check.js')} comic check --file ${comicJson} --context ${join(packet, 'context.json')} --evidence ${join(packet, 'brief.md')} ${join(packet, 'changes.patch')}`;
+    const seen = recent.list.slice(0, RECENT_COUNT);
+    writeFileSync(join(dir, 'recent.json'), JSON.stringify(seen.map((r) => r.id)) + '\n');
+    writePacket(c.dir, {
+      skillFiles: [join(o.skill, 'SKILL.md')],
+      genre: o.genre,
+      out: packet,
+      checkCommand,
+      recentComics: seen.map((r) => r.summary),
+      pinGenre: true,
+    });
     // Point the instructions at the packet's own copy of the diff.
     const ins = join(packet, 'instructions.md');
     writeFileSync(ins, readFileSync(ins, 'utf8').replaceAll(resolve(c.dir, 'changes.patch'), join(packet, 'changes.patch')));
   }
 
-  // 2. Author, in Codex's read-only sandbox: every file the packet names is
-  //    inlined, the author replies with both JSON files, and the runner writes
-  //    them, runs the check and sends problems back (at most AUTHOR_ROUNDS).
+  // 2. Author.
+  //    sandbox (default): Codex works in the packet folder under its
+  //    workspace-write sandbox, reads the instructions and the files they name,
+  //    writes both files and runs the check itself, as a production subagent does.
+  //    inline: the fallback for hosts without a Windows sandbox (see below).
+  if (!existsSync(comicJson) && (o.author ?? 'sandbox') === 'sandbox') {
+    const r = await codexExec({
+      prompt: `Your whole instruction is ${join(packet, 'instructions.md')}. Read it and follow it, including the skill files it names (in ${o.skill}). Write only inside ${packet}. Read only that folder and the skill folder: the packet holds every file you need.`,
+      cwd: packet,
+      sandbox: 'workspace-write',
+      logDir: join(dir, 'author', '1'),
+      model: o.model,
+      timeoutMs: 30 * 60_000,
+    });
+    if (r.sandbox && r.sandbox !== 'workspace-write')
+      throw new SandboxError(`Codex ran the author with sandbox ${r.sandbox}, not workspace-write; stopping so no comic is written without its tools.`);
+    const log = existsSync(join(dir, 'author', '1', 'codex.log')) ? readFileSync(join(dir, 'author', '1', 'codex.log'), 'utf8') : '';
+    writeFileSync(join(dir, 'author', 'stats.json'), JSON.stringify({ mode: 'sandbox', checkRuns: (log.match(/^exec\s*\n.*tracetoon-check\.js comic check/gm) ?? []).length, readOutsidePacket: /EPERM|facts\.json/.test(log) }) + '\n');
+    if (!existsSync(comicJson)) return state({ status: 'error', stage: 'author', error: r.error ?? 'no comic.json written' });
+  }
+  // inline: every file the packet names is inlined, the author replies with
+  //    both JSON files, and the runner writes them, runs the check and sends
+  //    problems back (at most AUTHOR_ROUNDS).
   if (!existsSync(comicJson)) {
     const base = authorPrompt(packet, o.skill);
     let last: { design: unknown; comic: unknown } | undefined;
@@ -212,6 +273,12 @@ async function oneComic(c: Case, sample: number, o: RoundOpts, tt: Tt, genreText
   }
   writeFileSync(join(dir, 'check.json'), check.stdout.toString() || check.stderr.toString());
   const script = JSON.parse(readFileSync(comicJson, 'utf8'));
+  // Later comics in this arm see this one among their recentComics.
+  try {
+    recent.list.unshift({ id: `${id}#${sample}`, summary: tt.comicSummary(script) });
+  } catch {
+    /* an unreadable script just isn't remembered */
+  }
   const gates = { factualIntegrity: true, phoneLegibility: true, punchUp: true, outputContract: checkOk } as ComicJudgment['gates'];
   const scores: ComicJudgment['scores'] = {};
   const writeJudgment = (extra: Record<string, unknown>) => {
@@ -243,54 +310,122 @@ async function oneComic(c: Case, sample: number, o: RoundOpts, tt: Tt, genreText
   if (!existsSync(w360)) await rendition(tt, full, 360, w360);
 
   // 5. Judges.
-  const judgeDir = join(dir, 'judge');
-  const blindFile = join(judgeDir, 'blind.json');
+  const j = await judgeComic({ caseDir: c.dir, script, art: { full, w760, w360 }, judgeDir: join(dir, 'judge'), genreText, tt, model: o.model });
+  if ('error' in j) return state({ status: 'error', stage: j.stage, error: j.error });
+  Object.assign(gates, j.gates);
+  Object.assign(scores, j.scores);
+  const phoneResult = { missing: j.phoneMissing };
+  writeJudgment({ phoneMissing: phoneResult.missing });
+  return state({ status: Object.values(gates).every(Boolean) ? 'judged' : 'gated' });
+}
+
+export interface JudgeInput {
+  caseDir: string;
+  script: any;
+  art: { full: string; w760: string; w360: string };
+  /** Where this judge's answers go: judge/, judge-2/, judge-repeat/ or a calibration folder. */
+  judgeDir: string;
+  genreText: string;
+  tt: Pick<Tt, 'styleById' | 'phoneGate' | 'PHONE_SCHEMA' | 'pageText'>;
+  model?: string;
+  /** Leave the phone reading to the primary judge (second judges skip it). */
+  skipPhone?: boolean;
+}
+export type JudgeOutput =
+  | {
+      blind: any;
+      context: any;
+      phone?: any;
+      gates: Omit<ComicJudgment['gates'], 'outputContract'>;
+      scores: ComicJudgment['scores'];
+      phoneMissing: string[];
+    }
+  | { stage: string; error: string };
+
+/** The blind, context and phone judges for one drawn comic; answers are cached in judgeDir. */
+export async function judgeComic(i: JudgeInput): Promise<JudgeOutput> {
+  const { full, w760, w360 } = i.art;
+  const cwd = dirname(full);
+  mkdirSync(i.judgeDir, { recursive: true });
+  const blindFile = join(i.judgeDir, 'blind.json');
   let blind = readJson<any>(blindFile);
   if (!blind) {
-    const r = await codexExec({ prompt: blindPrompt(artSheet(genreText, tt)), cwd: art, images: [full, w760, w360], schema: BLIND_SCHEMA, logDir: join(judgeDir, 'blind'), model: o.model });
-    if (!r.ok) return state({ status: 'error', stage: 'blind', error: r.error });
+    const r = await codexExec({ prompt: blindPrompt(artSheet(i.genreText, i.tt, i.script)), cwd, images: [full, w760, w360], schema: BLIND_SCHEMA, logDir: join(i.judgeDir, 'blind'), model: i.model });
+    if (!r.ok) return { stage: 'blind', error: r.error ?? 'no reply' };
     blind = r.json;
     writeFileSync(blindFile, JSON.stringify(blind, null, 2));
   }
-  const contextFile = join(judgeDir, 'context.json');
+  const contextFile = join(i.judgeDir, 'context.json');
   let context = readJson<any>(contextFile);
   if (!context) {
-    const diff = readFileSync(join(c.dir, 'changes.patch'), 'utf8');
+    const diff = readFileSync(join(i.caseDir, 'changes.patch'), 'utf8');
     const r = await codexExec({
       prompt: contextPrompt({
         observation: `${blind.observation}\nJoke: ${blind.joke}`,
-        brief: readFileSync(join(c.dir, 'brief.md'), 'utf8'),
-        description: readFileSync(join(c.dir, 'description.md'), 'utf8'),
-        facts: readFileSync(join(c.dir, 'facts.json'), 'utf8'),
+        brief: readFileSync(join(i.caseDir, 'brief.md'), 'utf8'),
+        description: readFileSync(join(i.caseDir, 'description.md'), 'utf8'),
+        facts: readFileSync(join(i.caseDir, 'facts.json'), 'utf8'),
         diff: diff.length > DIFF_LIMIT ? `${diff.slice(0, DIFF_LIMIT)}\n[truncated: ${diff.length - DIFF_LIMIT} more characters]` : diff,
-        genre: genreText,
+        genre: i.genreText,
       }),
-      cwd: art,
+      cwd,
       images: [full],
       schema: CONTEXT_SCHEMA,
-      logDir: join(judgeDir, 'context'),
-      model: o.model,
+      logDir: join(i.judgeDir, 'context'),
+      model: i.model,
     });
-    if (!r.ok) return state({ status: 'error', stage: 'context', error: r.error });
+    if (!r.ok) return { stage: 'context', error: r.error ?? 'no reply' };
     context = r.json;
     writeFileSync(contextFile, JSON.stringify(context, null, 2));
   }
-  const phoneFile = join(judgeDir, 'phone.json');
-  let phone = readJson<any>(phoneFile);
-  if (!phone) {
-    const r = await codexExec({ prompt: PHONE_PROMPT, cwd: art, images: [w360], schema: tt.PHONE_SCHEMA, logDir: join(judgeDir, 'phone'), model: o.model });
-    if (!r.ok) return state({ status: 'error', stage: 'phone', error: r.error });
-    phone = r.json;
-    writeFileSync(phoneFile, JSON.stringify(phone, null, 2));
+  let phone: any;
+  let phoneLegibility = true;
+  let phoneMissing: string[] = [];
+  if (!i.skipPhone) {
+    const phoneFile = join(i.judgeDir, 'phone.json');
+    phone = readJson<any>(phoneFile);
+    if (!phone) {
+      const r = await codexExec({ prompt: PHONE_PROMPT, cwd, images: [w360], schema: i.tt.PHONE_SCHEMA, logDir: join(i.judgeDir, 'phone'), model: i.model });
+      if (!r.ok) return { stage: 'phone', error: r.error ?? 'no reply' };
+      phone = r.json;
+      writeFileSync(phoneFile, JSON.stringify(phone, null, 2));
+    }
+    const result = i.tt.phoneGate(phone, i.tt.pageText(i.script).filter((t: string) => t?.trim()));
+    phoneLegibility = result.state !== 'fail';
+    phoneMissing = result.missing;
   }
-  const phoneResult = tt.phoneGate(phone, tt.pageText(script).filter((t: string) => t?.trim()));
-  gates.phoneLegibility = phoneResult.state !== 'fail';
-  gates.punchUp = blind.punchUp.pass === true;
-  gates.factualIntegrity = context.factualIntegrity.pass === true;
+  const scores: ComicJudgment['scores'] = {};
   for (const k of BLIND_IDS) scores[k] = blind.scores[k]?.score ?? null;
   for (const k of CONTEXT_IDS) scores[k] = context.scores[k]?.score ?? null;
-  writeJudgment({ phoneMissing: phoneResult.missing });
-  return state({ status: Object.values(gates).every(Boolean) ? 'judged' : 'gated' });
+  return {
+    blind,
+    context,
+    phone,
+    gates: { punchUp: blind.punchUp.pass === true, factualIntegrity: context.factualIntegrity.pass === true, phoneLegibility },
+    scores,
+    phoneMissing,
+  };
+}
+
+/**
+ * The set judge's clusters split two ways: a case's samples telling the same
+ * joke (within), and different cases sharing one premise (across).
+ */
+export function splitClusters(clusters: string[][]): { withinCase: number; acrossCase: number; casesWithSamePair: string[] } {
+  let withinCase = 0;
+  let acrossCase = 0;
+  const casesWithSamePair = new Set<string>();
+  for (const cluster of clusters) {
+    const cases = cluster.map((id) => id.split('#')[0]!);
+    const distinct = new Set(cases);
+    if (distinct.size > 1) acrossCase++;
+    for (const c of distinct)
+      if (cases.filter((x) => x === c).length > 1) {
+        withinCase++;
+        casesWithSamePair.add(c);
+      }
+  }
+  return { withinCase, acrossCase, casesWithSamePair: [...casesWithSamePair].sort() };
 }
 
 export async function runRound(o: RoundOpts) {
@@ -304,6 +439,8 @@ export async function runRound(o: RoundOpts) {
   const manifestFile = join(o.out, 'manifest.json');
   const manifest = {
     schema: 'comicbench.round/v1',
+    name: basename(o.out),
+    casesDir: o.cases,
     rubricVersion: RUBRIC_VERSION,
     skill: { path: o.skill, hash: treeHash(o.skill) },
     genre: { path: o.genre, hash: sha256(genreText) },
@@ -311,6 +448,8 @@ export async function runRound(o: RoundOpts) {
     split: o.split,
     samples: o.samples,
     model: o.model ?? 'codex default',
+    author: o.author ?? 'sandbox',
+    authorIsolation: 'convention: the author is told to read only the packet and skill folders; facts.json is not copied into the packet',
     cases: cases.map((c) => ({ id: c.meta.id, sha256: c.meta.sha256 })),
   };
   const prior = readJson<typeof manifest>(manifestFile);
@@ -318,7 +457,14 @@ export async function runRound(o: RoundOpts) {
     throw new Error(`${o.out} holds a round for a different skill, genre or rubric; use a new --out`);
   writeFileSync(manifestFile, JSON.stringify({ ...manifest, startedAt: (prior as any)?.startedAt ?? new Date().toISOString() }, null, 2) + '\n');
 
-  const tasks = cases.flatMap((c) => Array.from({ length: o.samples }, (_, i) => ({ c, sample: i + 1 })));
+  // Seeded order, all first samples before any second: a case's second
+  // sample sees other comics (and its own first) among its recentComics.
+  const tasks = Array.from({ length: o.samples }, (_, i) => i + 1).flatMap((sample) =>
+    [...cases]
+      .sort((x, y) => sha256(`${sample}:${x.meta.id}`).localeCompare(sha256(`${sample}:${y.meta.id}`)))
+      .map((c) => ({ c, sample })),
+  );
+  const recent: Recent = { list: [] };
   const states: ComicState[] = [];
   const queue = [...tasks];
   await Promise.all(
@@ -326,8 +472,13 @@ export async function runRound(o: RoundOpts) {
       for (let t = queue.shift(); t; t = queue.shift()) {
         let s: ComicState;
         try {
-          s = await oneComic(t.c, t.sample, o, tt, genreText);
+          s = await oneComic(t.c, t.sample, o, tt, genreText, recent);
         } catch (e) {
+          // A wrong sandbox would make every comic invalid: stop the round.
+          if (e instanceof SandboxError) {
+            queue.length = 0;
+            throw e;
+          }
           s = { case: t.c.meta.id, sample: t.sample, dir: '', status: 'error', stage: 'crash', error: (e as Error).message.slice(0, 500) };
         }
         states.push(s);
@@ -354,7 +505,7 @@ export async function runRound(o: RoundOpts) {
       const j = r.json as any;
       set = Object.fromEntries(Object.entries(j.scores).map(([k, v]: [string, any]) => [k, v.score])) as SetJudgment;
       writeFileSync(setFile, JSON.stringify(set, null, 2) + '\n');
-      writeFileSync(join(o.out, 'set-detail.json'), JSON.stringify({ ...j, hints }, null, 2) + '\n');
+      writeFileSync(join(o.out, 'set-detail.json'), JSON.stringify({ ...j, hints, split: splitClusters(j.clusters) }, null, 2) + '\n');
     }
   }
   const judgments = existsSync(join(o.out, 'judgments'))

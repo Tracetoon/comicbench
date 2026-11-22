@@ -32,6 +32,8 @@ export interface CodexResult {
   ms: number;
   /** The model Codex reported in its log header, when it did. */
   model?: string;
+  /** The sandbox Codex reported it actually used (it can differ from the one asked for). */
+  sandbox?: string;
 }
 
 /** The codex command; COMICBENCH_CODEX_BIN overrides it (a .ts stand-in runs under Bun, for tests). */
@@ -47,6 +49,10 @@ export async function codexExec(c: CodexCall): Promise<CodexResult> {
   writeFileSync(join(c.logDir, 'prompt.md'), c.prompt);
   const args = [...codexCommand(), 'exec', '--skip-git-repo-check', '--ephemeral', '--ignore-user-config'];
   args.push('-s', c.sandbox ?? 'read-only', '-C', c.cwd);
+  // --ignore-user-config also drops the user's [windows] sandbox setting, and
+  // without it Codex can't sandbox commands on Windows: workspace-write falls
+  // back to read-only and every shell call is rejected. Set it explicitly.
+  if (process.platform === 'win32') args.push('-c', `windows.sandbox="${process.env.COMICBENCH_WINDOWS_SANDBOX ?? 'elevated'}"`);
   for (const d of c.addDirs ?? []) args.push('--add-dir', d);
   if (c.model) args.push('-m', c.model);
   // Without the user's config Codex defaults to no reasoning; prbench's writers and judges use medium.
@@ -68,12 +74,14 @@ export async function codexExec(c: CodexCall): Promise<CodexResult> {
   writeFileSync(log, `${stdout}\n${stderr}`);
   const ms = Math.round(performance.now() - started);
   const model = /^model:\s*(\S+)/m.exec(`${stdout}\n${stderr}`)?.[1];
+  const sandbox = /^sandbox:\s*(\S+)/m.exec(`${stdout}\n${stderr}`)?.[1];
   const text = existsSync(out) ? readFileSync(out, 'utf8') : '';
-  if (code !== 0) return { ok: false, text, error: `codex exit ${code}: ${stderr.trim().slice(-500)}`, ms, model };
-  if (!c.schema) return { ok: true, text, ms, model };
+  const base = { text, ms, model, sandbox };
+  if (code !== 0) return { ok: false, ...base, error: `codex exit ${code}: ${stderr.trim().slice(-500)}` };
+  if (!c.schema) return { ok: true, ...base };
   try {
-    return { ok: true, text, json: JSON.parse(text), ms, model };
+    return { ok: true, ...base, json: JSON.parse(text) };
   } catch (e) {
-    return { ok: false, text, error: `not JSON: ${(e as Error).message}`, ms, model };
+    return { ok: false, ...base, error: `not JSON: ${(e as Error).message}` };
   }
 }

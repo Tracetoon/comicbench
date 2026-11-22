@@ -20,6 +20,30 @@ function judgments(round: string): ComicJudgment[] {
 }
 
 /** Per comic: how many author tries, and whether the first draft came back clean. */
+/**
+ * The check runs a sandboxed author made, read from its Codex log: each
+ * `exec` block whose command runs the packet's checker, with its output.
+ * clean: the checker said the script looks good with no warnings.
+ */
+export function authorChecks(log: string): { ok: boolean; clean: boolean; output: string }[] {
+  const out: { ok: boolean; clean: boolean; output: string }[] = [];
+  for (const block of log.split(/^exec\s*$/m).slice(1)) {
+    const lines = block.replace(/^\r?\n/, '').split(/\r?\n/);
+    const status = lines.findIndex((l) => /^\s*(succeeded|exited \d+) in /.test(l));
+    if (status < 0) continue;
+    if (!/tracetoon-check\.js\\?['"]?\s+comic check/.test(lines.slice(0, status).join('\n'))) continue;
+    const rest: string[] = [];
+    for (const l of lines.slice(status + 1)) {
+      if (/^(codex|exec|tokens used)\s*$/.test(l)) break;
+      rest.push(l);
+    }
+    const output = rest.join('\n').trim();
+    const ok = /succeeded/.test(lines[status]!);
+    out.push({ ok, clean: /comic\.json looks good\./.test(output) && !/warning/i.test(output), output });
+  }
+  return out;
+}
+
 export function authorStats(round: string): { comics: number; firstClean: number; meanTries: number } {
   const root = join(round, 'comics');
   if (!existsSync(root)) return { comics: 0, firstClean: 0, meanTries: NaN };
@@ -31,6 +55,14 @@ export function authorStats(round: string): { comics: number; firstClean: number
       if (!existsSync(author)) continue;
       const rounds = readdirSync(author).filter((d) => /^\d+$/.test(d)).sort((a, b) => Number(a) - Number(b));
       if (!rounds.length) continue;
+      // Sandbox mode: one Codex session that ran the checker itself.
+      const log = join(author, '1', 'codex.log');
+      if (!existsSync(join(author, '1', 'check.txt')) && existsSync(log)) {
+        const runs = authorChecks(readFileSync(log, 'utf8'));
+        tries.push(Math.max(1, runs.length));
+        if (runs[0]?.clean) firstClean++;
+        continue;
+      }
       tries.push(rounds.length);
       const first = join(author, rounds[0]!, 'check.txt');
       if (existsSync(first) && /^comic\.json looks good\.$/.test(readFileSync(first, 'utf8').trim())) firstClean++;

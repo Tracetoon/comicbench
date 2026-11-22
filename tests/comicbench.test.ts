@@ -7,7 +7,7 @@ import { caseProblems } from '../src/cases.ts';
 import { scoreRun, validate, writePacket } from '../src/cli.ts';
 import { parseGenre } from '../src/genre.ts';
 import { comicPacketFiles } from '../src/packet.ts';
-import { CRITERIA, GATES, HEADLINE, SET_CRITERIA, TOTAL_WEIGHT } from '../src/rubric.ts';
+import { CRITERIA, GATES, HEADLINE, SET_CRITERIA, TOTAL_WEIGHT, RUBRIC_VERSION } from '../src/rubric.ts';
 import { comicScore, report, setScore, varietyHints, type ComicJudgment } from '../src/score.ts';
 import { clusteredBootstrapCI } from '../src/stats.ts';
 
@@ -146,7 +146,7 @@ describe('score command', () => {
     const r = scoreRun(run);
     expect(r.comicMean).toBe(50);
     expect(r.set).toBe(50);
-    expect(JSON.parse(readFileSync(join(run, 'report.json'), 'utf8')).rubricVersion).toBe(1);
+    expect(JSON.parse(readFileSync(join(run, 'report.json'), 'utf8')).rubricVersion).toBe(RUBRIC_VERSION);
   });
 
   test('refuses a judgment with an out-of-range score', () => {

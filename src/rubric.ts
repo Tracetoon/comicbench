@@ -4,7 +4,15 @@
  * a criterion, an anchor, a gate or a weight changes; runs compare only when
  * their rubric versions match.
  */
-export const RUBRIC_VERSION = 1;
+export const RUBRIC_VERSION = 2;
+
+/**
+ * v2 (round 2): v1's judges sat at the ceiling (art style 4.97-5.00,
+ * relevance about 4.9). A competent comic now scores 3, a 4 or 5 must name
+ * its strength, art style is judged against the one style the script asked
+ * for, and relevance runs the swap test out loud.
+ */
+export const SCALE = `Score each criterion on 1-5 using its anchors; 2 and 4 sit between. A competent comic with nothing wrong and nothing special scores 3. A 4 needs a strength you can name; a 5 needs a strength a developer would point out to a colleague. Name that strength in the reason for every 4 or 5; if you can't, the score is 3 at most. Use null only when you truly cannot assess it from what you were given. Give a one-sentence reason for each score.`;
 
 /** Stage A sees only the image and the genre's art sheet; stage B adds the PR evidence. */
 export type Stage = 'blind' | 'context';
@@ -30,7 +38,7 @@ export const CRITERIA: Criterion[] = [
     anchors: {
       1: 'No identifiable joke, or the punchline needs explaining.',
       3: 'A clear joke that lands mildly; a familiar shape done competently.',
-      5: 'A surprising, well-timed punchline a developer would share.',
+      5: 'A surprising, well-timed punchline a developer would share; not the first joke anyone would make.',
     },
   },
   {
@@ -38,11 +46,11 @@ export const CRITERIA: Criterion[] = [
     name: 'Change relevance',
     weight: 20,
     stage: 'context',
-    question: 'Swap test: is the joke about this change, or would it fit any PR?',
+    question: 'Swap test: is the joke about this change, or would it fit another PR? In the reason, name another kind of PR it would also fit, or say none.',
     anchors: {
       1: 'Generic; the comic would fit almost any pull request.',
-      3: 'Recognizably this area of the code, but the joke is not about what changed.',
-      5: 'The joke only works because of what this PR changed.',
+      3: 'Recognizably this area of the code, but the joke is not about what changed, or it fits other PRs in the area.',
+      5: 'The joke only works because of what this PR changed; you can name no other PR it would fit.',
     },
   },
   {
@@ -98,11 +106,11 @@ export const CRITERIA: Criterion[] = [
     name: 'Art-style fidelity',
     weight: 10,
     stage: 'blind',
-    question: "Does it look like the genre's declared art style (line, palette, rendering)?",
+    question: 'Does it look like the one art style the script asked for (line, palette, rendering, lettering)?',
     anchors: {
       1: 'A different style, a 3D render or a photo-like image.',
-      3: 'Recognizably a drawn comic, loosely in the declared style.',
-      5: 'Clearly the declared style throughout.',
+      3: 'A drawn comic loosely in the requested style, or with visible lapses: mixed rendering, garbled or uneven lettering, off-model panels.',
+      5: 'The requested style in every panel, consistent characters, clean lettering; nothing off-model.',
     },
   },
 ];

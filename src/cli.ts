@@ -47,7 +47,16 @@ export function validate(root: string): { ok: boolean; lines: string[] } {
 /** Writes the author packet for one frozen case; the author never sees facts.json. */
 export function writePacket(
   caseDir: string,
-  opts: { skillFiles: string[]; genre: string; out: string; checkCommand?: string },
+  opts: {
+    skillFiles: string[];
+    genre: string;
+    out: string;
+    checkCommand?: string;
+    /** The round's earlier comics (newest first), as production's recentComics. */
+    recentComics?: Record<string, unknown>[];
+    /** Pin the genre so the repeat rule doesn't refuse a round's shared genre. */
+    pinGenre?: boolean;
+  },
 ): string[] {
   const problems = caseProblems(caseDir);
   if (problems.length) throw new Error(`${caseDir}: ${problems.join('; ')}`);
@@ -57,6 +66,8 @@ export function writePacket(
     brief: readFileSync(join(caseDir, 'brief.md'), 'utf8'),
     description: readFileSync(join(caseDir, 'description.md'), 'utf8'),
     genres: [readGenre(opts.genre)],
+    ...(opts.recentComics ? { recentComics: opts.recentComics } : {}),
+    ...(opts.pinGenre ? { pinnedGenre: readGenre(opts.genre).id } : {}),
     skillFiles: opts.skillFiles.map((f) => resolve(f)),
     patchPath: resolve(caseDir, 'changes.patch'),
     out: { comic: join(out, 'comic.json'), design: join(out, 'comic-design.json') },
@@ -92,6 +103,7 @@ export function scoreRun(runDir: string) {
 }
 
 const fmt = (n: number | null) => (n === null || Number.isNaN(n) ? 'n/a' : n.toFixed(1));
+const fmt2 = (n: number) => (Number.isNaN(n) ? 'n/a' : n.toFixed(2));
 
 if (import.meta.main) {
   try {
@@ -166,6 +178,7 @@ if (import.meta.main) {
         jobs: Number(flags.get('jobs')?.[0] ?? 3),
         ...(flags.get('model')?.[0] ? { model: flags.get('model')![0]! } : {}),
         ...(flags.get('only')?.[0] ? { only: flags.get('only')![0]!.split(',') } : {}),
+        ...(flags.get('author')?.[0] ? { author: flags.get('author')![0] as 'sandbox' | 'inline' } : {}),
       });
       const r = result.report;
       const errors = result.states.filter((s) => s.status === 'error').length;
@@ -174,8 +187,59 @@ if (import.meta.main) {
           `Comic score: ${fmt(r.comicMean)} [${fmt(r.comicCI[0])}, ${fmt(r.comicCI[1])}]\n` +
           `Set score: ${fmt(r.set)}\nHeadline: ${fmt(r.headline)} (rubric v${r.rubricVersion})`,
       );
+    } else if (cmd === 'reliability') {
+      const round = positional[0];
+      const tracetoon = flags.get('tracetoon')?.[0];
+      const model2 = flags.get('model-2')?.[0];
+      if (!round || !tracetoon || !model2) throw new Error('usage: comicbench reliability <round> --tracetoon <dir> --model-2 <model> [--share 0.3] [--repeat-share 0.1]');
+      const { runReliability } = await import('./reliability.ts');
+      const r = await runReliability({
+        round: resolve(round),
+        tracetoon: resolve(tracetoon),
+        model2,
+        share: Number(flags.get('share')?.[0] ?? 0.3),
+        repeatShare: Number(flags.get('repeat-share')?.[0] ?? 0.1),
+        jobs: Number(flags.get('jobs')?.[0] ?? 3),
+      });
+      const line = (name: string, a: typeof r.secondJudge) =>
+        `${name} (${a.pairs} comics): ` + Object.entries(a.criteria).map(([k, v]) => `${k} α=${fmt2(v.alpha)}`).join(', ');
+      console.log(`${line(`second judge ${r.model2}`, r.secondJudge)}\n${line('same judge again', r.repeat)}${r.errors.length ? `\nerrors: ${r.errors.length}` : ''}`);
+    } else if (cmd === 'calibrate') {
+      const round = positional[0];
+      const tracetoon = flags.get('tracetoon')?.[0];
+      if (!round || !tracetoon) throw new Error('usage: comicbench calibrate <round> --tracetoon <dir> [--cases 5]');
+      const { runCalibration } = await import('./calibrate.ts');
+      const r = await runCalibration({ round: resolve(round), tracetoon: resolve(tracetoon), cases: Number(flags.get('cases')?.[0] ?? 5), jobs: Number(flags.get('jobs')?.[0] ?? 3) });
+      console.log(Object.entries(r.controls).map(([k, v]) => `${k}: ${v.hits}/${v.of} noticed (${v.expect})${v.pass ? '' : ' — UNCALIBRATED'}`).join('\n'));
+    } else if (cmd === 'anchors') {
+      const [sub, target] = positional;
+      const tracetoon = flags.get('tracetoon')?.[0];
+      if (!target || !tracetoon || (sub !== 'freeze' && sub !== 'check')) throw new Error('usage: comicbench anchors freeze <round> --tracetoon <dir> [--out anchors] | anchors check <anchors-dir> --tracetoon <dir> --label <name>');
+      const cal = await import('./calibrate.ts');
+      if (sub === 'freeze') {
+        const r = await cal.freezeAnchors({ round: resolve(target), tracetoon: resolve(tracetoon), out: resolve(flags.get('out')?.[0] ?? 'anchors') });
+        console.log(r.items.map((i) => `${i.id}: ${i.runs} runs`).join('\n'));
+      } else {
+        const label = flags.get('label')?.[0];
+        if (!label) throw new Error('anchors check needs --label');
+        const r = await cal.checkAnchors({ dir: resolve(target), tracetoon: resolve(tracetoon), label });
+        console.log(Object.entries(r.drift).map(([k, v]) => `${k}: ${fmt2(v.mean)}${v.flagged ? ' DRIFT' : ''}`).join('\n'));
+      }
+    } else if (cmd === 'review') {
+      const round = positional[0];
+      if (!round) throw new Error('usage: comicbench review <round> [--compare <round>] [--tracetoon <dir>] [--out <dir>]');
+      const { buildReview } = await import('./review.ts');
+      const compare = flags.get('compare')?.[0];
+      const tracetoon = flags.get('tracetoon')?.[0];
+      const out = buildReview({
+        round: resolve(round),
+        ...(compare ? { compare: resolve(compare) } : {}),
+        ...(tracetoon ? { tracetoon: resolve(tracetoon) } : {}),
+        out: resolve(flags.get('out')?.[0] ?? join(round, 'review')),
+      });
+      console.log(`Review page: ${join(out, 'index.html')}`);
     } else {
-      console.error('usage: comicbench <validate|packet|score|run|datasets fetch> ...');
+      console.error('usage: comicbench <validate|packet|score|run|compare|reliability|calibrate|anchors|review|datasets fetch> ...');
       process.exit(2);
     }
   } catch (e) {

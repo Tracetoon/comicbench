@@ -1,0 +1,15 @@
+{
+  "schema": "comicbench.dataset-registry/v1",
+  "default": "comic-cases@1.0.0",
+  "datasets": [
+    {
+      "id": "comic-cases",
+      "version": "1.0.0",
+      "description": "61 frozen comicbench cases (20 dev, 41 sealed) from prbench real-cases@4.0.0",
+      "url": "https://github.com/Tracetoon/comicbench/releases/download/cases-v1.0.0/comic-cases-1.0.0.tar.gz",
+      "sha256": "81a6d672a3b1d951ff5ff80d7da252aaa328dc6d45e479ddc54b600f2fd736f0",
+      "bytes": 1145308,
+      "cases": 61
+    }
+  ]
+}

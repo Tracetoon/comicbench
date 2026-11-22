@@ -125,8 +125,41 @@ if (import.meta.main) {
           `Comic score: ${fmt(r.comicMean)} [${fmt(r.comicCI[0])}, ${fmt(r.comicCI[1])}]\n` +
           `Set score: ${fmt(r.set)}\nHeadline: ${fmt(r.headline)} (rubric v${r.rubricVersion})`,
       );
+    } else if (cmd === 'datasets' && positional[0] === 'fetch') {
+      const { datasetRelease, fetchDataset } = await import('./datasets.ts');
+      const d = datasetRelease(positional[1]);
+      const out = flags.get('out')?.[0];
+      const dir = await fetchDataset(d, out ? resolve(out) : undefined);
+      console.log(`Dataset verified: ${d.id}@${d.version}\nCases: ${dir}`);
+    } else if (cmd === 'run') {
+      const need = (k: string) => {
+        const v = flags.get(k)?.[0];
+        if (!v) throw new Error(`run needs --${k} (see README: Running a round)`);
+        return v;
+      };
+      const { runRound } = await import('./round.ts');
+      const split = (flags.get('split')?.[0] ?? 'dev') as 'dev' | 'sealed' | 'all';
+      const result = await runRound({
+        cases: resolve(need('cases')),
+        split,
+        skill: resolve(need('skill')),
+        genre: resolve(need('genre')),
+        samples: Number(flags.get('samples')?.[0] ?? 2),
+        out: resolve(need('out')),
+        tracetoon: resolve(need('tracetoon')),
+        jobs: Number(flags.get('jobs')?.[0] ?? 3),
+        ...(flags.get('model')?.[0] ? { model: flags.get('model')![0]! } : {}),
+        ...(flags.get('only')?.[0] ? { only: flags.get('only')![0]!.split(',') } : {}),
+      });
+      const r = result.report;
+      const errors = result.states.filter((s) => s.status === 'error').length;
+      console.log(
+        `Round ${result.name}: ${r.comics} judged comics (gated ${r.gated}, unknown ${r.unknown}), ${errors} errors\n` +
+          `Comic score: ${fmt(r.comicMean)} [${fmt(r.comicCI[0])}, ${fmt(r.comicCI[1])}]\n` +
+          `Set score: ${fmt(r.set)}\nHeadline: ${fmt(r.headline)} (rubric v${r.rubricVersion})`,
+      );
     } else {
-      console.error('usage: comicbench <validate|packet|score> ...');
+      console.error('usage: comicbench <validate|packet|score|run|datasets fetch> ...');
       process.exit(2);
     }
   } catch (e) {

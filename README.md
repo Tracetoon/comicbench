@@ -49,14 +49,59 @@ What works today, offline and without model calls:
   `real-cases@4.0.0` into 61 comicbench cases, 20 dev and 41 sealed. It
   rebuilds each prbench writer sandbox, runs a pinned Tracetoon `prepare`,
   takes the description from prbench's golden run, and redacts personal email
-  addresses. The frozen cases stay in the git-ignored `cases-local/` until
-  they are published as a dataset release.
+  addresses. They are published as the `comic-cases@1.0.0` dataset release.
+- **Rounds** (`comicbench run`): author, draw and judge every comic of a split,
+  then the set judge and the report. Every model call goes through Codex
+  (`codex exec`); see "Running a round".
 
 Next:
 
-- Publish the frozen cases as a dataset release.
-- The author, drawing and judge runners.
 - Anchor comics and judge controls.
+
+## Getting the cases
+
+```sh
+bun src/cli.ts datasets fetch comic-cases@1.0.0 --out cases-local
+bun src/cli.ts validate cases-local
+```
+
+`datasets fetch` checks the archive's sha256 and every file against its
+manifest before moving it into place.
+
+## Running a round
+
+A round scores one draw-cartoon skill folder (`SKILL.md` + `references/`) with
+one genre file across a split, `--samples` comics per case. It needs the Codex
+CLI signed in, and a Tracetoon source checkout with `comic check --file` for
+linting and drawing (Tracetoon's own `scripts/comic-draw.ts` on the Codex image
+route).
+
+```sh
+bun src/cli.ts run --cases cases-local --split dev \
+  --skill <draw-cartoon skill folder> --genre genres/space-opera.md \
+  --samples 2 --tracetoon ../tracetoon --out results/<round> --jobs 3
+```
+
+Per comic:
+
+1. **Author:** the author runs in Codex's read-only sandbox. The packet's
+   instructions and every file they name are inlined into its prompt, and it
+   replies with `comic-design.json` and `comic.json` as one JSON object. The
+   runner writes them, runs `tracetoon comic check --file`, and sends problems
+   back for up to two more tries. The author never sees `facts.json` or the
+   diff, so this is the brief-only input.
+2. **Draw:** the comic is drawn on the Codex image route, with 760 px and
+   360 px renditions.
+3. **Judge:**
+   - **Blind:** image and art sheet only. Scores humor, clarity and art style,
+     and gates punch-up.
+   - **Context:** the observation plus the brief, description, facts and diff.
+     Scores relevance, fidelity, audience and genre, and gates factual
+     integrity.
+   - **Phone:** the 360 px rendition only, checked with Tracetoon's phone gate.
+
+Then one set judge scores variety. The round writes `manifest.json`,
+`judgments/`, `set.json` and `report.json`, and resumes where it stopped.
 
 ## Freezing the cases
 

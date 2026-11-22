@@ -45,12 +45,32 @@ What works today, offline and without model calls:
 - **Author packets** (`comicbench packet`): the same packet Tracetoon's
   `comic packet` writes, built from a frozen case, the skill under test and a
   genre file. The author never sees `facts.json`.
+- **Freezing the real cases** (`scripts/freeze-cases.ts`): turns prbench's
+  `real-cases@4.0.0` into 61 comicbench cases, 20 dev and 41 sealed. It
+  rebuilds each prbench writer sandbox, runs a pinned Tracetoon `prepare`,
+  takes the description from prbench's golden run, and redacts personal email
+  addresses. The frozen cases stay in the git-ignored `cases-local/` until
+  they are published as a dataset release.
 
 Next:
 
-- Freeze the 61 prbench cases.
+- Publish the frozen cases as a dataset release.
 - The author, drawing and judge runners.
 - Anchor comics and judge controls.
+
+## Freezing the cases
+
+Needs prbench v0.4.0 checked out with its dependencies installed, the dataset
+(`prbench datasets fetch real-cases@4.0.0`), and a pinned Tracetoon bundle (a
+skill folder with its runtime at `bin/tracetoon-<platform>-<arch>`). No model
+is called.
+
+```sh
+bun scripts/freeze-cases.ts --prbench ../prbench-v4 \
+  --dataset ~/.cache/prbench/datasets/real-cases/4.0.0 \
+  --skill <pinned Tracetoon bundle> --out cases-local --jobs 3
+bun src/cli.ts validate cases-local
+```
 
 ## Using it
 

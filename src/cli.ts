@@ -52,16 +52,19 @@ export function writePacket(
   const problems = caseProblems(caseDir);
   if (problems.length) throw new Error(`${caseDir}: ${problems.join('; ')}`);
   mkdirSync(opts.out, { recursive: true });
+  const out = resolve(opts.out);
   const files = comicPacketFiles({
     brief: readFileSync(join(caseDir, 'brief.md'), 'utf8'),
     description: readFileSync(join(caseDir, 'description.md'), 'utf8'),
     genres: [readGenre(opts.genre)],
     skillFiles: opts.skillFiles.map((f) => resolve(f)),
     patchPath: resolve(caseDir, 'changes.patch'),
-    out: { comic: join(resolve(opts.out), 'comic.json'), design: join(resolve(opts.out), 'comic-design.json') },
-    // Needs `tracetoon comic check --file` (planned); pass --check to use another linter.
+    out: { comic: join(out, 'comic.json'), design: join(out, 'comic-design.json') },
+    // `comic check --file` (a Tracetoon release after 1.0.0-rc.45) lints outside a run;
+    // the packet's own context and brief give it the repeat and anchor checks.
     checkCommand:
-      opts.checkCommand ?? `tracetoon comic check --file ${join(resolve(opts.out), 'comic.json')}`,
+      opts.checkCommand ??
+      `tracetoon comic check --file ${join(out, 'comic.json')} --context ${join(out, 'context.json')} --evidence ${join(out, 'brief.md')}`,
   });
   for (const [name, text] of Object.entries(files)) writeFileSync(join(opts.out, name), text);
   return Object.keys(files).map((f) => join(opts.out, f));

@@ -93,6 +93,20 @@ function judgedFrom(dir: string, phone?: boolean): Judged | undefined {
   };
 }
 
+/**
+ * The tiny control's page: the original page at a third of the width, on a
+ * blank canvas three pages wide, so at phone width every letter is a third of
+ * its size. Legibility is all that changes.
+ */
+export async function shrunkPage(tt: { svgToPng: (svg: string, width: number) => Promise<Uint8Array> | Uint8Array; imageSize: (b: Uint8Array) => { w: number; h: number } | undefined }, page: string): Promise<Uint8Array> {
+  const data = readFileSync(page);
+  const size = tt.imageSize(new Uint8Array(data)) ?? { w: 1536, h: 1024 };
+  const mime = /\.jpe?g$/.test(page) ? 'image/jpeg' : page.endsWith('.webp') ? 'image/webp' : 'image/png';
+  const W = size.w * 3;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${size.h}" viewBox="0 0 ${W} ${size.h}"><rect width="${W}" height="${size.h}" fill="#ffffff"/><image href="data:${mime};base64,${data.toString('base64')}" x="0" y="0" width="${size.w}" height="${size.h}"/></svg>`;
+  return tt.svgToPng(svg, Math.min(W, 2400));
+}
+
 /** Per control: how often the judges ranked the original above its broken copy. */
 export function controlRates(results: { control: Control['id']; hit: boolean | null }[]) {
   return Object.fromEntries(
@@ -149,6 +163,13 @@ export async function runCalibration(o: { round: string; tracetoon: string; case
       const variant = JSON.parse(readFileSync(scriptFile, 'utf8'));
       const art = join(dir, 'art');
       let page = existsSync(art) ? readdirSync(art).find((f) => /^page\.(png|jpeg|jpg|webp)$/.test(f)) : undefined;
+      if (!page && control.id === 'tiny') {
+        // Built from the original page, not drawn: image models redraw a
+        // one-row layout at a readable size (round 2 caught 1 of 5 that way).
+        mkdirSync(art, { recursive: true });
+        writeFileSync(join(art, 'page.png'), await shrunkPage(tt, c.full));
+        page = 'page.png';
+      }
       if (!page) {
         await tt.draw(variant, art, { provider: 'codex' });
         page = readdirSync(art).find((f) => /^page\.(png|jpeg|jpg|webp)$/.test(f));

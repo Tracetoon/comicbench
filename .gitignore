@@ -3,3 +3,5 @@ node_modules/
 cases-local/
 results/
 .comicbench-cache/
+# Frozen judge anchors: drawn comics plus reference scores, kept locally like results.
+anchors/

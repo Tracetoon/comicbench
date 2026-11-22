@@ -457,7 +457,9 @@ dialog::backdrop { background: rgba(20,19,15,.7) }
   function calBadge(arm, id) {
     const control = D.controlFor[id];
     if (!control) return '<span class="chip plain" title="No calibration control covers this criterion">no control</span>';
-    const c = arm.calibration && arm.calibration[control];
+    // Both arms share one set of judges, so a calibration run on either arm speaks for both.
+    const cal = arm.calibration || (D.arms.find((a) => a.calibration) || {}).calibration;
+    const c = cal && cal[control];
     if (!c) return '<span class="chip plain" title="Calibration not run">not run</span>';
     return '<span class="chip ' + (c.pass ? 'ok' : 'bad') + '" title="' + esc(control + ': ' + c.expect) + '">' + (c.pass ? 'calibrated' : 'uncalibrated') + ' ' + c.hits + '/' + c.of + '</span>';
   }

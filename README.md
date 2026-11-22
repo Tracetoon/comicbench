@@ -29,13 +29,40 @@ every run, and pinned judge settings.
 
 ## Status
 
-This repository is in the planning stage. The design is in
-[docs/plan.md](docs/plan.md). It also covers the Tracetoon changes comicbench
-depends on:
+The design is in [docs/plan.md](docs/plan.md). The Tracetoon side has landed:
+user genre files (Tracetoon #196), and the `tracetoon-draw-cartoon` skill with
+a comic author that runs as a subagent from a comic packet (#197).
 
-- a separate `tracetoon-draw-cartoon` skill
-- user genre files
-- a comic author that runs as a subagent
+What works today, offline and without model calls:
+
+- **The rubric** (`src/rubric.ts`, version 1): seven criteria on anchored 1–5
+  scales weighted to 100 points, four pass/fail gates, three set-level variety
+  criteria, and the 80/20 headline.
+- **Scoring** (`comicbench score <run>`): turns judgment files into points,
+  with a case-clustered 95% bootstrap interval.
+- **Frozen cases** (`comicbench validate`): the case format with hashed inputs.
+  `cases/example` is synthetic.
+- **Author packets** (`comicbench packet`): the same packet Tracetoon's
+  `comic packet` writes, built from a frozen case, the skill under test and a
+  genre file. The author never sees `facts.json`.
+
+Next:
+
+- Freeze the 61 prbench cases.
+- The author, drawing and judge runners.
+- Anchor comics and judge controls.
+
+## Using it
+
+```sh
+bun install
+bun scripts/make-example.ts      # cases/example and genres/space-opera.md
+bun src/cli.ts validate cases
+bun src/cli.ts packet cases/example --skill <draw-cartoon>/SKILL.md \
+  --genre genres/space-opera.md --out /tmp/packet
+bun src/cli.ts score results/<run>
+bun test && bun run typecheck
+```
 
 Sibling projects:
 

@@ -1,0 +1,17 @@
+{
+  "schema": "prbench.facts/v1",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "Uploads retry up to three times with 1s, 2s and 4s waits."
+    }
+  ],
+  "context": [],
+  "uncertainties": [],
+  "traps": [
+    {
+      "id": "T1",
+      "text": "Claims of unlimited retries."
+    }
+  ]
+}

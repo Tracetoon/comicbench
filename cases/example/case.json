@@ -1,0 +1,18 @@
+{
+  "schema": "comicbench.case/v1",
+  "id": "example",
+  "split": "dev",
+  "source": {
+    "dataset": "synthetic",
+    "case": "example"
+  },
+  "tracetoon": "synthetic",
+  "description": "synthetic",
+  "license": "Apache-2.0",
+  "sha256": {
+    "brief.md": "9d17b245e828f76c481c03fcc4e290cd1b7b0ea1aa1ed459ea4ffc822a1a1710",
+    "description.md": "d3f57a1c22d4175b9fc0d3c5d033e1f1a36aba024fdcdfa0d5535abe7abde7aa",
+    "changes.patch": "af848586647519682ed121852bcf672949db25b42ac838017076232c70fbed69",
+    "facts.json": "cfe62e8847557d1f1f455a6fc416c9f2020e7aac3815e3250bef19d11946bf30"
+  }
+}

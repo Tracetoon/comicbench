@@ -1,0 +1,5 @@
+node_modules/
+# Real cases are downloaded as a dataset release, never committed.
+cases-local/
+results/
+.comicbench-cache/

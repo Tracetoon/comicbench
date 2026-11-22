@@ -84,12 +84,20 @@ bun src/cli.ts run --cases cases-local --split dev \
 
 Per comic:
 
-1. **Author:** the author runs in Codex's read-only sandbox. The packet's
-   instructions and every file they name are inlined into its prompt, and it
-   replies with `comic-design.json` and `comic.json` as one JSON object. The
-   runner writes them, runs `tracetoon comic check --file`, and sends problems
-   back for up to two more tries. The author never sees `facts.json` or the
-   diff, so this is the brief-only input.
+1. **Author** (`--author sandbox`, the default): Codex works in the packet
+   folder under its `workspace-write` sandbox (on Windows with
+   `windows.sandbox="elevated"`, overridable with
+   `COMICBENCH_WINDOWS_SANDBOX`). It reads the packet's instructions, the
+   skill, the brief, the description and its copy of the diff, writes
+   `comic-design.json` and `comic.json`, and runs the check itself with a
+   bundled copy of Tracetoon's checker in the packet. If Codex reports any
+   other sandbox, the round stops. The packet holds the earlier comics of
+   the arm as `recentComics`. The author never gets `facts.json`; that it
+   reads only the packet and skill folders is a convention, not enforced.
+   `--author inline` is the fallback for hosts without a sandbox: Codex
+   read-only, files inlined, and the runner sends check problems back for up
+   to two more tries. Either way the runner's own `comic check` is the
+   recorded gate.
 2. **Draw:** the comic is drawn on the Codex image route, with 760 px and
    360 px renditions.
 3. **Judge:**
@@ -102,6 +110,23 @@ Per comic:
 
 Then one set judge scores variety. The round writes `manifest.json`,
 `judgments/`, `set.json` and `report.json`, and resumes where it stopped.
+
+## Checking the judges and reviewing a round
+
+- `comicbench compare <round-a> <round-b>`: the paired score difference over
+  shared cases, criterion means, gate failures and author check runs.
+- `comicbench calibrate <round> --tracetoon <dir>`: broken copies of a few
+  comics (flat punchline, another PR's joke, a wrong fact, tiny lettering, a
+  photo-real render); a control passes when the judges rank the original
+  higher at least 80% of the time.
+- `comicbench reliability <round> --tracetoon <dir> --model-2 <model>`: a
+  second Codex model re-judges 30% of comics and the same model 10%;
+  agreement is Krippendorff's alpha.
+- `comicbench anchors freeze|check`: frozen comics with reference scores;
+  a criterion whose mean moves more than 0.3 is flagged.
+- `comicbench review <round> [--compare <round>]`: a static page of every
+  comic with each judge's score and reason, for people to audit the judges.
+  Notes typed on it never change a score.
 
 ## Freezing the cases
 

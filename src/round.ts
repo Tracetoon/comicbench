@@ -21,6 +21,7 @@ import { basename, dirname, join, resolve } from 'node:path';
 import { loadCases, sha256, type Case } from './cases.ts';
 import { codexExec } from './codex.ts';
 import { writePacket } from './cli.ts';
+import { readGenre } from './genre.ts';
 import {
   BLIND_IDS,
   BLIND_SCHEMA,
@@ -123,7 +124,7 @@ export function treeHash(path: string): string {
 }
 
 export async function tracetoonModules(root: string) {
-  const [draw, raster, judging, script, styles, compose, composition] = await Promise.all([
+  const [draw, raster, judging, script, styles, compose, composition, genres] = await Promise.all([
     import(join(root, 'scripts', 'comic-draw.ts')),
     import(join(root, 'src', 'comic', 'raster.ts')),
     import(join(root, 'src', 'comic', 'judging.ts')),
@@ -131,8 +132,9 @@ export async function tracetoonModules(root: string) {
     import(join(root, 'src', 'comic', 'styles.ts')),
     import(join(root, 'src', 'comic', 'compose.ts')),
     import(join(root, 'src', 'comic', 'composition.ts')),
+    import(join(root, 'src', 'comic', 'genres.ts')),
   ]);
-  return { draw: draw.draw, svgToPng: raster.svgToPng, phoneGate: judging.phoneGate, PHONE_SCHEMA: judging.PHONE_SCHEMA, pageText: script.pageText, styleById: styles.styleById, imageSize: compose.imageSize, comicSummary: composition.comicSummary };
+  return { draw: draw.draw, svgToPng: raster.svgToPng, phoneGate: judging.phoneGate, PHONE_SCHEMA: judging.PHONE_SCHEMA, pageText: script.pageText, styleById: styles.styleById, imageSize: compose.imageSize, comicSummary: composition.comicSummary, sceneOptions: genres.sceneOptions as ((g: unknown, recent: string[], o: { seed?: string }) => unknown[]) | undefined, genreById: genres.genreById as (id: string) => unknown };
 }
 type Tt = Awaited<ReturnType<typeof tracetoonModules>>;
 
@@ -203,6 +205,18 @@ async function oneComic(c: Case, sample: number, o: RoundOpts, tt: Tt, genreText
       out: packet,
       checkCommand,
       recentComics: seen.map((r) => r.summary),
+      // The Tracetoon under test offers scenes only if it has a scene library.
+      ...(tt.sceneOptions
+        ? {
+            sceneOptions: {
+              [readGenre(o.genre).id]: tt.sceneOptions(
+                tt.genreById(readGenre(o.genre).id),
+                seen.flatMap((r) => (typeof r.summary.scene === 'string' ? [r.summary.scene] : [])),
+                { seed: `${basename(o.out)}:${id}:${sample}` },
+              ),
+            },
+          }
+        : {}),
       pinGenre: true,
     });
     // Point the instructions at the packet's own copy of the diff.

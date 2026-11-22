@@ -56,6 +56,8 @@ export function writePacket(
     recentComics?: Record<string, unknown>[];
     /** Pin the genre so the repeat rule doesn't refuse a round's shared genre. */
     pinGenre?: boolean;
+    /** Scenes per genre id, when the Tracetoon under test has a scene library. */
+    sceneOptions?: Record<string, unknown[]>;
   },
 ): string[] {
   const problems = caseProblems(caseDir);
@@ -68,6 +70,7 @@ export function writePacket(
     genres: [readGenre(opts.genre)],
     ...(opts.recentComics ? { recentComics: opts.recentComics } : {}),
     ...(opts.pinGenre ? { pinnedGenre: readGenre(opts.genre).id } : {}),
+    ...(opts.sceneOptions ? { sceneOptions: opts.sceneOptions } : {}),
     skillFiles: opts.skillFiles.map((f) => resolve(f)),
     patchPath: resolve(caseDir, 'changes.patch'),
     out: { comic: join(out, 'comic.json'), design: join(out, 'comic-design.json') },

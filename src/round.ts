@@ -162,7 +162,7 @@ async function oneComic(c: Case, sample: number, o: RoundOpts, tt: Tt, genreText
   // 1. Packet: the diff is copied in so the author's packet points inside it.
   if (!existsSync(join(packet, 'instructions.md'))) {
     cpSync(join(c.dir, 'changes.patch'), join(packet, 'changes.patch'));
-    const checkCommand = `${cli.join(' ')} comic check --file ${comicJson} --context ${join(packet, 'context.json')} --evidence ${join(packet, 'brief.md')}`;
+    const checkCommand = `${cli.join(' ')} comic check --file ${comicJson} --context ${join(packet, 'context.json')} --evidence ${join(packet, 'brief.md')} ${join(packet, 'changes.patch')}`;
     writePacket(c.dir, { skillFiles: [join(o.skill, 'SKILL.md')], genre: o.genre, out: packet, checkCommand });
     // Point the instructions at the packet's own copy of the diff.
     const ins = join(packet, 'instructions.md');
@@ -193,7 +193,7 @@ async function oneComic(c: Case, sample: number, o: RoundOpts, tt: Tt, genreText
       last = reply;
       writeFileSync(join(packet, 'comic-design.json'), JSON.stringify(reply.design, null, 2) + '\n');
       writeFileSync(comicJson, JSON.stringify(reply.comic, null, 2) + '\n');
-      const lint = Bun.spawnSync([...cli, 'comic', 'check', '--file', comicJson, '--context', join(packet, 'context.json'), '--evidence', join(packet, 'brief.md')], { stdout: 'pipe', stderr: 'pipe' });
+      const lint = Bun.spawnSync([...cli, 'comic', 'check', '--file', comicJson, '--context', join(packet, 'context.json'), '--evidence', join(packet, 'brief.md'), join(packet, 'changes.patch')], { stdout: 'pipe', stderr: 'pipe' });
       const said = `${lint.stdout.toString()}${lint.stderr.toString()}`.trim();
       writeFileSync(join(dir, 'author', String(round), 'check.txt'), said);
       if (!/warning:|^\S+: /m.test(said.replace(/comic\.json looks good\./, ''))) break;
@@ -203,7 +203,7 @@ async function oneComic(c: Case, sample: number, o: RoundOpts, tt: Tt, genreText
   }
 
   // 3. Check (recorded); errors fail the output contract.
-  const check = Bun.spawnSync([...cli, '--json', 'comic', 'check', '--file', comicJson, '--context', join(packet, 'context.json'), '--evidence', join(packet, 'brief.md')], { stdout: 'pipe', stderr: 'pipe' });
+  const check = Bun.spawnSync([...cli, '--json', 'comic', 'check', '--file', comicJson, '--context', join(packet, 'context.json'), '--evidence', join(packet, 'brief.md'), join(packet, 'changes.patch')], { stdout: 'pipe', stderr: 'pipe' });
   let checkOk = false;
   try {
     checkOk = JSON.parse(check.stdout.toString()).ok === true;

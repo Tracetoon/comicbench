@@ -125,6 +125,22 @@ if (import.meta.main) {
           `Comic score: ${fmt(r.comicMean)} [${fmt(r.comicCI[0])}, ${fmt(r.comicCI[1])}]\n` +
           `Set score: ${fmt(r.set)}\nHeadline: ${fmt(r.headline)} (rubric v${r.rubricVersion})`,
       );
+    } else if (cmd === 'compare') {
+      const [a, b] = positional;
+      if (!a || !b) throw new Error('usage: comicbench compare <round-a> <round-b>');
+      const { compareRounds } = await import('./compare.ts');
+      const r = compareRounds(resolve(a), resolve(b));
+      const f1 = (n: number) => (Number.isNaN(n) ? 'n/a' : n.toFixed(1));
+      const f2 = (n: number) => (Number.isNaN(n) ? 'n/a' : n.toFixed(2));
+      const side = (s: typeof r.a) =>
+        `${s.round}: ${s.comics} comics, score ${f1(s.score)}; first draft clean ${s.author.firstClean}/${s.author.comics}, tries ${f2(s.author.meanTries)}\n` +
+        `  criteria ${Object.entries(s.criteria).map(([k, v]) => `${k} ${f2(v)}`).join(', ')}\n` +
+        `  gate failures ${Object.entries(s.gateFails).map(([k, v]) => `${k} ${v}`).join(', ')}`;
+      console.log(
+        `${side(r.a)}\n${side(r.b)}\n` +
+          `B - A over ${r.cases} shared cases: ${f1(r.delta.mean)} [${f1(r.delta.ci[0])}, ${f1(r.delta.ci[1])}]; B higher on ${r.delta.wins}, lower on ${r.delta.losses}, tied ${r.delta.ties}`,
+      );
+      if (flags.get('json')) console.log(JSON.stringify(r, null, 2));
     } else if (cmd === 'datasets' && positional[0] === 'fetch') {
       const { datasetRelease, fetchDataset } = await import('./datasets.ts');
       const d = datasetRelease(positional[1]);

@@ -147,7 +147,9 @@ export async function tracetoonModules(root: string) {
     import(join(root, 'src', 'comic', 'composition.ts')),
     import(join(root, 'src', 'comic', 'genres.ts')),
   ]);
-  return { draw: draw.draw, svgToPng: raster.svgToPng, pageText: script.pageText, styleById: styles.styleById, imageSize: compose.imageSize, comicSummary: composition.comicSummary, sceneOptions: genres.sceneOptions as ((g: unknown, recent: string[], o: { seed?: string }) => unknown[]) | undefined, genreById: genres.genreById as (id: string) => unknown };
+  // casting.ts exists only in Tracetoon builds that rotate casting (round 7 on).
+  const casting = existsSync(join(root, 'src', 'comic', 'casting.ts')) ? await import(join(root, 'src', 'comic', 'casting.ts')) : undefined;
+  return { draw: draw.draw, svgToPng: raster.svgToPng, pageText: script.pageText, styleById: styles.styleById, imageSize: compose.imageSize, comicSummary: composition.comicSummary, sceneOptions: genres.sceneOptions as ((g: unknown, recent: string[], o: { seed?: string }) => unknown[]) | undefined, genreById: genres.genreById as (id: string) => unknown, castHint: casting?.castHint as ((seed: string) => string | undefined) | undefined };
 }
 type Tt = Awaited<ReturnType<typeof tracetoonModules>>;
 
@@ -220,7 +222,7 @@ export function readScriptCheckpoint(round: string, order: string[]): ScriptChec
 export interface Recent {
   list: { id: string; summary: Record<string, unknown> }[];
 }
-export const RECENT_COUNT = 5;
+export const RECENT_COUNT = 10;
 
 async function oneComic(c: Case, sample: number, o: RoundOpts, tt: Tt, genreText: string, recent: Recent, saved?: ComicState): Promise<ComicState> {
   const id = c.meta.id;
@@ -255,6 +257,8 @@ async function oneComic(c: Case, sample: number, o: RoundOpts, tt: Tt, genreText
       out: packet,
       checkCommand,
       recentComics: seen.map((r) => r.summary),
+      // The Tracetoon under test rotates casting only if it has casting.ts.
+      ...(tt.castHint ? { castHint: tt.castHint(`${basename(o.out)}:${id}:${sample}`) } : {}),
       // The Tracetoon under test offers scenes only if it has a scene library.
       ...(tt.sceneOptions
         ? {

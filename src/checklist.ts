@@ -309,12 +309,40 @@ function summarizeDiagnostics(items: { id: string; checklist: Checklist; script?
       topShare: withBackground ? Math.max(...backgrounds.values()) / withBackground : null,
     },
     leadDesign: {
+      ...lookConcentration(checklists.map((c) => c.leadDesign?.traits ?? [])),
       darkSkinLightHair: tally(checklists.map((c) => present(c.leadDesign?.darkSkinLightHair))),
       repeats: [...designs].filter(([, design]) => design.cases.size > 1)
         .map(([traits, design]) => ({ traits, comics: design.comics, cases: design.cases.size }))
         .sort((a, b) => b.cases - a.cases || a.traits.localeCompare(b.traits)),
     },
   };
+}
+
+/**
+ * How much one lead design dominates a set. Leads whose visible traits
+ * overlap by half or more (Jaccard on words) count as the same design, so
+ * "silver buzz cut, dark skin, teal jacket" and "dark skin, silver hair,
+ * flight jacket" cluster even though no exact string repeats. topShare is
+ * the biggest cluster's share of comics with a described lead.
+ */
+export function lookConcentration(traitLists: string[][]): { topShare: number | null; distinctLooks: number; topLook: string | null } {
+  const looks = traitLists
+    .map((traits) => new Set(traits.join(' ').toLowerCase().split(/[^a-z0-9-]+/).filter((w) => w.length > 2)))
+    .filter((set) => set.size);
+  if (!looks.length) return { topShare: null, distinctLooks: 0, topLook: null };
+  const jaccard = (a: Set<string>, b: Set<string>) => {
+    let shared = 0;
+    for (const w of a) if (b.has(w)) shared++;
+    return shared / (a.size + b.size - shared);
+  };
+  const clusters: { seed: Set<string>; size: number; label: string }[] = [];
+  looks.forEach((look, i) => {
+    const home = clusters.find((c) => jaccard(c.seed, look) >= 0.5);
+    if (home) home.size++;
+    else clusters.push({ seed: look, size: 1, label: traitLists.filter((t) => t.length)[i]!.join(', ') });
+  });
+  const top = clusters.reduce((a, b) => (b.size > a.size ? b : a));
+  return { topShare: top.size / looks.length, distinctLooks: clusters.length, topLook: top.label };
 }
 
 /** Shannon entropy in bits of a list of labels. */

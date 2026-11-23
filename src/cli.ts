@@ -58,6 +58,8 @@ export function writePacket(
     pinGenre?: boolean;
     /** Scenes per genre id, when the Tracetoon under test has a scene library. */
     sceneOptions?: Record<string, unknown[]>;
+    /** A casting suggestion, when the Tracetoon under test rotates casting. */
+    castHint?: string;
   },
 ): string[] {
   const problems = caseProblems(caseDir);
@@ -71,6 +73,7 @@ export function writePacket(
     ...(opts.recentComics ? { recentComics: opts.recentComics } : {}),
     ...(opts.pinGenre ? { pinnedGenre: readGenre(opts.genre).id } : {}),
     ...(opts.sceneOptions ? { sceneOptions: opts.sceneOptions } : {}),
+    ...(opts.castHint ? { castHint: opts.castHint } : {}),
     skillFiles: opts.skillFiles.map((f) => resolve(f)),
     patchPath: resolve(caseDir, 'changes.patch'),
     out: { comic: join(out, 'comic.json'), design: join(out, 'comic-design.json') },

@@ -57,6 +57,28 @@ describe('author sandbox', () => {
     expect(runs.map((r) => r.clean)).toEqual([false, true]);
     expect(runs[0]!.output).toContain('anchor.mapping[0]');
   });
+
+  test('inline authors disable local read tools and use the supplied packet', async () => {
+    const { codexExec } = await import('../src/codex.ts');
+    const dir = temp();
+    const prior = process.env.COMICBENCH_CODEX_BIN;
+    process.env.COMICBENCH_CODEX_BIN = FAKE;
+    process.env.FAKE_CODEX_ARGS = join(dir, 'args.json');
+    try {
+      await codexExec({ prompt: 'Packet only', cwd: dir, noTools: true, logDir: join(dir, 'log') });
+      const args = JSON.parse(readFileSync(join(dir, 'args.json'), 'utf8')) as string[];
+      const disabled = args.flatMap((value, i) => value === '--disable' ? [args[i + 1]] : []);
+      expect(disabled).toContain('shell_tool');
+      expect(disabled).toContain('unified_exec');
+      expect(disabled).toContain('view_image');
+      expect(disabled).toContain('multi_agent_v2');
+      expect(args).toContain('web_search="disabled"');
+    } finally {
+      delete process.env.FAKE_CODEX_ARGS;
+      if (prior === undefined) delete process.env.COMICBENCH_CODEX_BIN;
+      else process.env.COMICBENCH_CODEX_BIN = prior;
+    }
+  });
 });
 
 describe('recent comics and variety', () => {

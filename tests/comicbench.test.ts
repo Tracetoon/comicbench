@@ -8,7 +8,7 @@ import { scoreRun, validate, writePacket } from '../src/cli.ts';
 import { parseGenre } from '../src/genre.ts';
 import { comicPacketFiles } from '../src/packet.ts';
 import { CRITERIA, GATES, HEADLINE, SET_CRITERIA, TOTAL_WEIGHT, RUBRIC_VERSION } from '../src/rubric.ts';
-import { comicScore, report, setScore, varietyHints, type ComicJudgment } from '../src/score.ts';
+import { comicScore, judgmentProblems, report, respectRates, setScore, varietyHints, type ComicJudgment } from '../src/score.ts';
 import { clusteredBootstrapCI } from '../src/stats.ts';
 
 const temp = () => mkdtempSync(join(tmpdir(), 'comicbench-'));
@@ -42,6 +42,17 @@ describe('scoring', () => {
     j.scores.humor = null;
     expect(comicScore(j)).toBeNull();
     expect(report([j]).unknown).toBe(1);
+  });
+
+  test('a respect failure scores zero and an undrawn comic stays unassessed', () => {
+    const failing = judged('a', 1, 5, { ...allPass, respect: false });
+    const undrawn = judged('c', 1, 5, { ...allPass, respect: null, outputContract: false });
+    expect(comicScore(failing)).toBe(0);
+    expect(judgmentProblems(undrawn)).toEqual([]);
+    expect(judgmentProblems(judged('c', 1, 5, { ...allPass, respect: null }))).toContain('gate respect must be true or false');
+    expect(respectRates([failing, judged('b', 1, 5), undrawn], 4)).toEqual({
+      passed: 1, failed: 1, assessed: 2, planned: 4, unassessed: 2, failureRate: 0.5,
+    });
   });
 
   test('humor weighs more than art style', () => {

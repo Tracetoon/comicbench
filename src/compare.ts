@@ -10,6 +10,7 @@ import { join } from 'node:path';
 import { CRITERIA, GATES } from './rubric.ts';
 import { comicScore, type ComicJudgment } from './score.ts';
 import { mean, mulberry32 } from './stats.ts';
+import { comparableRounds } from './manifest.ts';
 
 function judgments(round: string): ComicJudgment[] {
   const dir = join(round, 'judgments');
@@ -80,6 +81,7 @@ const caseMeans = (js: ComicJudgment[]) => {
 };
 
 export function compareRounds(a: string, b: string, opts: { resamples?: number; seed?: number } = {}) {
+  comparableRounds(a, b);
   const ja = judgments(a);
   const jb = judgments(b);
   const ma = caseMeans(ja);

@@ -18,7 +18,7 @@ import { clusteredBootstrapCI, mean, type BootstrapOpts } from './stats.ts';
 export interface ComicJudgment {
   case: string;
   sample: number;
-  gates: Record<GateId, boolean>;
+  gates: Record<Exclude<GateId, 'respect'>, boolean> & { respect?: boolean | null };
   scores: Record<string, number | null>;
 }
 
@@ -30,8 +30,10 @@ const isScore = (v: unknown): v is number =>
 /** Problems that make a judgment unusable; empty when it is valid. */
 export function judgmentProblems(j: ComicJudgment): string[] {
   const out: string[] = [];
-  for (const g of GATES)
-    if (typeof j.gates?.[g.id] !== 'boolean') out.push(`gate ${g.id} must be true or false`);
+  for (const { id } of GATES) {
+    if (id === 'respect' && j.gates?.outputContract === false && j.gates.respect === null) continue;
+    if (typeof j.gates?.[id] !== 'boolean') out.push(`gate ${id} must be true or false`);
+  }
   for (const c of CRITERIA) {
     const v = j.scores?.[c.id];
     if (v !== null && !isScore(v)) out.push(`${c.id} must be an integer 1–5 or null`);
@@ -102,7 +104,7 @@ export function report(
   }
   const scores = [...byCase.values()].flat();
   const comicMean = mean(scores);
-  const passing = judgments.filter((j) => GATES.every((g) => j.gates[g.id]));
+  const passing = judgments.filter((j) => GATES.every((g) => j.gates[g.id] !== false));
   const criteria = Object.fromEntries(
     CRITERIA.map((c) => [
       c.id,
@@ -125,6 +127,13 @@ export function report(
     criteria,
     perCase: Object.fromEntries([...byCase].map(([k, v]) => [k, mean(v)])),
   };
+}
+
+export function respectRates(judgments: ComicJudgment[], planned: number = judgments.length) {
+  const passed = judgments.filter((j) => j.gates.respect === true).length;
+  const failed = judgments.filter((j) => j.gates.respect === false).length;
+  const assessed = passed + failed;
+  return { passed, failed, assessed, planned, unassessed: planned - assessed, failureRate: assessed ? failed / assessed : null };
 }
 
 /** Host-computed variety hints for the set judge, from the comic scripts. */

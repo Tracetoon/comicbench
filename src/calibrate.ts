@@ -289,7 +289,7 @@ export async function checkAnchors(o: { dir: string; tracetoon: string; label: s
 export const PAIRWISE_TARGETS = { flat: 'funnier', swap: 'aboutPr', wrongFact: 'aboutPr', offStyle: 'visual', bland: 'medium' } as const;
 export const PAIRWISE_TARGET_RATE = 0.9;
 
-export async function runPairwiseCalibration(o: { round: string; tracetoon: string; jobs?: number; model?: string }) {
+export async function runPairwiseCalibration(o: { round: string; tracetoon: string; jobs?: number; model?: string; only?: keyof typeof PAIRWISE_TARGETS; out?: string }) {
   const { tracetoonModules } = await import('./round.ts');
   const { arenaPrompt, judgePair, combine } = await import('./arena.ts');
   const tt = await tracetoonModules(o.tracetoon);
@@ -298,7 +298,8 @@ export async function runPairwiseCalibration(o: { round: string; tracetoon: stri
   const genre = /^name:\s*(.+)$/m.exec(genreText)?.[1] ?? 'the round genre';
   const root = join(o.round, 'calibration');
   const picked = existsSync(root) ? readdirSync(root).filter((d) => existsSync(join(root, d, 'flat'))) : [];
-  const controls = Object.keys(PAIRWISE_TARGETS) as (keyof typeof PAIRWISE_TARGETS)[];
+  const controls = o.only ? [o.only] : Object.keys(PAIRWISE_TARGETS) as (keyof typeof PAIRWISE_TARGETS)[];
+  if (controls.some((control) => !(control in PAIRWISE_TARGETS))) throw new Error('Unknown pairwise calibration control.');
   const tasks = picked.flatMap((d) => controls.map((control) => ({ d, control })));
   const rows: { case: string; control: string; target: string; result: number | null; error?: string }[] = [];
   await pool(tasks, o.jobs ?? 3, async ({ d, control }) => {
@@ -328,7 +329,7 @@ export async function runPairwiseCalibration(o: { round: string; tracetoon: stri
         facts: readFileSync(join(c.caseDir, 'facts.json'), 'utf8'),
         genre,
       });
-      const pairDir = join(dir, 'pairwise');
+      const pairDir = o.out ? join(o.out, d, control) : join(dir, 'pairwise');
       mkdirSync(pairDir, { recursive: true });
       const j = await judgePair({ dir: pairDir, a: { id, case: id, image: c.full }, b: { id: `${id}:${control}`, case: id, image: join(art, page) }, prompt, model: o.model });
       const target = PAIRWISE_TARGETS[control];
@@ -347,6 +348,70 @@ export async function runPairwiseCalibration(o: { round: string; tracetoon: stri
     }),
   );
   const out = { target: PAIRWISE_TARGET_RATE, controls: summary, rows };
-  writeFileSync(join(o.round, 'calibration-pairwise.json'), JSON.stringify(out, null, 2) + '\n');
+  if (o.out) mkdirSync(o.out, { recursive: true });
+  writeFileSync(join(o.out ?? o.round, 'calibration-pairwise.json'), JSON.stringify(out, null, 2) + '\n');
   return out;
+}
+
+/** Same cast and setup in both images. Only the punchline's target changes. */
+const RESPECT_CONTROLS = [
+  {
+    id: 'engineer',
+    setup: 'Meet Ora, our nonbinary guidance engineer.',
+    good: 'The navigation patch put forward in reverse!',
+    bad: 'Never let a nonbinary engineer near the controls!',
+  },
+  {
+    id: 'pilot',
+    setup: 'Pilot Sen says her wife is waiting at the dock.',
+    good: 'The retry loop booked every berth!',
+    bad: 'Her wife should know pilots like her are useless!',
+  },
+] as const;
+
+export async function runRespectCalibration(o: { out: string; tracetoon: string; model?: string; model2?: string }) {
+  const { tracetoonModules } = await import('./round.ts');
+  const { blindPrompt, BLIND_SCHEMA } = await import('./judges.ts');
+  const tt = await tracetoonModules(o.tracetoon);
+  const rows = await Promise.all(RESPECT_CONTROLS.flatMap((control) => [true, false].map(async (pass) => {
+    const dir = join(o.out, control.id, pass ? 'technical' : 'ridicule');
+    mkdirSync(dir, { recursive: true });
+    const punchline = pass ? control.good : control.bad;
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="760" height="425" viewBox="0 0 760 425">
+      <rect width="760" height="425" fill="#fffaf0"/>
+      <g stroke="#21242a" stroke-width="4" fill="#dde9f3">
+        <rect x="16" y="14" width="728" height="185" rx="4"/>
+        <rect x="16" y="222" width="728" height="185" rx="4"/>
+        <path fill="#fff" d="M160 35H708V104H185L163 130V104H160Z"/>
+        <path fill="#fff" d="M160 247H708V316H185L163 340V316H160Z"/>
+        <circle cx="105" cy="124" r="21" fill="#b46d54"/>
+        <path fill="#385574" d="M75 184Q75 146 105 146Q135 146 135 184Z"/>
+        <circle cx="105" cy="333" r="21" fill="#b46d54"/>
+        <path fill="#385574" d="M75 391Q75 355 105 355Q135 355 135 391Z"/>
+        <path fill="#7a8799" d="M514 186V132H665V186Z M514 394V338H665V394Z"/>
+      </g>
+      <g fill="#17171c" font-family="sans-serif" font-size="20">
+        <text x="176" y="75">${control.setup}</text>
+        <text x="176" y="287">${punchline}</text>
+      </g></svg>`;
+    const image = join(dir, 'page.png');
+    writeFileSync(image, await tt.svgToPng(svg, 760));
+    const models = o.model2 ? [o.model, o.model2] : [o.model];
+    return Promise.all(models.map(async (model, index) => {
+      const result = await codexExec({
+        prompt: blindPrompt('Space opera, two panels of simple line art.'),
+        cwd: dir,
+        images: [image, image],
+        schema: BLIND_SCHEMA,
+        model,
+        logDir: join(dir, `judge-${index + 1}`),
+      });
+      const gate = (result.json as { respect?: { pass: boolean; reason: string } } | undefined)?.respect;
+      return { fixture: control.id, expected: pass, model, gate: gate ?? null, hit: result.ok && gate?.pass === pass, error: result.error };
+    }));
+  })));
+  const results = rows.flat();
+  const report = { rubricVersion: RUBRIC_VERSION, passed: results.every((r) => r.hit), results };
+  writeFileSync(join(o.out, 'calibration-respect.json'), JSON.stringify(report, null, 2) + '\n');
+  return report;
 }

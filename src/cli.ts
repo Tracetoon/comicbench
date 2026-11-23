@@ -14,7 +14,7 @@ import { caseProblems, loadCases } from './cases.ts';
 import { readGenre } from './genre.ts';
 import { comicPacketFiles } from './packet.ts';
 import { RUBRIC_VERSION } from './rubric.ts';
-import { judgmentProblems, report, type ComicJudgment, type SetJudgment } from './score.ts';
+import { judgmentProblems, report, respectRates, type ComicJudgment, type SetJudgment } from './score.ts';
 
 function args(argv: string[]): { positional: string[]; flags: Map<string, string[]> } {
   const positional: string[] = [];
@@ -100,7 +100,7 @@ export function scoreRun(runDir: string) {
     }
   const setPath = join(runDir, 'set.json');
   const set = existsSync(setPath) ? (JSON.parse(readFileSync(setPath, 'utf8')) as SetJudgment) : undefined;
-  const r = { rubricVersion: RUBRIC_VERSION, ...report(judgments, set) };
+  const r = { rubricVersion: RUBRIC_VERSION, ...report(judgments, set), respect: respectRates(judgments) };
   writeFileSync(join(runDir, 'report.json'), JSON.stringify(r, null, 2) + '\n');
   return r;
 }
@@ -138,7 +138,8 @@ if (import.meta.main) {
       console.log(
         `Comics: ${r.comics} (scored ${r.scored}, gated ${r.gated}, unknown ${r.unknown})\n` +
           `Comic score: ${fmt(r.comicMean)} [${fmt(r.comicCI[0])}, ${fmt(r.comicCI[1])}]\n` +
-          `Set score: ${fmt(r.set)}\nHeadline: ${fmt(r.headline)} (rubric v${r.rubricVersion})`,
+          `Set score: ${fmt(r.set)}\nDiagnostic score: ${fmt(r.headline)} (rubric v${r.rubricVersion})\n` +
+          `Respect: ${r.respect.failed}/${r.respect.assessed} failed, ${r.respect.unassessed} unassessed`,
       );
     } else if (cmd === 'compare') {
       const [a, b] = positional;
@@ -170,6 +171,8 @@ if (import.meta.main) {
       };
       const { runRound } = await import('./round.ts');
       const split = (flags.get('split')?.[0] ?? 'dev') as 'dev' | 'sealed' | 'all';
+      const stopAfter = flags.get('stop-after')?.[0];
+      if (stopAfter !== undefined && stopAfter !== 'check') throw new Error('run --stop-after accepts check');
       const result = await runRound({
         cases: resolve(need('cases')),
         split,
@@ -182,14 +185,21 @@ if (import.meta.main) {
         ...(flags.get('model')?.[0] ? { model: flags.get('model')![0]! } : {}),
         ...(flags.get('only')?.[0] ? { only: flags.get('only')![0]!.split(',') } : {}),
         ...(flags.get('author')?.[0] ? { author: flags.get('author')![0] as 'sandbox' | 'inline' } : {}),
+        ...(stopAfter ? { stopAfter } : {}),
+        ...(flags.get('draw-jobs')?.[0] ? { drawJobs: Number(flags.get('draw-jobs')![0]) } : {}),
       });
-      const r = result.report;
       const errors = result.states.filter((s) => s.status === 'error').length;
-      console.log(
-        `Round ${result.name}: ${r.comics} judged comics (gated ${r.gated}, unknown ${r.unknown}), ${errors} errors\n` +
-          `Comic score: ${fmt(r.comicMean)} [${fmt(r.comicCI[0])}, ${fmt(r.comicCI[1])}]\n` +
-          `Set score: ${fmt(r.set)}\nHeadline: ${fmt(r.headline)} (rubric v${r.rubricVersion})`,
-      );
+      if (result.stage === 'check') {
+        const checked = result.states.filter((s) => s.status === 'checked').length;
+        console.log(`Round ${result.name}: ${checked}/${result.states.length} scripts checked, ${errors} errors\nCheckpoint: ${join(result.out, 'script-report.json')}`);
+      } else {
+        const r = result.report;
+        console.log(
+          `Round ${result.name}: ${r.comics} judged comics (gated ${r.gated}, unknown ${r.unknown}), ${errors} errors\n` +
+            `Comic score: ${fmt(r.comicMean)} [${fmt(r.comicCI[0])}, ${fmt(r.comicCI[1])}]\n` +
+            `Set score: ${fmt(r.set)}\nHeadline: ${fmt(r.headline)} (rubric v${r.rubricVersion})`,
+        );
+      }
     } else if (cmd === 'reliability') {
       const round = positional[0];
       const tracetoon = flags.get('tracetoon')?.[0];
@@ -212,8 +222,25 @@ if (import.meta.main) {
       const tracetoon = flags.get('tracetoon')?.[0];
       if (!round || !tracetoon) throw new Error('usage: comicbench calibrate <round> --tracetoon <dir> [--cases 5] [--pairwise true]');
       const cal = await import('./calibrate.ts');
-      if (flags.get('pairwise')?.[0] === 'true') {
-        const r = await cal.runPairwiseCalibration({ round: resolve(round), tracetoon: resolve(tracetoon), jobs: Number(flags.get('jobs')?.[0] ?? 3) });
+      const model = flags.get('model')?.[0];
+      const out = flags.get('out')?.[0];
+      if (flags.get('craft')?.[0] === 'true') {
+        if (!out) throw new Error('Craft calibration needs --out to keep the reference round intact.');
+        const { runCraftCalibration } = await import('./calibrate-craft.ts');
+        const r = await runCraftCalibration({ reference: resolve(round), out: resolve(out), tracetoon: resolve(tracetoon), model });
+        for (const fixture of r.results) {
+          const misses = Object.entries(fixture.verdicts).flatMap(([name, pass]) => pass ? [] : [name]);
+          console.log(`${fixture.id}: ${misses.length ? misses.join(', ') : 'matched'}`);
+        }
+        if (!r.passed) process.exitCode = 1;
+      } else if (flags.get('respect')?.[0] === 'true') {
+        const r = await cal.runRespectCalibration({
+          out: resolve(out ?? round), tracetoon: resolve(tracetoon), model, model2: flags.get('model-2')?.[0],
+        });
+        console.log(`Respect calibration: ${r.results.filter((row) => row.hit).length}/${r.results.length} matched${r.passed ? '' : ' (UNCALIBRATED)'}`);
+      } else if (flags.get('pairwise')?.[0] === 'true') {
+        const only = flags.get('only')?.[0] as keyof typeof cal.PAIRWISE_TARGETS | undefined;
+        const r = await cal.runPairwiseCalibration({ round: resolve(round), tracetoon: resolve(tracetoon), jobs: Number(flags.get('jobs')?.[0] ?? 3), model, only, out: out ? resolve(out) : undefined });
         console.log(Object.entries(r.controls).map(([k, v]) => `${k}: the original won ${v.won}/${v.of} on ${v.target}${v.pass ? '' : ' (UNCALIBRATED)'}`).join('\n'));
       } else {
         const r = await cal.runCalibration({ round: resolve(round), tracetoon: resolve(tracetoon), cases: Number(flags.get('cases')?.[0] ?? 5), jobs: Number(flags.get('jobs')?.[0] ?? 3) });
@@ -235,7 +262,10 @@ if (import.meta.main) {
       }
     } else if (cmd === 'arena') {
       const [a, b] = positional;
-      if (!a || !b) throw new Error('usage: comicbench arena <round-a> <round-b> [--out <dir>] [--model-2 <model>] [--share-2 0.3] [--only a,b]');
+      const pairing = flags.get('pairing')?.[0];
+      if (!a || !b || (pairing !== undefined && pairing !== 'matched')) {
+        throw new Error('usage: comicbench arena <round-a> <round-b> [--out <dir>] [--model-2 <model>] [--share-2 0.3] [--only a,b] [--pairing matched]');
+      }
       const { runArena, ARENA_CRITERIA } = await import('./arena.ts');
       const m2 = flags.get('model-2')?.[0];
       const { out, report } = await runArena({
@@ -244,20 +274,36 @@ if (import.meta.main) {
         ...(flags.get('out')?.[0] ? { out: resolve(flags.get('out')![0]!) } : {}),
         ...(m2 ? { model2: m2, share2: Number(flags.get('share-2')?.[0] ?? 0.3) } : {}),
         ...(flags.get('only')?.[0] ? { only: flags.get('only')![0]!.split(',') } : {}),
+        ...(pairing ? { pairing } : {}),
         jobs: Number(flags.get('jobs')?.[0] ?? 3),
       });
-      console.log(`${report.b} vs ${report.a} over ${report.pairs} pairs (win rate of ${report.b}; ties count half):`);
+      console.log(`${report.b} vs ${report.a}: ${report.pairs}/${report.plannedPairs} pairs judged (win rate of ${report.b}; ties count half):`);
       for (const c of ARENA_CRITERIA) {
         const r = report.criteria[c.id]!;
         console.log(`  ${c.id}: ${(100 * r.winRate).toFixed(0)}% [${(100 * r.ci[0]).toFixed(0)}, ${(100 * r.ci[1]).toFixed(0)}]  (${r.wins} won, ${r.losses} lost, ${r.ties} tied, ${r.flips} flipped with order)`);
       }
+      const raw = report.rawOverall!;
+      console.log(`  raw overall: ${(100 * raw.winRate).toFixed(0)}% over ${raw.pairs} pairs`);
+      const gate = report.respect;
+      console.log(`  respect: ${gate.aForfeits} A forfeits, ${gate.bForfeits} B forfeits, ${gate.doubleForfeits} double forfeits, ${gate.incomplete} incomplete pairs`);
       if (report.secondJudge) console.log(`  second judge ${report.secondJudge.model}: kappa ${Object.entries(report.secondJudge.kappa).map(([k, v]) => `${k} ${fmt2(v as number)}`).join(', ')}`);
       if (report.errors.length) console.log(`  errors: ${report.errors.length}`);
       console.log(`Arena: ${join(out, 'arena.json')}`);
+    } else if (cmd === 'script-audit') {
+      const [a, b] = positional;
+      const out = flags.get('out')?.[0];
+      const jobs = Number(flags.get('jobs')?.[0] ?? 3);
+      if (!a || !b || !out || !Number.isInteger(jobs) || jobs < 1) {
+        throw new Error('usage: comicbench script-audit <round-a> <round-b> --out <dir> [--jobs 3]');
+      }
+      const { runScriptAudit } = await import('./script-audit.ts');
+      const audit = await runScriptAudit({ a: resolve(a), b: resolve(b), out: resolve(out), jobs });
+      const completed = audit.results.filter((r) => !('error' in r)).length;
+      console.log(`Audited ${completed}/${audit.results.length} script pairs. Results: ${join(resolve(out), 'script-audit.json')}`);
     } else if (cmd === 'checklist') {
       const round = positional[0];
       if (!round) throw new Error('usage: comicbench checklist <round> [--jobs 3]');
-      const { runChecklist } = await import('./checklist.ts');
+      const { REPRESENTATION_ITEMS, runChecklist } = await import('./checklist.ts');
       const s = await runChecklist({ round: resolve(round), jobs: Number(flags.get('jobs')?.[0] ?? 3) });
       const pct = (x: number) => `${(100 * x).toFixed(0)}%`;
       console.log(
@@ -266,9 +312,22 @@ if (import.meta.main) {
           `  settings: ${Object.entries(s.settings).map(([k, v]) => `${k} ${v}`).join(', ')} (entropy ${fmt2(s.settingEntropy)})\n` +
           `  punchlines: ${Object.entries(s.punchlines).map(([k, v]) => `${k} ${v}`).join(', ')}${s.errors.length ? `\n  errors: ${s.errors.length}` : ''}`,
       );
+      for (const { id, label } of REPRESENTATION_ITEMS) {
+        const authored = s.representation.authored[id]!;
+        const published = s.representation.published[id]!;
+        console.log(`  ${label}: ${authored.observed}/${authored.assessed} in script, ${published.observed}/${published.assessed} on page`);
+      }
+      for (const window of s.representation.windows) {
+        console.log(`  Comics ${window.from}–${window.to}: ${window.observed}/${window.assessed} with evidenced LGBTQ+ representation${window.gap ? ' (review guidance)' : ''}`);
+      }
+      const { spaceConflict, roleRead, backgrounds } = s.diagnostics;
+      const coverage = (value: { observed: number; assessed: number }) => `${value.observed}/${value.assessed}`;
+      console.log(`  Space conflict: ${coverage(spaceConflict.considered)} considered, ${coverage(spaceConflict.selected)} selected, ${coverage(spaceConflict.scripted)} scripts, ${coverage(spaceConflict.rendered)} pages`);
+      console.log(`  Recognizable roles: ${coverage(roleRead)} assessed, ${roleRead.intended} intended`);
+      console.log(`  Explicit backgrounds: ${backgrounds.comicsWithBackground}/${backgrounds.assessed} scripts`);
     } else if (cmd === 'review') {
       const round = positional[0];
-      if (!round) throw new Error('usage: comicbench review <round> [<round>...] [--arena <arena-dir>...] [--tracetoon <dir>] [--out <dir>]');
+      if (!round) throw new Error('usage: comicbench review <round> [<round>...] [--arena <arena-dir>...] [--script-audit <dir>...] [--tracetoon <dir>] [--out <dir>]');
       const { buildReview } = await import('./review.ts');
       const compare = flags.get('compare')?.[0];
       const tracetoon = flags.get('tracetoon')?.[0];
@@ -277,12 +336,13 @@ if (import.meta.main) {
         ...(compare ? { compare: resolve(compare) } : {}),
         rounds: positional.slice(1).map((r) => resolve(r)),
         arenas: (flags.get('arena') ?? []).map((a) => resolve(a)),
+        scriptAudits: (flags.get('script-audit') ?? []).map((a) => resolve(a)),
         ...(tracetoon ? { tracetoon: resolve(tracetoon) } : {}),
         out: resolve(flags.get('out')?.[0] ?? join(round, 'review')),
       });
       console.log(`Review page: ${join(out, 'index.html')}`);
     } else {
-      console.error('usage: comicbench <validate|packet|score|run|compare|reliability|calibrate|anchors|review|datasets fetch> ...');
+      console.error('usage: comicbench <validate|packet|score|run|script-audit|compare|arena|checklist|reliability|calibrate|anchors|review|datasets fetch> ...');
       process.exit(2);
     }
   } catch (e) {

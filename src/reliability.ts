@@ -71,9 +71,12 @@ export function agreement(pairs: [Scored, Scored][]) {
       },
     ]),
   );
-  const gateIds = ['factualIntegrity', 'punchUp'];
+  const gateIds = ['factualIntegrity', 'punchUp', 'respect'];
   const gates = Object.fromEntries(
-    gateIds.map((g) => [g, { agree: pairs.filter(([a, b]) => a.gates[g] === b.gates[g]).length, of: pairs.length }]),
+    gateIds.map((g) => {
+      const assessed = pairs.filter(([a, b]) => typeof a.gates[g] === 'boolean' && typeof b.gates[g] === 'boolean');
+      return [g, { agree: assessed.filter(([a, b]) => a.gates[g] === b.gates[g]).length, of: assessed.length }];
+    }),
   );
   return { pairs: pairs.length, criteria, gates };
 }
@@ -115,7 +118,7 @@ function judged(dir: string): Scored | undefined {
   const context = JSON.parse(readFileSync(c, 'utf8'));
   return {
     scores: Object.fromEntries([...Object.entries(blind.scores), ...Object.entries(context.scores)].map(([k, v]: [string, any]) => [k, v?.score ?? null])),
-    gates: { punchUp: blind.punchUp.pass === true, factualIntegrity: context.factualIntegrity.pass === true },
+    gates: { punchUp: blind.punchUp.pass === true, factualIntegrity: context.factualIntegrity.pass === true, ...(typeof blind.respect?.pass === 'boolean' ? { respect: blind.respect.pass } : {}) },
   };
 }
 

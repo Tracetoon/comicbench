@@ -4,7 +4,7 @@
  * a criterion, an anchor, a gate or a weight changes; runs compare only when
  * their rubric versions match.
  */
-export const RUBRIC_VERSION = 3;
+export const RUBRIC_VERSION = 6;
 
 /**
  * v3 (round 3): the 1-5 scores are diagnostics; the arena (src/arena.ts) and
@@ -127,6 +127,7 @@ export const GATES = [
   { id: 'factualIntegrity', question: 'Nothing contradicts the brief, the facts or the diff.' },
   { id: 'phoneLegibility', question: 'Retired in v3 (desktop comics): always passes.' },
   { id: 'punchUp', question: 'Punches at problems, not people; no copied character designs (genre parody is fine).' },
+  { id: 'respect', question: 'Avoids demeaning identity stereotypes and ridicule directed at marginalized characters.' },
   { id: 'outputContract', question: 'A valid comic.json and a drawn image exist.' },
 ] as const;
 export type GateId = (typeof GATES)[number]['id'];

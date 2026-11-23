@@ -10,16 +10,16 @@
  *   draw     Tracetoon's own draw() on the Codex image route, plus 760 and 360 px
  *            renditions
  *   judge    blind (image + art sheet), context (+ PR evidence), phone reader
- *            (360 px only, checked by Tracetoon's phoneGate)
+ *            (360 px only, checked against the script's required text)
  *
  * then one set judge over every script, and the report. Every model call goes
  * through Codex (src/codex.ts). Steps whose outputs exist are skipped, so a
  * round resumes where it stopped.
  */
-import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, renameSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join, resolve } from 'node:path';
-import { loadCases, sha256, type Case } from './cases.ts';
-import { codexExec } from './codex.ts';
+import { caseProblems, loadCases, sha256, type Case } from './cases.ts';
+import { codexCommand, codexExec } from './codex.ts';
 import { writePacket } from './cli.ts';
 import { readGenre } from './genre.ts';
 import {
@@ -28,13 +28,17 @@ import {
   CONTEXT_IDS,
   CONTEXT_SCHEMA,
   PHONE_PROMPT,
+  PHONE_SCHEMA,
   SET_SCHEMA,
   blindPrompt,
   contextPrompt,
+  isPhoneRead,
+  missingPhoneText,
   setPrompt,
 } from './judges.ts';
 import { RUBRIC_VERSION } from './rubric.ts';
-import { report, varietyHints, type ComicJudgment, type SetJudgment } from './score.ts';
+import { report, respectRates, varietyHints, type ComicJudgment, type SetJudgment } from './score.ts';
+import type { RoundManifest } from './manifest.ts';
 
 export interface RoundOpts {
   cases: string;
@@ -52,6 +56,9 @@ export interface RoundOpts {
   only?: string[];
   /** sandbox (default): Codex workspace-write; inline: files inlined, read-only. */
   author?: 'sandbox' | 'inline';
+  stopAfter?: 'check';
+  /** Resume concurrency is independent of the frozen author order. */
+  drawJobs?: number;
 }
 
 /** Tracetoon's CLI bundled into one file (built once per round), for the author's packet. */
@@ -110,6 +117,13 @@ function readJson<T>(path: string): T | undefined {
   return existsSync(path) ? (JSON.parse(readFileSync(path, 'utf8')) as T) : undefined;
 }
 
+function checkRuntime(tracetoon: string) {
+  const check = Bun.spawnSync(['bun', join(tracetoon, 'src', 'cli.ts'), 'comic', 'check', '--help'], { stdout: 'pipe', stderr: 'pipe' });
+  if (check.exitCode !== 0 || !check.stdout.toString().includes('--file')) {
+    throw new Error('The shared Tracetoon runtime must support comic check --file before a round can start.');
+  }
+}
+
 /** A folder's files, hashed together: the identity of a skill or genre under test. */
 export function treeHash(path: string): string {
   const files: string[] = [];
@@ -124,17 +138,16 @@ export function treeHash(path: string): string {
 }
 
 export async function tracetoonModules(root: string) {
-  const [draw, raster, judging, script, styles, compose, composition, genres] = await Promise.all([
+  const [draw, raster, script, styles, compose, composition, genres] = await Promise.all([
     import(join(root, 'scripts', 'comic-draw.ts')),
     import(join(root, 'src', 'comic', 'raster.ts')),
-    import(join(root, 'src', 'comic', 'judging.ts')),
     import(join(root, 'src', 'comic', 'script.ts')),
     import(join(root, 'src', 'comic', 'styles.ts')),
     import(join(root, 'src', 'comic', 'compose.ts')),
     import(join(root, 'src', 'comic', 'composition.ts')),
     import(join(root, 'src', 'comic', 'genres.ts')),
   ]);
-  return { draw: draw.draw, svgToPng: raster.svgToPng, phoneGate: judging.phoneGate, PHONE_SCHEMA: judging.PHONE_SCHEMA, pageText: script.pageText, styleById: styles.styleById, imageSize: compose.imageSize, comicSummary: composition.comicSummary, sceneOptions: genres.sceneOptions as ((g: unknown, recent: string[], o: { seed?: string }) => unknown[]) | undefined, genreById: genres.genreById as (id: string) => unknown };
+  return { draw: draw.draw, svgToPng: raster.svgToPng, pageText: script.pageText, styleById: styles.styleById, imageSize: compose.imageSize, comicSummary: composition.comicSummary, sceneOptions: genres.sceneOptions as ((g: unknown, recent: string[], o: { seed?: string }) => unknown[]) | undefined, genreById: genres.genreById as (id: string) => unknown };
 }
 type Tt = Awaited<ReturnType<typeof tracetoonModules>>;
 
@@ -167,9 +180,40 @@ interface ComicState {
   case: string;
   sample: number;
   dir: string;
-  status: 'judged' | 'gated' | 'error';
+  status: 'checked' | 'judged' | 'gated' | 'error';
   stage?: string;
   error?: string;
+}
+
+export interface ScriptCheckpoint {
+  schema: 'comicbench.script-checkpoint/v1';
+  states: (ComicState & { artifacts: Record<string, string | null> })[];
+}
+
+function checkedArtifacts(dir: string) {
+  return Object.fromEntries(['packet/comic.json', 'packet/comic-design.json', 'check.json'].map((file) => {
+    const path = join(dir, file);
+    return [file, dir && existsSync(path) ? sha256(readFileSync(path)) : null];
+  }));
+}
+
+export function readScriptCheckpoint(round: string, order: string[]): ScriptCheckpoint | undefined {
+  const checkpoint = readJson<ScriptCheckpoint>(join(round, 'script-report.json'));
+  if (!checkpoint) return undefined;
+  if (checkpoint.schema !== 'comicbench.script-checkpoint/v1' ||
+      JSON.stringify(checkpoint.states.map((s) => `${s.case}#${s.sample}`)) !== JSON.stringify(order)) {
+    throw new Error(`${round} has a script checkpoint for a different cohort.`);
+  }
+  for (const s of checkpoint.states) {
+    s.dir = join(round, 'comics', s.case, String(s.sample));
+    if (s.status !== 'checked' && s.status !== 'gated' && s.status !== 'error') {
+      throw new Error(`Unexpected checkpoint status for ${s.case}#${s.sample}.`);
+    }
+    if (JSON.stringify(s.artifacts) !== JSON.stringify(checkedArtifacts(s.dir))) {
+      throw new Error(`Checkpoint artifacts changed for ${s.case}#${s.sample}. Restore them before resuming.`);
+    }
+  }
+  return checkpoint;
 }
 
 /** The arm's finished comics, newest first: what the next packet sees as recentComics. */
@@ -178,16 +222,22 @@ export interface Recent {
 }
 export const RECENT_COUNT = 5;
 
-async function oneComic(c: Case, sample: number, o: RoundOpts, tt: Tt, genreText: string, recent: Recent): Promise<ComicState> {
+async function oneComic(c: Case, sample: number, o: RoundOpts, tt: Tt, genreText: string, recent: Recent, saved?: ComicState): Promise<ComicState> {
   const id = c.meta.id;
   const dir = join(o.out, 'comics', id, String(sample));
   const packet = join(dir, 'packet');
+  const comicJson = join(packet, 'comic.json');
   const judgmentFile = join(o.out, 'judgments', id, `${sample}.json`);
   const state = (s: Omit<ComicState, 'case' | 'sample' | 'dir'>): ComicState => ({ case: id, sample, dir, ...s });
-  if (existsSync(judgmentFile)) return state({ status: 'judged' });
+  if (saved?.status === 'error') return saved;
+  if (existsSync(judgmentFile)) {
+    const prior = readJson<ComicJudgment>(judgmentFile)!;
+    const previousScript = readJson<Record<string, unknown>>(comicJson);
+    if (previousScript) recent.list.unshift({ id: `${id}#${sample}`, summary: tt.comicSummary(previousScript) });
+    return prior.gates.outputContract ? state({ status: 'judged' }) : state({ status: 'gated', stage: 'check' });
+  }
   mkdirSync(packet, { recursive: true });
   const cli = ['bun', join(o.tracetoon, 'src', 'cli.ts')];
-  const comicJson = join(packet, 'comic.json');
 
   // 1. Packet: the diff is copied in so the author's packet points inside it.
   if (!existsSync(join(packet, 'instructions.md'))) {
@@ -257,6 +307,7 @@ async function oneComic(c: Case, sample: number, o: RoundOpts, tt: Tt, genreText
         cwd: packet,
         logDir: join(dir, 'author', String(round)),
         model: o.model,
+        noTools: true,
         timeoutMs: 30 * 60_000,
       });
       const reply = r.ok ? parseAuthorReply(r.text) : undefined;
@@ -278,14 +329,16 @@ async function oneComic(c: Case, sample: number, o: RoundOpts, tt: Tt, genreText
   }
 
   // 3. Check (recorded); errors fail the output contract.
-  const check = Bun.spawnSync([...cli, '--json', 'comic', 'check', '--file', comicJson, '--context', join(packet, 'context.json'), '--evidence', join(packet, 'brief.md'), join(packet, 'changes.patch')], { stdout: 'pipe', stderr: 'pipe' });
-  let checkOk = false;
-  try {
-    checkOk = JSON.parse(check.stdout.toString()).ok === true;
-  } catch {
-    checkOk = false;
+  let checkOk = saved?.status === 'checked';
+  if (!saved) {
+    const check = Bun.spawnSync([...cli, '--json', 'comic', 'check', '--file', comicJson, '--context', join(packet, 'context.json'), '--evidence', join(packet, 'brief.md'), join(packet, 'changes.patch')], { stdout: 'pipe', stderr: 'pipe' });
+    try {
+      checkOk = JSON.parse(check.stdout.toString()).ok === true;
+    } catch {
+      checkOk = false;
+    }
+    writeFileSync(join(dir, 'check.json'), check.stdout.toString() || check.stderr.toString());
   }
-  writeFileSync(join(dir, 'check.json'), check.stdout.toString() || check.stderr.toString());
   const script = JSON.parse(readFileSync(comicJson, 'utf8'));
   // Later comics in this arm see this one among their recentComics.
   try {
@@ -293,7 +346,8 @@ async function oneComic(c: Case, sample: number, o: RoundOpts, tt: Tt, genreText
   } catch {
     /* an unreadable script just isn't remembered */
   }
-  const gates = { factualIntegrity: true, phoneLegibility: true, punchUp: true, outputContract: checkOk } as ComicJudgment['gates'];
+  if (o.stopAfter === 'check') return state({ status: checkOk ? 'checked' : 'gated', stage: 'check' });
+  const gates: ComicJudgment['gates'] = { factualIntegrity: true, phoneLegibility: true, punchUp: true, respect: null, outputContract: checkOk };
   const scores: ComicJudgment['scores'] = {};
   const writeJudgment = (extra: Record<string, unknown>) => {
     mkdirSync(join(o.out, 'judgments', id), { recursive: true });
@@ -324,12 +378,14 @@ async function oneComic(c: Case, sample: number, o: RoundOpts, tt: Tt, genreText
   if (!existsSync(w360)) await rendition(tt, full, 360, w360);
 
   // 5. Judges.
-  const j = await judgeComic({ caseDir: c.dir, script, art: { full, w760, w360 }, judgeDir: join(dir, 'judge'), genreText, tt, model: o.model, skipPhone: true });
+  const j = await judgeComic({
+    caseDir: c.dir, script, art: { full, w760, w360 }, judgeDir: join(dir, 'judge'), genreText, tt, model: o.model,
+    skipPhone: true, diagnosePhone: !!saved,
+  });
   if ('error' in j) return state({ status: 'error', stage: j.stage, error: j.error });
   Object.assign(gates, j.gates);
   Object.assign(scores, j.scores);
-  const phoneResult = { missing: j.phoneMissing };
-  writeJudgment({ phoneMissing: phoneResult.missing });
+  writeJudgment({ phoneMissing: j.phoneMissing, phoneDiagnosticError: j.phoneDiagnosticError });
   return state({ status: Object.values(gates).every(Boolean) ? 'judged' : 'gated' });
 }
 
@@ -340,10 +396,12 @@ export interface JudgeInput {
   /** Where this judge's answers go: judge/, judge-2/, judge-repeat/ or a calibration folder. */
   judgeDir: string;
   genreText: string;
-  tt: Pick<Tt, 'styleById' | 'phoneGate' | 'PHONE_SCHEMA' | 'pageText'>;
+  tt: Pick<Tt, 'styleById' | 'pageText'>;
   model?: string;
   /** Leave the phone reading to the primary judge (second judges skip it). */
   skipPhone?: boolean;
+  /** Measure phone readability for a script pilot without gating the desktop comic. */
+  diagnosePhone?: boolean;
 }
 export type JudgeOutput =
   | {
@@ -353,6 +411,7 @@ export type JudgeOutput =
       gates: Omit<ComicJudgment['gates'], 'outputContract'>;
       scores: ComicJudgment['scores'];
       phoneMissing: string[];
+      phoneDiagnosticError?: string;
     }
   | { stage: string; error: string };
 
@@ -363,10 +422,14 @@ export async function judgeComic(i: JudgeInput): Promise<JudgeOutput> {
   mkdirSync(i.judgeDir, { recursive: true });
   const blindFile = join(i.judgeDir, 'blind.json');
   let blind = readJson<any>(blindFile);
+  if (blind && typeof blind.respect?.pass !== 'boolean') return { stage: 'blind', error: 'cached judgment predates the respect gate; use a fresh judge directory' };
   if (!blind) {
-    const r = await codexExec({ prompt: blindPrompt(artSheet(i.genreText, i.tt, i.script)), cwd, images: [full, w760, w360], schema: BLIND_SCHEMA, logDir: join(i.judgeDir, 'blind'), model: i.model });
+    const r = await codexExec({ prompt: blindPrompt(artSheet(i.genreText, i.tt, i.script)), cwd, images: [full, w760], schema: BLIND_SCHEMA, logDir: join(i.judgeDir, 'blind'), model: i.model });
     if (!r.ok) return { stage: 'blind', error: r.error ?? 'no reply' };
     blind = r.json;
+    if (typeof blind?.respect?.pass !== 'boolean' || typeof blind.respect.reason !== 'string' || !blind.respect.reason.trim()) {
+      return { stage: 'blind', error: 'respect verdict requires a pass/fail and an explanation' };
+    }
     writeFileSync(blindFile, JSON.stringify(blind, null, 2));
   }
   const contextFile = join(i.judgeDir, 'context.json');
@@ -395,18 +458,25 @@ export async function judgeComic(i: JudgeInput): Promise<JudgeOutput> {
   let phone: any;
   let phoneLegibility = true;
   let phoneMissing: string[] = [];
-  if (!i.skipPhone) {
+  let phoneDiagnosticError: string | undefined;
+  if (!i.skipPhone || i.diagnosePhone) {
     const phoneFile = join(i.judgeDir, 'phone.json');
     phone = readJson<any>(phoneFile);
-    if (!phone) {
-      const r = await codexExec({ prompt: PHONE_PROMPT, cwd, images: [w360], schema: i.tt.PHONE_SCHEMA, logDir: join(i.judgeDir, 'phone'), model: i.model });
-      if (!r.ok) return { stage: 'phone', error: r.error ?? 'no reply' };
-      phone = r.json;
-      writeFileSync(phoneFile, JSON.stringify(phone, null, 2));
+    if (!isPhoneRead(phone)) {
+      const r = await codexExec({ prompt: PHONE_PROMPT, cwd, images: [w360], schema: PHONE_SCHEMA, logDir: join(i.judgeDir, 'phone-transcription'), model: i.model, noTools: true });
+      if (!r.ok || !isPhoneRead(r.json)) {
+        phoneDiagnosticError = r.error ?? 'invalid phone transcription';
+        if (!i.skipPhone) return { stage: 'phone', error: phoneDiagnosticError };
+        phone = undefined;
+      } else {
+        phone = r.json;
+        writeFileSync(phoneFile, JSON.stringify(phone, null, 2));
+      }
     }
-    const result = i.tt.phoneGate(phone, i.tt.pageText(i.script).filter((t: string) => t?.trim()));
-    phoneLegibility = result.state !== 'fail';
-    phoneMissing = result.missing;
+    if (isPhoneRead(phone)) {
+      phoneMissing = missingPhoneText(phone, i.tt.pageText(i.script));
+      if (!i.skipPhone) phoneLegibility = !phoneMissing.length;
+    }
   }
   const scores: ComicJudgment['scores'] = {};
   for (const k of BLIND_IDS) scores[k] = blind.scores[k]?.score ?? null;
@@ -415,9 +485,10 @@ export async function judgeComic(i: JudgeInput): Promise<JudgeOutput> {
     blind,
     context,
     phone,
-    gates: { punchUp: blind.punchUp.pass === true, factualIntegrity: context.factualIntegrity.pass === true, phoneLegibility },
+    gates: { punchUp: blind.punchUp.pass === true, respect: blind.respect.pass, factualIntegrity: context.factualIntegrity.pass === true, phoneLegibility },
     scores,
     phoneMissing,
+    phoneDiagnosticError,
   };
 }
 
@@ -443,57 +514,96 @@ export function splitClusters(clusters: string[][]): { withinCase: number; acros
 }
 
 export async function runRound(o: RoundOpts) {
+  checkRuntime(o.tracetoon);
   const tt = await tracetoonModules(o.tracetoon);
   const genreText = readFileSync(o.genre, 'utf8');
   const cases = loadCases(o.cases).filter(
     (c) => (o.split === 'all' || c.meta.split === o.split) && (!o.only || o.only.includes(c.meta.id)),
   );
   if (!cases.length) throw new Error(`No ${o.split} cases in ${o.cases}`);
+  const missing = o.only?.filter((id) => !cases.some((c) => c.meta.id === id));
+  if (missing?.length) throw new Error(`Cases unavailable in ${o.split}: ${missing.join(', ')}`);
+  for (const c of cases) {
+    const problems = caseProblems(c.dir);
+    if (problems.length) throw new Error(`Frozen case ${c.meta.id}: ${problems.join('; ')}`);
+  }
   mkdirSync(o.out, { recursive: true });
   const manifestFile = join(o.out, 'manifest.json');
-  const manifest = {
-    schema: 'comicbench.round/v1',
+  // Seeded order, all first samples before any second.
+  const tasks = Array.from({ length: o.samples }, (_, i) => i + 1).flatMap((sample) =>
+    [...cases]
+      .sort((x, y) => sha256(`${sample}:${x.meta.id}`).localeCompare(sha256(`${sample}:${y.meta.id}`)))
+      .map((c) => ({ c, sample })),
+  );
+  const imageCli = process.env.TRACETOON_CODEX_BIN ? [process.env.TRACETOON_CODEX_BIN] : codexCommand();
+  const cliVersion = Bun.spawnSync([...imageCli, '--version'], { stdout: 'pipe', stderr: 'pipe' });
+  if (cliVersion.exitCode !== 0) throw new Error('Could not identify the Codex image CLI version.');
+  const manifest: RoundManifest = {
+    schema: 'comicbench.round/v2',
     name: basename(o.out),
     casesDir: o.cases,
     rubricVersion: RUBRIC_VERSION,
     skill: { path: o.skill, hash: treeHash(o.skill) },
     genre: { path: o.genre, hash: sha256(genreText) },
     tracetoon: o.tracetoon,
+    runtimeHash: sha256([
+      treeHash(join(o.tracetoon, 'src')),
+      sha256(readFileSync(join(o.tracetoon, 'scripts', 'comic-draw.ts'))),
+      sha256(readFileSync(join(o.tracetoon, 'bun.lock'))),
+    ].join('\n')),
+    imageRoute: {
+      provider: 'codex',
+      lettering: 'page',
+      cli: cliVersion.stdout.toString().trim(),
+      agentModel: process.env.TRACETOON_CODEX_IMAGE_AGENT_MODEL ?? 'Codex configuration',
+      agentEffort: process.env.TRACETOON_CODEX_IMAGE_AGENT_EFFORT ?? (process.env.TRACETOON_CODEX_IMAGE_AGENT_MODEL ? 'medium' : 'Codex configuration'),
+    },
     split: o.split,
     samples: o.samples,
+    jobs: o.jobs,
     model: o.model ?? 'codex default',
     author: o.author ?? 'sandbox',
-    authorIsolation: 'convention: the author is told to read only the packet and skill folders; facts.json is not copied into the packet',
+    authorIsolation: o.author === 'inline' ? 'inline packet with local file tools disabled' : 'workspace-write sandbox with judge files omitted from author packet',
+    order: tasks.map(({ c, sample }) => `${c.meta.id}#${sample}`),
     cases: cases.map((c) => ({ id: c.meta.id, sha256: c.meta.sha256 })),
   };
-  const prior = readJson<typeof manifest>(manifestFile);
-  if (prior && (prior.skill.hash !== manifest.skill.hash || prior.genre.hash !== manifest.genre.hash || prior.rubricVersion !== manifest.rubricVersion))
-    throw new Error(`${o.out} holds a round for a different skill, genre or rubric; use a new --out`);
-  writeFileSync(manifestFile, JSON.stringify({ ...manifest, startedAt: (prior as any)?.startedAt ?? new Date().toISOString() }, null, 2) + '\n');
-
-  // Seeded order, all first samples before any second: a case's second
-  // sample sees other comics (and its own first) among its recentComics.
-  const tasks = Array.from({ length: o.samples }, (_, i) => i + 1).flatMap((sample) =>
-    [...cases]
-      .sort((x, y) => sha256(`${sample}:${x.meta.id}`).localeCompare(sha256(`${sample}:${y.meta.id}`)))
-      .map((c) => ({ c, sample })),
-  );
+  const prior = readJson<RoundManifest & { startedAt: string }>(manifestFile);
+  if (prior) {
+    for (const key of Object.keys(manifest) as (keyof RoundManifest)[]) {
+      if (JSON.stringify(prior[key]) !== JSON.stringify(manifest[key])) {
+        throw new Error(`${o.out} holds a round with different ${key}; use a new --out`);
+      }
+    }
+  } else {
+    writeFileSync(manifestFile, JSON.stringify({ ...manifest, startedAt: new Date().toISOString() }, null, 2) + '\n');
+  }
+  const checkpoint = readScriptCheckpoint(o.out, manifest.order);
+  if (o.drawJobs !== undefined && (o.stopAfter || !checkpoint || !Number.isInteger(o.drawJobs) || o.drawJobs < 1)) {
+    throw new Error('Draw jobs requires a completed script checkpoint and a positive worker count.');
+  }
+  if (o.stopAfter === 'check' && checkpoint) {
+    return { stage: 'check' as const, states: checkpoint.states, out: o.out, name: basename(o.out) };
+  }
+  if (o.stopAfter === 'check' && existsSync(join(o.out, 'judgments'))) {
+    throw new Error('Use a fresh output directory for a script-only run.');
+  }
+  const saved = new Map(checkpoint?.states.map((s) => [`${s.case}#${s.sample}`, s]));
   const recent: Recent = { list: [] };
   const states: ComicState[] = [];
   const queue = [...tasks];
   await Promise.all(
-    Array.from({ length: Math.max(1, o.jobs) }, async () => {
+    Array.from({ length: Math.max(1, o.drawJobs ?? o.jobs) }, async () => {
       for (let t = queue.shift(); t; t = queue.shift()) {
         let s: ComicState;
         try {
-          s = await oneComic(t.c, t.sample, o, tt, genreText, recent);
+          s = await oneComic(t.c, t.sample, o, tt, genreText, recent, saved.get(`${t.c.meta.id}#${t.sample}`));
         } catch (e) {
           // A wrong sandbox would make every comic invalid: stop the round.
           if (e instanceof SandboxError) {
             queue.length = 0;
             throw e;
           }
-          s = { case: t.c.meta.id, sample: t.sample, dir: '', status: 'error', stage: 'crash', error: (e as Error).message.slice(0, 500) };
+          s = { case: t.c.meta.id, sample: t.sample, dir: join(o.out, 'comics', t.c.meta.id, String(t.sample)), status: 'error', stage: 'crash', error: (e as Error).message.slice(0, 500) };
         }
         states.push(s);
         console.error(`${s.case}/${s.sample}: ${s.status}${s.stage ? ` (${s.stage}${s.error ? `: ${s.error.slice(0, 160)}` : ''})` : ''}`);
@@ -501,6 +611,21 @@ export async function runRound(o: RoundOpts) {
       }
     }),
   );
+
+  if (o.stopAfter === 'check') {
+    const byId = new Map(states.map((s) => [`${s.case}#${s.sample}`, s]));
+    const summary: ScriptCheckpoint = {
+      schema: 'comicbench.script-checkpoint/v1',
+      states: manifest.order.map((id) => {
+        const s = byId.get(id)!;
+        return { ...s, artifacts: checkedArtifacts(s.dir) };
+      }),
+    };
+    const file = join(o.out, 'script-report.json');
+    writeFileSync(file + '.tmp', JSON.stringify(summary, null, 2) + '\n');
+    renameSync(file + '.tmp', file);
+    return { stage: 'check' as const, states: summary.states, out: o.out, name: basename(o.out) };
+  }
 
   // The set judge, over every comic that has a script.
   const scripts = tasks
@@ -527,7 +652,7 @@ export async function runRound(o: RoundOpts) {
         readdirSync(join(o.out, 'judgments', cid)).map((f) => readJson<ComicJudgment>(join(o.out, 'judgments', cid, f))!),
       )
     : [];
-  const r = { rubricVersion: RUBRIC_VERSION, ...report(judgments, set) };
+  const r = { rubricVersion: RUBRIC_VERSION, ...report(judgments, set), respect: respectRates(judgments, tasks.length) };
   writeFileSync(join(o.out, 'report.json'), JSON.stringify(r, null, 2) + '\n');
-  return { report: r, states, out: o.out, name: basename(o.out) };
+  return { stage: 'complete' as const, report: r, states, out: o.out, name: basename(o.out) };
 }

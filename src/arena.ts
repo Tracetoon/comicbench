@@ -13,11 +13,12 @@
  */
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, join } from 'node:path';
-import { loadCases, sha256 } from './cases.ts';
+import { caseProblems, loadCases, sha256 } from './cases.ts';
 import { codexExec } from './codex.ts';
+import { comparableRounds } from './manifest.ts';
 import { clusteredBootstrapCI, mean } from './stats.ts';
 
-export const ARENA_VERSION = 1;
+export const ARENA_VERSION = 2;
 
 export const ARENA_CRITERIA = [
   { id: 'funnier', question: 'Which comic is funnier to a software developer: a better joke, better timing, a punchline that lands harder?' },
@@ -31,7 +32,7 @@ export const ARENA_CRITERIA = [
     question:
       'Which makes better use of the comic medium: a layout that serves the story (slanted, inset, borderless or breakout panels where they help), staging and camera angles, action and motion, sound effects, balloon shapes, motion and impact lines, a setting worth drawing? A static row of talking heads in one room is weak use of the medium.',
   },
-  { id: 'visual', question: 'Which is more visually striking and better drawn, with lettering that reads cleanly at PR width?' },
+  { id: 'visual', question: 'Which works better as drawn comic art? Consider draftsmanship, expressive staging, coherent panels and lettering that reads cleanly at PR width. A striking image or photorealism alone does not make it better comic art.' },
   { id: 'overall', question: 'Overall, which comic would a reviewer rather find at the top of this pull request?' },
 ] as const;
 export type ArenaCriterion = (typeof ARENA_CRITERIA)[number]['id'];
@@ -98,11 +99,28 @@ export interface PairResult {
   b: string;
   verdicts: Record<string, { result: 1 | 0 | -1; flipped: boolean; reasons: [string, string] }>;
   summaries: { a: [string, string]; b: [string, string] };
+  orderVerdicts?: Record<string, [Verdict, Verdict]>;
+  respect?: {
+    status: 'pass' | 'a-forfeit' | 'b-forfeit' | 'double-forfeit' | 'incomplete';
+    overall: 1 | 0 | -1 | null;
+    a: RespectVerdict | null;
+    b: RespectVerdict | null;
+  };
   judge?: string;
 }
 
+interface RespectVerdict { pass: boolean; reason: string }
+
+export function respectOutcome(a: RespectVerdict | null, b: RespectVerdict | null, overall: 1 | 0 | -1): NonNullable<PairResult['respect']> {
+  if (!a || !b) return { status: 'incomplete', overall: null, a, b };
+  if (!a.pass && !b.pass) return { status: 'double-forfeit', overall: null, a, b };
+  if (!a.pass) return { status: 'a-forfeit', overall: -1, a, b };
+  if (!b.pass) return { status: 'b-forfeit', overall: 1, a, b };
+  return { status: 'pass', overall, a, b };
+}
+
 /** B's win rate (wins + half the ties) per criterion, with a case-clustered interval. */
-export function winRates(pairs: PairResult[]) {
+export function winRates(pairs: PairResult[], opts: { rawOverall?: boolean } = {}) {
   return Object.fromEntries(
     ARENA_CRITERIA.map((c) => {
       const byCase = new Map<string, number[]>();
@@ -113,11 +131,14 @@ export function winRates(pairs: PairResult[]) {
       for (const p of pairs) {
         const v = p.verdicts[c.id];
         if (!v) continue;
-        const s = v.result === -1 ? 1 : v.result === 1 ? 0 : 0.5;
-        if (v.result === -1) wins++;
-        else if (v.result === 1) losses++;
+        const adjusted = c.id === 'overall' && !opts.rawOverall ? p.respect : undefined;
+        const result = adjusted ? adjusted.overall : v.result;
+        if (result === null) continue;
+        const s = result === -1 ? 1 : result === 1 ? 0 : 0.5;
+        if (result === -1) wins++;
+        else if (result === 1) losses++;
         else ties++;
-        if (v.flipped) flips++;
+        if (v.flipped && (!adjusted || adjusted.status === 'pass')) flips++;
         byCase.set(p.case, [...(byCase.get(p.case) ?? []), s]);
       }
       const all = [...byCase.values()].flat();
@@ -163,6 +184,7 @@ export interface ArenaComic {
   id: string;
   case: string;
   image: string;
+  respect?: RespectVerdict | null;
 }
 
 /** A round's drawn comics (any round folder with comics/<case>/<n>/art/page.*). */
@@ -174,7 +196,14 @@ export function arenaComics(round: string): ArenaComic[] {
     for (const n of readdirSync(join(root, c)).sort()) {
       const art = join(root, c, n, 'art');
       const page = existsSync(art) ? readdirSync(art).find((f) => /^page\.(png|jpe?g|webp)$/.test(f)) : undefined;
-      if (page) out.push({ id: `${c}#${n}`, case: c, image: join(art, page) });
+      if (!page) continue;
+      const blind = readJson(join(root, c, n, 'judge', 'blind.json'));
+      const judgment = readJson(join(round, 'judgments', c, `${n}.json`));
+      const respect = typeof judgment?.gates?.respect === 'boolean' && blind?.respect?.pass === judgment.gates.respect && typeof blind.respect.reason === 'string' && blind.respect.reason.trim()
+        ? blind.respect as RespectVerdict
+        : null;
+      const desktop = join(art, 'page-760.png');
+      out.push({ id: `${c}#${n}`, case: c, image: existsSync(desktop) ? desktop : join(art, page), respect });
     }
   return out;
 }
@@ -189,8 +218,14 @@ const readJson = (f: string) => (existsSync(f) ? JSON.parse(readFileSync(f, 'utf
 /** One judge's two orders of a pair, cached under dir/ab and dir/ba. */
 export async function judgePair(o: { dir: string; a: ArenaComic; b: ArenaComic; prompt: string; model?: string }) {
   const out: Record<'ab' | 'ba', any> = { ab: undefined, ba: undefined };
+  const cacheKey = sha256(JSON.stringify({
+    version: ARENA_VERSION,
+    model: o.model,
+    prompt: o.prompt,
+    images: [o.a.image, o.b.image].map((path) => sha256(readFileSync(path))),
+  }));
   for (const order of ['ab', 'ba'] as const) {
-    const file = join(o.dir, `${order}.json`);
+    const file = join(o.dir, `${order}-${cacheKey.slice(0, 16)}.json`);
     out[order] = readJson(file);
     if (out[order]) continue;
     const [first, second] = order === 'ab' ? [o.a, o.b] : [o.b, o.a];
@@ -203,38 +238,70 @@ export async function judgePair(o: { dir: string; a: ArenaComic; b: ArenaComic; 
 }
 
 function pairResult(c: string, a: ArenaComic, b: ArenaComic, ab: any, ba: any): PairResult {
+  const orderVerdicts: Record<string, [Verdict, Verdict]> = Object.fromEntries(
+    ARENA_CRITERIA.map((k) => [k.id, [ab.verdicts[k.id].winner, ba.verdicts[k.id].winner]]),
+  );
+  const overall = combine(...orderVerdicts.overall!).result;
   return {
     case: c,
     a: a.id,
     b: b.id,
     verdicts: Object.fromEntries(
-      ARENA_CRITERIA.map((k) => [k.id, { ...combine(ab.verdicts[k.id].winner, ba.verdicts[k.id].winner), reasons: [ab.verdicts[k.id].reason, ba.verdicts[k.id].reason] as [string, string] }]),
+      ARENA_CRITERIA.map((k) => [k.id, { ...combine(...orderVerdicts[k.id]!), reasons: [ab.verdicts[k.id].reason, ba.verdicts[k.id].reason] as [string, string] }]),
     ),
+    orderVerdicts,
+    respect: respectOutcome(a.respect ?? null, b.respect ?? null, overall),
     summaries: { a: [ab.first, ba.second], b: [ab.second, ba.first] },
   };
 }
 
-export async function runArena(o: { a: string; b: string; out?: string; cases?: string; model?: string; model2?: string; share2?: number; jobs?: number; only?: string[] }) {
+export async function runArena(o: {
+  a: string; b: string; out?: string; cases?: string; model?: string; model2?: string;
+  share2?: number; jobs?: number; only?: string[]; pairing?: 'matched';
+}) {
+  const { A: manifestA, B: manifest } = comparableRounds(o.a, o.b);
+  const model = o.model ?? (manifest.model === 'codex default' ? undefined : manifest.model);
   const nameA = basename(o.a);
   const nameB = basename(o.b);
   const out = o.out ?? join(o.a, '..', `arena-${nameA}-vs-${nameB}`);
+  const pairing = o.pairing ?? 'cross';
+  const previous = readJson(join(out, 'arena.json'));
+  if (previous && (previous.arenaVersion !== ARENA_VERSION || (previous.pairing ?? 'cross') !== pairing)) {
+    throw new Error('Use a fresh --out to preserve the historical arena.');
+  }
   mkdirSync(out, { recursive: true });
-  const manifest = readJson(join(o.b, 'manifest.json')) ?? readJson(join(o.a, 'manifest.json')) ?? {};
   const casesDir = o.cases ?? manifest.casesDir;
   const cases = new Map(loadCases(casesDir).map((c) => [c.meta.id, c]));
   const genreText = manifest.genre?.path && existsSync(manifest.genre.path) ? readFileSync(manifest.genre.path, 'utf8') : '';
   const genre = /^name:\s*(.+)$/m.exec(genreText)?.[1] ?? 'the round genre';
   const A = arenaComics(o.a);
   const B = arenaComics(o.b);
-  const pairs = [...new Set(A.map((x) => x.case))]
-    .filter((c) => cases.has(c) && (!o.only || o.only.includes(c)))
-    .flatMap((c) => A.filter((x) => x.case === c).flatMap((a) => B.filter((y) => y.case === c).map((b) => ({ c, a, b }))));
+  const byId = (comics: ArenaComic[]) => new Map(comics.map((comic) => [comic.id, comic]));
+  const drawnA = byId(A);
+  const drawnB = byId(B);
+  const errors: string[] = [];
+  const plannedKeys: string[] = [];
+  const pairs = manifest.cases.filter(({ id }) => !o.only || o.only.includes(id)).flatMap(({ id: c, sha256: caseHashes }) => {
+    const ids = manifestA.order.filter((id) => id.startsWith(`${c}#`));
+    const kase = cases.get(c);
+    if (!kase || JSON.stringify(kase.meta.sha256) !== JSON.stringify(caseHashes) || caseProblems(kase.dir).length) {
+      throw new Error(`Missing or different frozen case ${c}.`);
+    }
+    return ids.flatMap((idA) => (pairing === 'matched' ? [idA] : ids).flatMap((idB) => {
+      plannedKeys.push(`${idA}|${idB}`);
+      const a = drawnA.get(idA);
+      const b = drawnB.get(idB);
+      if (a && b) return [{ c, a, b }];
+      errors.push(`${idA} vs ${idB}: missing drawn comic`);
+      return [];
+    }));
+  });
+  const plannedPairs = plannedKeys.length;
   const second = new Set(
-    o.model2 ? pairs.map((p) => `${p.a.id}|${p.b.id}`).sort((x, y) => sha256(`k:${x}`).localeCompare(sha256(`k:${y}`))).slice(0, Math.round(pairs.length * (o.share2 ?? 0.3))) : [],
+    o.model2 ? plannedKeys.sort((x, y) => sha256(`k:${x}`).localeCompare(sha256(`k:${y}`))).slice(0, Math.round(plannedPairs * (o.share2 ?? 0.3))) : [],
   );
   const results: PairResult[] = [];
   const secondResults: { primary: PairResult; second: PairResult }[] = [];
-  const errors: string[] = [];
   await pool(pairs, o.jobs ?? 3, async ({ c, a, b }) => {
     const kase = cases.get(c)!;
     const prompt = arenaPrompt({
@@ -246,7 +313,7 @@ export async function runArena(o: { a: string; b: string; out?: string; cases?: 
     const dir = join(out, 'pairs', c, `${a.id.split('#')[1]}-vs-${b.id.split('#')[1]}`);
     mkdirSync(dir, { recursive: true });
     try {
-      const j = await judgePair({ dir, a, b, prompt, model: o.model });
+      const j = await judgePair({ dir, a, b, prompt, model });
       const r = pairResult(c, a, b, j.ab, j.ba);
       results.push(r);
       if (second.has(`${a.id}|${b.id}`)) {
@@ -255,26 +322,41 @@ export async function runArena(o: { a: string; b: string; out?: string; cases?: 
         const j2 = await judgePair({ dir: dir2, a, b, prompt, model: o.model2 });
         secondResults.push({ primary: r, second: { ...pairResult(c, a, b, j2.ab, j2.ba), judge: o.model2 } });
       }
-      console.log(`${c} ${a.id.split('#')[1]} vs ${b.id.split('#')[1]}: overall ${r.verdicts.overall!.result === -1 ? nameB : r.verdicts.overall!.result === 1 ? nameA : 'tie'}`);
+      const result = r.respect!.overall;
+      console.log(`${c} ${a.id.split('#')[1]} vs ${b.id.split('#')[1]}: overall ${result === -1 ? nameB : result === 1 ? nameA : result === 0 ? 'tie' : r.respect!.status}`);
     } catch (e) {
       errors.push(`${c} ${a.id} vs ${b.id}: ${(e as Error).message.slice(0, 300)}`);
     }
   });
   results.sort((x, y) => `${x.a}|${x.b}`.localeCompare(`${y.a}|${y.b}`));
   const label = (v: 1 | 0 | -1) => (v === 1 ? 'a' : v === -1 ? 'b' : 'tie');
+  const raw = winRates(results, { rawOverall: true });
+  const criteria = winRates(results);
   const report = {
     arenaVersion: ARENA_VERSION,
+    pairing,
+    rubricVersion: manifest.rubricVersion,
     a: nameA,
     b: nameB,
     roundA: o.a,
     roundB: o.b,
-    model: o.model ?? 'codex default',
+    model: model ?? 'codex default',
+    plannedPairs,
     pairs: results.length,
-    criteria: winRates(results),
+    criteria,
+    rawOverall: raw.overall,
+    respect: {
+      aForfeits: results.filter((p) => p.respect?.status === 'a-forfeit').length,
+      bForfeits: results.filter((p) => p.respect?.status === 'b-forfeit').length,
+      doubleForfeits: results.filter((p) => p.respect?.status === 'double-forfeit').length,
+      incomplete: results.filter((p) => p.respect?.status === 'incomplete').length + plannedPairs - results.length,
+    },
     secondJudge: o.model2
       ? {
           model: o.model2,
           pairs: secondResults.length,
+          planned: second.size,
+          criteria: winRates(secondResults.map((s) => s.second)),
           kappa: Object.fromEntries(ARENA_CRITERIA.map((c) => [c.id, cohensKappa(secondResults.map((s) => [label(s.primary.verdicts[c.id]!.result), label(s.second.verdicts[c.id]!.result)]))])),
         }
       : null,

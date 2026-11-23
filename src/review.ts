@@ -18,7 +18,7 @@ import { authorChecks, authorStats, compareRounds } from './compare.ts';
 import { CRITERIA, GATES, RUBRIC_VERSION, SET_CRITERIA } from './rubric.ts';
 import { comicScore, type ComicJudgment } from './score.ts';
 import { ARENA_CRITERIA } from './arena.ts';
-import { MEDIUM_ITEMS } from './checklist.ts';
+import { BEAT_CHOICES, CONFLICT_KINDS, FRAME_FEATURES, MEDIUM_ITEMS, REPRESENTATION_ITEMS } from './checklist.ts';
 
 const readJson = <T = any>(f: string): T | undefined => {
   try {
@@ -92,6 +92,7 @@ function scoresOf(dir: string) {
     ),
     gates: {
       punchUp: blind?.punchUp ?? null,
+      respect: blind?.respect ?? null,
       factualIntegrity: context?.factualIntegrity ?? null,
     },
     observation: blind?.observation ?? '',
@@ -103,6 +104,11 @@ function armData(round: string, out: string) {
   const manifest = readJson(join(round, 'manifest.json')) ?? {};
   const arm = manifest.name ?? basename(round);
   const cases = new Map(loadCases(manifest.casesDir ?? join(round, '..', '..', 'cases-local')).map((c) => [c.meta.id, c]));
+  const checkpoint = readJson(join(round, 'script-report.json'));
+  const progress = readJson(join(round, 'progress.json')) ?? checkpoint?.states ?? [];
+  const states = new Map<string, { status: string; error?: string }>(
+    progress.map((s: any) => [`${s.case}#${s.sample}`, s]),
+  );
   const comics: any[] = [];
   const root = join(round, 'comics');
   const imgDir = join(out, 'img', arm);
@@ -110,7 +116,7 @@ function armData(round: string, out: string) {
   for (const cid of existsSync(root) ? readdirSync(root).sort() : [])
     for (const n of readdirSync(join(root, cid)).sort()) {
       const dir = join(root, cid, n);
-      const judgment = readJson<ComicJudgment & { phoneMissing?: string[]; note?: string }>(join(round, 'judgments', cid, `${n}.json`));
+      const judgment = readJson<ComicJudgment & { phoneMissing?: string[]; phoneDiagnosticError?: string; note?: string }>(join(round, 'judgments', cid, `${n}.json`));
       const script = readJson(join(dir, 'packet', 'comic.json'));
       const design = readJson(join(dir, 'packet', 'comic-design.json'));
       const check = readJson(join(dir, 'check.json'));
@@ -138,7 +144,8 @@ function armData(round: string, out: string) {
       const primary = scoresOf(join(dir, 'judge'));
       const second = scoresOf(join(dir, 'judge-2'));
       const repeat = scoresOf(join(dir, 'judge-repeat'));
-      const status = !judgment ? (existsSync(join(dir, 'art')) ? 'in progress' : 'not judged') : Object.values(judgment.gates).every(Boolean) ? 'judged' : 'gated';
+      const state = states.get(`${cid}#${n}`);
+      const status = !judgment ? state?.status ?? (existsSync(join(dir, 'art')) ? 'in progress' : 'not judged') : Object.values(judgment.gates).every(Boolean) ? 'judged' : 'gated';
       comics.push({
         key: `${arm}--${cid}--${n}`,
         arm,
@@ -147,11 +154,13 @@ function armData(round: string, out: string) {
         status,
         total: judgment ? comicScore(judgment) : null,
         gates: judgment?.gates ?? null,
-        note: judgment?.note ?? null,
+        note: judgment?.note ?? state?.error ?? null,
         judge: primary ?? null,
         second: second ? { scores: Object.fromEntries(Object.entries(second.scores).map(([k, v]: [string, any]) => [k, v.score])), reasons: Object.fromEntries(Object.entries(second.scores).map(([k, v]: [string, any]) => [k, v.reason])), gates: Object.fromEntries(Object.entries(second.gates).map(([k, v]: [string, any]) => [k, v?.pass ?? null])) } : null,
         repeat: repeat ? Object.fromEntries(Object.entries(repeat.scores).map(([k, v]: [string, any]) => [k, v.score])) : null,
         phone: phone ? { items: phone.items ?? [], unreadable: phone.unreadable ?? [], missing: judgment?.phoneMissing ?? [] } : null,
+        phoneDiagnostic: !!checkpoint,
+        phoneDiagnosticError: judgment?.phoneDiagnosticError ?? null,
         img,
         comic: script
           ? {
@@ -169,9 +178,12 @@ function armData(round: string, out: string) {
         author: {
           checks,
           finalCheck: check ? (check.ok ? 'passed' : `failed: ${(check.problems ?? []).map((p: any) => `${p.where}: ${p.problem}`).join('; ') || check.error || ''}`) : null,
-          chosen: design?.chosen ?? design?.choice ?? design?.pick ?? null,
-          concepts: (design?.concepts ?? []).map((c: any) => ({ id: c.id ?? '', punchline: c.punchline ?? '', jokeShape: c.jokeShape ?? '', layout: c.layout ?? '' })),
-          reason: design?.why ?? design?.reason ?? design?.choiceReason ?? '',
+          chosen: design?.chosen ?? design?.selected ?? design?.choice ?? design?.pick ?? null,
+          concepts: (Array.isArray(design?.concepts) ? design.concepts : []).map((c: any) => ({
+            id: c?.id ?? c?.title ?? '', punchline: c?.punchline ?? '', jokeShape: c?.jokeShape ?? '', layout: c?.layout ?? '',
+            beats: Array.isArray(c?.beats) ? c.beats : [],
+          })),
+          reason: design?.why ?? design?.reason ?? design?.choiceReason ?? design?.selectionReason ?? '',
         },
         recent: readJson<string[]>(join(dir, 'recent.json')) ?? [],
         checklist: readJson(join(dir, 'checklist.json')) ?? null,
@@ -205,6 +217,7 @@ function armData(round: string, out: string) {
       startedAt: manifest.startedAt ?? '',
     },
     report: report ?? null,
+    checkpoint: checkpoint?.states?.length ?? null,
     author,
     set: setDetail
       ? {
@@ -227,7 +240,7 @@ function armData(round: string, out: string) {
   };
 }
 
-export function buildReview(o: { round: string; compare?: string; rounds?: string[]; arenas?: string[]; out: string; tracetoon?: string }): string {
+export function buildReview(o: { round: string; compare?: string; rounds?: string[]; arenas?: string[]; scriptAudits?: string[]; out: string; tracetoon?: string }): string {
   mkdirSync(o.out, { recursive: true });
   const rounds = [o.round, ...(o.compare ? [o.compare] : []), ...(o.rounds ?? [])];
   const arms = rounds.map((r) => armData(r, o.out));
@@ -241,11 +254,18 @@ export function buildReview(o: { round: string; compare?: string; rounds?: strin
   }
   const arenas = (o.arenas ?? []).flatMap((d) => {
     const r = readJson(existsSync(join(d, 'arena.json')) ? join(d, 'arena.json') : d);
-    return r ? [{ a: r.a, b: r.b, pairs: r.pairs, criteria: r.criteria, secondJudge: r.secondJudge, results: r.results }] : [];
+    return r ? [r] : [];
+  });
+  const scriptAudits = (o.scriptAudits ?? []).flatMap((d) => {
+    const audit = readJson(existsSync(join(d, 'script-audit.json')) ? join(d, 'script-audit.json') : d);
+    return audit ? [audit] : [];
   });
   const data = {
     arenas,
+    scriptAudits,
     arenaCriteria: ARENA_CRITERIA.map(({ id, question }) => ({ id, question })),
+    representationItems: REPRESENTATION_ITEMS,
+    craft: { conflicts: CONFLICT_KINDS, frames: FRAME_FEATURES, beats: BEAT_CHOICES },
     mediumItems: MEDIUM_ITEMS.map(({ id, question }) => ({ id, question })),
     rubricVersion: RUBRIC_VERSION,
     builtAt: new Date().toISOString(),
@@ -392,6 +412,7 @@ dialog::backdrop { background: rgba(20,19,15,.7) }
 
   <section id="arena-pairs"></section>
   <section id="checklist"></section>
+  <section id="script-audits"></section>
   <section id="summary"></section>
   <section id="criteria"></section>
   <section id="variety"></section>
@@ -399,7 +420,7 @@ dialog::backdrop { background: rgba(20,19,15,.7) }
   <div class="toolbar" role="toolbar" aria-label="Filter comics">
     <label for="f-arm">Arm <select id="f-arm"><option value="">All</option></select></label>
     <label for="f-status">Show <select id="f-status">
-      <option value="">Every comic</option><option value="judged">Passed every gate</option><option value="gated">Gated</option>
+      <option value="">Every comic</option><option value="judged">Passed every gate</option><option value="gated">Gated</option><option value="checked">Checked script</option><option value="error">Error</option>
       <option value="disagree">Comics I disagreed with</option><option value="split">Judges disagree (±2)</option></select></label>
     <label for="f-sort">Order <select id="f-sort">
       <option value="case">By pull request</option><option value="delta">Biggest arm difference first</option><option value="low">Lowest score first</option><option value="high">Highest score first</option></select></label>
@@ -471,12 +492,14 @@ dialog::backdrop { background: rgba(20,19,15,.7) }
       const m = a.manifest;
       const judged = a.comics.filter((c) => c.status === 'judged').length;
       const gated = a.comics.filter((c) => c.status === 'gated').length;
+      const checked = a.comics.filter((c) => c.status === 'checked').length;
       return '<article class="arm inked"><h3>' + esc(a.arm) + '</h3>' +
         '<div class="big">' + f1(r.headline) + ' <small style="font:600 .85rem var(--body);color:var(--muted)">headline</small></div>' +
         '<dl class="kv">' +
         '<dt>Comic score</dt><dd>' + f1(r.comicMean) + ' [' + f1(r.comicCI && r.comicCI[0]) + ', ' + f1(r.comicCI && r.comicCI[1]) + ']</dd>' +
         '<dt>Variety (set)</dt><dd>' + f1(r.set) + '</dd>' +
-        '<dt>Comics</dt><dd>' + a.comics.length + ' (' + judged + ' passed every gate, ' + gated + ' gated)</dd>' +
+        '<dt>Comics</dt><dd>' + a.comics.length + ' (' + judged + ' passed every gate, ' + gated + ' gated' + (checked ? ', ' + checked + ' checked scripts' : '') + ')</dd>' +
+        (r.respect ? '<dt>Respect gate</dt><dd>' + r.respect.failed + '/' + r.respect.assessed + ' failed · ' + r.respect.unassessed + '/' + r.respect.planned + ' unassessed</dd>' : '') +
         '<dt>First draft clean</dt><dd>' + a.author.firstClean + ' / ' + a.author.comics + ', ' + f2(a.author.meanTries) + ' check runs each</dd>' +
         '<dt>Author</dt><dd>' + esc(m.author) + ' · ' + esc(m.model) + '</dd>' +
         '<dt>Genre · rubric</dt><dd>' + esc(m.genre) + ' · v' + esc(m.rubricVersion) + '</dd>' +
@@ -506,8 +529,10 @@ dialog::backdrop { background: rgba(20,19,15,.7) }
       const fails = D.arms.map((a) => '<td class="num">' + a.comics.filter((x) => x.gates && x.gates[g.id] === false).length + ' failed</td>').join('');
       return '<tr><td><b>' + esc(g.id) + '</b> <span class="chip plain">gate</span><div class="legend">' + esc(g.question) + '</div></td><td class="num">0 if failed</td><td></td>' + fails + '<td>' + D.arms.map((a) => calBadge(a, g.id)).join(' ') + '</td><td></td><td></td></tr>';
     }).join('');
-    const relNote = rel ? '<p class="legend">Second judge: <b>' + esc(rel.reliability.model2) + '</b> re-judged ' + rel.reliability.second.pairs + ' comics; the same judge re-ran on ' + rel.reliability.repeat.pairs + '. α is Krippendorff\'s alpha (ordinal): 1 is perfect agreement, 0 is chance, and below about 0.67 the scores are too noisy to rank small differences.</p>' : '<p class="legend">The second judge has not run on this round yet.</p>';
-    $('#criteria').innerHTML = '<h2>How the judges scored</h2><p class="legend">Each criterion is scored 1 to 5 against written anchors; a competent comic scores 3, and a 4 or 5 must name its strength. A failed gate scores the comic 0. Calibration: the judges saw deliberately broken copies of comics (a flat punchline, a joke about another PR, a wrong fact, tiny lettering, a photo-real render) and had to rank the original higher at least 80% of the time.</p><div class="scroll inked" style="padding:6px 8px"><table><thead>' + head + '</thead><tbody>' + body + gates + '</tbody></table></div>' + relNote;
+    const relNote = rel ? '<p class="legend">Second judge: <b>' + esc(rel.reliability.model2) + '</b> re-judged ' + rel.reliability.second.pairs + ' comics; the same judge re-ran on ' + rel.reliability.repeat.pairs + '. α is Krippendorff\'s alpha (ordinal): 1 is perfect agreement, 0 is chance, and below about 0.67 the scores are too noisy to rank small differences.</p>' :
+      D.arenas.some((a) => a.secondJudge) ? '<p class="legend">Second-model pair judgments appear under Head to head.</p>' : '';
+    const calibration = D.arms.some((a) => a.calibration) ? ' Calibration compares original comics against deliberately weakened controls.' : '';
+    $('#criteria').innerHTML = '<h2>How the judges scored</h2><p class="legend">Each criterion is scored 1 to 5 against written anchors. A competent comic scores 3, and a 4 or 5 must name its strength. A failed gate scores the comic 0.' + calibration + '</p><div class="scroll inked" style="padding:6px 8px"><table><thead>' + head + '</thead><tbody>' + body + gates + '</tbody></table></div>' + relNote;
   }
 
   function variety() {
@@ -549,27 +574,32 @@ dialog::backdrop { background: rgba(20,19,15,.7) }
     const jr = x.judge ? x.judge.gates : {};
     const gates = '<div class="gates">' +
       gateChip('factual', g.factualIntegrity, jr.factualIntegrity && jr.factualIntegrity.reason) +
-      gateChip('phone', g.phoneLegibility, x.phone && x.phone.missing.length ? 'Unreadable at 360 px: ' + x.phone.missing.join(' | ') : 'Every required word read at 360 px') +
+      (x.phone && !x.phoneDiagnostic ? gateChip('phone', g.phoneLegibility, x.phone.missing.length ? 'Unreadable at 360 px: ' + x.phone.missing.join(' | ') : 'Every required word read at 360 px') : '') +
       gateChip('punch up', g.punchUp, jr.punchUp && jr.punchUp.reason) +
+      (Object.hasOwn(g, 'respect') ? gateChip('respect', g.respect, jr.respect && jr.respect.reason) : '') +
       gateChip('valid script', g.outputContract, x.author.finalCheck) + '</div>';
-    const gateReasons = ['factualIntegrity', 'punchUp'].filter((k) => jr[k] && jr[k].reason).map((k) => '<li><b>' + esc(k) + ':</b> ' + esc(jr[k].reason) + critique(x.key, k).replace('class="critique"', 'class="critique" style="display:inline-flex;margin-left:6px"') + '</li>').join('');
+    const gateReasons = ['factualIntegrity', 'punchUp', 'respect'].filter((k) => jr[k] && jr[k].reason).map((k) => '<li><b>' + esc(k) + ':</b> ' + esc(jr[k].reason) + critique(x.key, k).replace('class="critique"', 'class="critique" style="display:inline-flex;margin-left:6px"') + '</li>').join('');
     const m = x.comic;
     const meta = m ? '<div class="meta"><span class="chip plain">' + esc(m.layout) + ' · ' + m.panels + ' panels</span><span class="chip plain">' + esc(m.style) + '</span>' + m.cast.map((n) => '<span class="chip plain">' + esc(n) + '</span>').join('') + '</div>' : '';
     const phone = x.phone ? '<details><summary>What the phone reader could read (' + x.phone.items.length + ' items' + (x.phone.missing.length ? ', ' + x.phone.missing.length + ' required lines missed' : '') + ')</summary><ul class="tight phone">' +
       x.phone.items.map((i) => '<li>' + (i.panel != null ? 'Panel ' + esc(i.panel) + ': ' : '') + '“' + esc(i.words) + '” <span class="chip ' + (i.legible === 'yes' ? 'ok' : i.legible === 'partly' ? 'warn' : 'bad') + '">' + esc(i.legible) + '</span></li>').join('') +
-      x.phone.missing.map((t) => '<li class="missing">Missed: “' + esc(t) + '”</li>').join('') + '</ul></details>' : '';
+      x.phone.missing.map((t) => '<li class="missing">Missed: “' + esc(t) + '”</li>').join('') + '</ul></details>' :
+      (x.phoneDiagnosticError ? '<p class="legend">Phone diagnosis unavailable · ' + esc(x.phoneDiagnosticError) + '</p>' : '');
     const checks = x.author.checks;
     const author = '<details><summary>How the author got there (' + (checks.length || 'no') + ' check run' + (checks.length === 1 ? '' : 's') + ')</summary>' +
-      (x.author.concepts.length ? '<p><b>Concepts it weighed</b></p><ul class="tight">' + x.author.concepts.map((c) => '<li><b>' + esc(c.id) + ':</b> ' + esc(c.punchline) + (c.layout ? ' <span class="legend">(' + esc(c.layout) + ')</span>' : '') + '</li>').join('') + '</ul>' : '') +
+      (x.author.concepts.length ? '<p><b>Concepts it weighed</b></p><ul class="tight">' + x.author.concepts.map((c) => '<li><b>' + esc(c.id) + ':</b> ' + esc(c.punchline) + (c.layout ? ' <span class="legend">(' + esc(c.layout) + ')</span>' : '') +
+        (c.beats.length ? '<ul>' + c.beats.map((beat) => '<li>' + esc(beat) + '</li>').join('') + '</ul>' : '') + '</li>').join('') + '</ul>' : '') +
       (x.author.chosen ? '<p><b>Chose:</b> ' + esc(typeof x.author.chosen === 'string' ? x.author.chosen : JSON.stringify(x.author.chosen)) + (x.author.reason ? ' — ' + esc(x.author.reason) : '') + '</p>' : '') +
       checks.map((c, i) => '<p><b>Check ' + (i + 1) + '</b> <span class="chip ' + (c.clean ? 'ok' : 'warn') + '">' + (c.clean ? 'clean' : 'problems') + '</span></p><pre>' + esc(c.output) + '</pre>').join('') +
       '<p><b>Runner\'s final check:</b> ' + esc(x.author.finalCheck || 'not run') + '</p>' +
       (x.recent.length ? '<p class="legend">It saw these earlier comics as recent: ' + x.recent.map(esc).join(', ') + '</p>' : '<p class="legend">It saw no earlier comics.</p>') + '</details>';
     const n = notes[x.key] || {};
-    const img = x.img ? '<img class="comicimg" src="' + esc(x.img) + '" alt="' + esc(m ? m.altText || m.title : x.key) + '" loading="lazy" data-zoom>' : '<div class="noimg">' + (x.status === 'gated' && !x.img ? 'Not drawn: the script failed the check' : 'No image yet') + '</div>';
+    const img = x.img ? '<img class="comicimg" src="' + esc(x.img) + '" alt="' + esc(m ? m.altText || m.title : x.key) + '" loading="lazy" data-zoom>' : '<div class="noimg">' +
+      (x.status === 'checked' ? 'Checked script' : x.status === 'gated' ? 'Script failed the check' : x.status === 'error' ? 'Run error' : 'No image yet') + '</div>';
     return '<article class="card inked" id="' + esc(x.key) + '"><div class="cardtop"><div><div class="who">' + esc(x.arm) + ' · sample ' + x.sample + '</div>' +
       (m && m.title ? '<h3>' + esc(m.title) + '</h3>' : '') + '</div><div class="score">' + (x.total == null ? '—' : x.total.toFixed(0)) + '<small> / 100</small></div></div>' +
-      img + meta + checkChips(x.checklist) + gates +
+      img + meta + (m?.synopsis ? '<p class="legend">' + esc(m.synopsis) + '</p>' : '') + checkChips(x.checklist) + gates +
+      (x.note ? '<p class="legend">' + esc(x.note) + '</p>' : '') +
       (x.judge ? '<div class="said"><b>The cold reader saw:</b> ' + esc(x.judge.observation) + '<br><b>The joke, in its words:</b> ' + esc(x.judge.joke) + '</div>' : '') +
       '<div class="crit">' + crit + '</div>' +
       (gateReasons ? '<details open><summary>Gate reasons</summary><ul class="tight">' + gateReasons + '</ul></details>' : '') +
@@ -581,7 +611,7 @@ dialog::backdrop { background: rgba(20,19,15,.7) }
   function visibleComics() {
     const arm = $('#f-arm').value, st = $('#f-status').value, q = $('#f-q').value.trim().toLowerCase();
     let xs = D.arms.flatMap((a) => a.comics).filter((x) => !arm || x.arm === arm);
-    if (st === 'judged' || st === 'gated') xs = xs.filter((x) => x.status === st);
+    if (['judged', 'gated', 'checked', 'error'].includes(st)) xs = xs.filter((x) => x.status === st);
     if (st === 'disagree') xs = xs.filter((x) => notes[x.key] && Object.values(notes[x.key].marks || {}).includes('disagree'));
     if (st === 'split') xs = xs.filter((x) => x.second && x.judge && D.criteria.some((c) => x.second.scores[c.id] != null && x.judge.scores[c.id].score != null && Math.abs(x.second.scores[c.id] - x.judge.scores[c.id].score) >= 2));
     if (q) xs = xs.filter((x) => (x.case + ' ' + (D.cases[x.case] || {}).title + ' ' + (x.comic ? x.comic.cast.join(' ') + ' ' + x.comic.layout + ' ' + x.comic.title : '')).toLowerCase().includes(q));
@@ -615,9 +645,38 @@ dialog::backdrop { background: rgba(20,19,15,.7) }
   function checkChips(cl) {
     if (!cl) return '';
     const yes = D.mediumItems.filter((m) => cl[m.id] && cl[m.id].yes);
+    const evidence = ['authoredRepresentation', 'publishedRepresentation'].flatMap((source) => {
+      if (!cl[source]) return [];
+      const label = source === 'authoredRepresentation' ? 'Script' : 'Page';
+      return D.representationItems.filter((m) => cl[source][m.id]?.yes).map((m) =>
+        '<li>' + label + ' · ' + esc(m.label) + ' · ' + esc(cl[source][m.id].evidence) + '</li>');
+    });
+    const observation = (label, ob) => ob ? '<li>' + esc(label) + ' · ' + esc(ob.state === 'supportsBeat' ? 'supports the beat' : ob.state) + ' · ' + esc(ob.evidence) + '</li>' : '';
+    if (cl.castAppearance?.yes) evidence.push('<li>Visible cast variation · ' + esc(cl.castAppearance.evidence) + '</li>');
+    if (cl.castContrast) evidence.push(observation('Human-to-human contrast', cl.castContrast.humanToHuman), observation('Human-to-alien contrast', cl.castContrast.humanToAlien));
+    const craft = [];
+    if (cl.spaceConflict) {
+      craft.push(observation('Combat in concepts', cl.spaceConflict.considered), observation('Combat in selected concept', cl.spaceConflict.selected), observation('Combat in script', cl.spaceConflict.scripted));
+      for (const kind of D.craft.conflicts) craft.push(observation(kind + ' on page', cl.spaceConflict[kind]));
+    }
+    if (cl.renderedGeometry) {
+      const features = (values) => values == null ? 'unassessed' : values.join(', ') || 'rectangular frames';
+      craft.push('<li>Scripted frames · ' + esc(features(cl.scriptedGeometry)) + '</li>');
+      craft.push('<li>Rendered frames · ' + esc(features(cl.renderedGeometry.features)) + ' · ' + esc(cl.renderedGeometry.evidence) + '</li>');
+    }
+    if (cl.beatCraft) for (const choice of D.craft.beats) craft.push(observation(choice, cl.beatCraft[choice]));
+    if (cl.roleRead?.intendedRole) craft.push(observation('Role · ' + cl.roleRead.intendedRole, cl.roleRead.visible));
+    if (cl.roleRead?.pageRole) craft.push(observation('Image-only role · ' + (cl.roleRead.pageRole.role ?? 'none discerned'), cl.roleRead.pageRole));
+    if (cl.leadDesign?.traits.length) {
+      craft.push('<li>Focal character · ' + esc(cl.leadDesign.traits.join(', ')) + ' · ' + esc(cl.leadDesign.evidence) + '</li>');
+    }
+    if (cl.leadDesign) craft.push(observation('Dark skin with silver or white hair', cl.leadDesign.darkSkinLightHair));
+    for (const bg of cl.authoredBackgrounds ?? []) evidence.push('<li>Script · ' + esc(bg.label) + ' · ' + esc(bg.quote ? '“' + bg.quote + '” · ' : '') + esc(bg.evidence) + '</li>');
     return '<div class="meta"><span class="chip ' + (cl.setting === 'office-like interior' ? 'warn' : 'plain') + '" title="' + esc(cl.settingDescription) + '">' + esc(cl.setting) + '</span><span class="chip plain">' + esc(cl.punchline) + '</span>' +
       D.mediumItems.map((m) => '<span class="chip ' + (cl[m.id] && cl[m.id].yes ? 'ok' : 'plain') + '" title="' + esc(cl[m.id] ? cl[m.id].evidence : '') + '">' + (cl[m.id] && cl[m.id].yes ? '✓ ' : '· ') + esc(m.id) + '</span>').join('') +
-      '<span class="chip plain">medium ' + yes.length + '/6</span></div>';
+      '<span class="chip plain">medium ' + yes.length + '/6</span></div>' +
+      (evidence.length ? '<details><summary>Representation evidence</summary><ul>' + evidence.join('') + '</ul></details>' : '') +
+      (craft.some(Boolean) ? '<details><summary>Art direction evidence</summary><ul>' + craft.join('') + '</ul></details>' : '');
   }
   const pct = (x) => (x == null || Number.isNaN(x) ? 'n/a' : Math.round(100 * x) + '%');
   const imgOf = (arm, id) => {
@@ -627,17 +686,56 @@ dialog::backdrop { background: rgba(20,19,15,.7) }
     return c && c.img ? c.img : null;
   };
 
+  function scriptAudits() {
+    const audits = D.scriptAudits || [];
+    if (!audits.length) return;
+    const signal = (label, observation) => '<li><b>' + esc(label) + '</b> · ' + esc(observation.state) + ' · ' + esc(observation.evidence) + '</li>';
+    const sections = audits.map((audit) => {
+      const pairs = audit.results.map((pair) => {
+        const [cid, sample] = pair.id.split('#');
+        const columns = [['a', audit.a], ['b', audit.b]].map(([key, arm]) => {
+          const entry = pair[key];
+          const title = '<h4><a href="#' + esc(arm + '--' + cid + '--' + sample) + '">' + esc(arm) + '</a></h4>';
+          if (!entry) return '<div>' + title + '<p>' + esc(pair.status?.[key]) + '</p></div>';
+          const rows = [
+            signal('PR grounding', entry.grounded), signal('Staging', entry.staging),
+            ...Object.entries(entry.action).map(([stage, observation]) => signal('Engagement ' + stage, observation)),
+            signal('Role through action', entry.casting.roleThroughAction),
+            signal('Dark skin and silver or white hair in script', entry.casting.darkSkinLightHair),
+            signal('Reader-facing LGBTQ+ cue', entry.casting.readerFacingLgbtqCue),
+            ...entry.casting.backgrounds.map((b) => '<li>' + esc(b.label) + ' · “' + esc(b.quote) + '”</li>'),
+          ];
+          return '<div>' + title + '<ul class="tight">' + rows.join('') + '</ul></div>';
+        });
+        const ordered = pair.first === audit.b ? [audit.b, audit.a] : [audit.a, audit.b];
+        const comparisons = pair.comparison ? '<p class="legend">Judge order · first ' + esc(ordered[0]) + ' · second ' + esc(ordered[1]) + '</p><ul class="tight">' +
+          Object.entries(pair.comparison).map(([name, text]) => '<li><b>' + esc(name) + '</b> · ' + esc(text) + '</li>').join('') + '</ul>' : '';
+        return '<details class="pair"><summary>' + esc(pair.id) + '</summary>' +
+          '<div class="arms">' + columns.join('') + '</div>' + comparisons +
+          (pair.error ? '<p class="legend">' + esc(pair.error) + '</p>' : '') + '</details>';
+      });
+      return '<h3>' + esc(audit.b) + ' vs ' + esc(audit.a) + '</h3>' + pairs.join('');
+    });
+    $('#script-audits').innerHTML = '<h2>Script checkpoint and AI audit</h2><p class="legend">The judge compares matched scripts before drawing. Open a pair to see the evidence from concepts and scripts.</p>' + sections.join('');
+  }
+
   // Head to head: the headline. Win rate of B over A per criterion, then every pair.
   function arena() {
     if (!D.arenas || !D.arenas.length) { $('#arena-pairs').innerHTML = ''; return; }
     const tables = D.arenas.map((r) => {
       const rows = D.arenaCriteria.map((c) => {
         const v = r.criteria[c.id];
-        const sig = v.ci[0] > 0.5 ? 'ok' : v.ci[1] < 0.5 ? 'bad' : 'plain';
-        return '<tr><td><b>' + esc(c.id) + '</b><div class="legend">' + esc(c.question) + '</div></td><td class="num"><span class="chip ' + sig + '">' + pct(v.winRate) + '</span></td><td class="num">[' + pct(v.ci[0]) + ', ' + pct(v.ci[1]) + ']</td><td class="num">' + v.wins + ' / ' + v.losses + ' / ' + v.ties + '</td><td class="num">' + v.flips + '</td>' +
-          (r.secondJudge ? '<td class="num">' + (Number.isNaN(r.secondJudge.kappa[c.id]) || r.secondJudge.kappa[c.id] == null ? 'n/a' : r.secondJudge.kappa[c.id].toFixed(2)) + '</td>' : '') + '</tr>';
+        const sig = v.ci[0] > 0.5 ? 'ok' : v.ci[1] != null && v.ci[1] < 0.5 ? 'bad' : 'plain';
+        const question = r.arenaVersion === 1 && c.id === 'visual' ? 'Which is more visually striking and better drawn, with lettering that reads cleanly at PR width?' : c.question;
+        return '<tr><td><b>' + esc(c.id) + '</b><div class="legend">' + esc(question) + '</div></td><td class="num"><span class="chip ' + sig + '">' + pct(v.winRate) + '</span></td><td class="num">[' + pct(v.ci[0]) + ', ' + pct(v.ci[1]) + ']</td><td class="num">' + v.wins + ' / ' + v.losses + ' / ' + v.ties + '</td><td class="num">' + v.flips + '</td>' +
+          (r.secondJudge ? '<td class="num">' + (r.secondJudge.criteria ? pct(r.secondJudge.criteria[c.id]?.winRate) + ' · κ ' : '') +
+          (Number.isNaN(r.secondJudge.kappa[c.id]) || r.secondJudge.kappa[c.id] == null ? 'n/a' : r.secondJudge.kappa[c.id].toFixed(2)) + '</td>' : '') + '</tr>';
       }).join('');
-      return '<article class="arm inked" style="padding:12px 14px"><h3>' + esc(r.b) + ' vs ' + esc(r.a) + '</h3><p class="legend">' + r.pairs + ' pairs, each judged in both orders. Win rate is ' + esc(r.b) + '\'s share (a tie counts half); green means its interval stays above 50%, orange below.</p><div class="scroll"><table><thead><tr><th>Criterion</th><th>' + esc(r.b) + ' wins</th><th>95% interval</th><th>won / lost / tied</th><th>flipped with order</th>' + (r.secondJudge ? '<th>2nd judge κ</th>' : '') + '</tr></thead><tbody>' + rows + '</tbody></table></div></article>';
+      const gate = r.respect;
+      const forfeits = gate ? '<p class="legend">Respect gate · ' + esc(r.a) + ' forfeits ' + gate.aForfeits + ' · ' + esc(r.b) + ' forfeits ' + gate.bForfeits + ' · double forfeits ' + gate.doubleForfeits + ' · incomplete ' + gate.incomplete + '. Overall uses ' + r.criteria.overall.pairs + ' pairs. Raw overall is ' + pct(r.rawOverall.winRate) + ' across ' + r.rawOverall.pairs + ' pairs.</p>' : '';
+      return '<article class="arm inked" style="padding:12px 14px"><h3>' + esc(r.b) + ' vs ' + esc(r.a) + '</h3><p class="legend">' + r.pairs + (r.plannedPairs == null ? '' : '/' + r.plannedPairs) + ' pairs judged in both orders. A tie counts half.' +
+        (r.secondJudge ? ' Second judge ' + esc(r.secondJudge.model) + ' · ' + r.secondJudge.pairs + '/' + (r.secondJudge.planned ?? r.secondJudge.pairs) + ' pairs.' : '') +
+        '</p>' + forfeits + '<div class="scroll"><table><thead><tr><th>Criterion</th><th>' + esc(r.b) + ' wins</th><th>95% interval</th><th>won / lost / tied</th><th>flipped with order</th>' + (r.secondJudge ? '<th>2nd judge ' + (r.secondJudge.criteria ? 'wins · ' : '') + 'κ</th>' : '') + '</tr></thead><tbody>' + rows + '</tbody></table></div></article>';
     }).join('');
     const pairs = D.arenas.map((r) => {
       const items = r.results.map((p) => {
@@ -645,9 +743,14 @@ dialog::backdrop { background: rgba(20,19,15,.7) }
         const verdicts = D.arenaCriteria.map((c) => {
           const v = p.verdicts[c.id];
           const who = v.result === 1 ? r.a : v.result === -1 ? r.b : 'tie';
-          return '<div class="c" style="grid-template-columns:90px 120px 1fr"><div class="n">' + esc(c.id) + '</div><div><span class="chip ' + (v.result === 0 ? 'plain' : 'warn') + '">' + esc(who) + (v.flipped ? ' · flipped' : '') + '</span></div><div class="r">' + esc(v.reasons[0]) + '<div class="alt">Swapped order: ' + esc(v.reasons[1]) + '</div></div>' + critique('arena--' + r.a + '--' + r.b + '--' + p.a + '--' + p.b, c.id) + '</div>';
+          const orders = p.orderVerdicts?.[c.id];
+          const choice = (order) => order === 'tie' ? 'tie' : order + ' image';
+          return '<div class="c" style="grid-template-columns:90px 120px 1fr"><div class="n">' + esc(c.id) + '</div><div><span class="chip ' + (v.result === 0 ? 'plain' : 'warn') + '">' + esc(who) + (v.flipped ? ' · flipped' : '') + '</span></div><div class="r">' + (orders ? esc(choice(orders[0])) + ' · ' : '') + esc(v.reasons[0]) + '<div class="alt">Swapped order: ' + (orders ? esc(choice(orders[1])) + ' · ' : '') + esc(v.reasons[1]) + '</div></div>' + critique('arena--' + r.a + '--' + r.b + '--' + p.a + '--' + p.b, c.id) + '</div>';
         }).join('');
-        return '<details class="pair"><summary>' + esc(p.case) + ': ' + esc(r.a) + ' #' + esc(p.a.split('#')[1]) + ' vs ' + esc(r.b) + ' #' + esc(p.b.split('#')[1]) + ' · overall: ' + esc(p.verdicts.overall.result === 1 ? r.a : p.verdicts.overall.result === -1 ? r.b : 'tie') + '</summary>' +
+        const result = p.respect ? p.respect.overall : p.verdicts.overall.result;
+        const overall = result === 1 ? r.a : result === -1 ? r.b : result === 0 ? 'tie' : p.respect.status.replaceAll('-', ' ');
+        const reasons = p.respect ? [[r.a, p.respect.a], [r.b, p.respect.b]].filter(([, g]) => g && !g.pass).map(([arm, g]) => '<p class="legend">' + esc(arm) + ' forfeits · ' + esc(g.reason) + '</p>').join('') : '';
+        return '<details class="pair"><summary>' + esc(p.case) + ': ' + esc(r.a) + ' #' + esc(p.a.split('#')[1]) + ' vs ' + esc(r.b) + ' #' + esc(p.b.split('#')[1]) + ' · overall: ' + esc(overall) + '</summary>' + reasons +
           '<div class="row" style="--card:360px">' + [[r.a, p.a, ia, p.summaries.a[0]], [r.b, p.b, ib, p.summaries.b[0]]].map(([arm, id, img, sum]) => '<div class="card inked"><div class="who">' + esc(arm) + ' · ' + esc(id) + '</div>' + (img ? '<img class="comicimg" src="' + esc(img) + '" alt="' + esc(id) + '" loading="lazy" data-zoom>' : '<div class="noimg">image not in this page</div>') + '<div class="said">' + esc(sum) + '</div></div>').join('') + '</div>' +
           '<div class="crit">' + verdicts + '</div></details>';
       }).join('');
@@ -663,8 +766,30 @@ dialog::backdrop { background: rgba(20,19,15,.7) }
     const items = D.mediumItems;
     const head = '<tr><th>Measure</th>' + arms.map((a) => '<th>' + esc(a.arm) + '</th>').join('') + '</tr>';
     const row = (label, f) => '<tr><td>' + label + '</td>' + arms.map((a) => '<td class="num">' + f(a.checklist) + '</td>').join('') + '</tr>';
+    const rate = (value) => value?.assessed ? value.observed + '/' + value.assessed : 'n/a';
+    const craftRows = arms.some((a) => a.checklist.diagnostics) ? [
+      ...['considered', 'selected', 'scripted', 'rendered'].map((stage) => row('Space conflict · ' + stage, (s) => rate(s.diagnostics?.spaceConflict[stage]))),
+      ...D.craft.conflicts.map((kind) => row('Space conflict on page · ' + kind, (s) => rate(s.diagnostics?.spaceConflict.kinds[kind]))),
+      ...['any', ...D.craft.frames].map((feature) => row('Dynamic frames · ' + feature, (s) => {
+        const f = s.diagnostics?.geometry[feature];
+        return f ? rate(f.scripted) + ' script · ' + rate(f.rendered) + ' page · ' + f.both + ' both' : 'n/a';
+      })),
+      row('Scripted layout families', (s) => s.diagnostics ? Object.entries(s.diagnostics.layouts).map(([label, n]) => esc(label) + ' · ' + n).join('<br>') || 'n/a' : 'n/a'),
+      ...D.craft.beats.map((choice) => row('Supports a story beat · ' + choice, (s) => rate(s.diagnostics?.beatCraft[choice]))),
+      row('Recognizable central genre role', (s) => {
+        const value = s.diagnostics?.roleRead;
+        return value?.intended ? rate(value) + ' assessed · ' + value.intended + ' intended roles' : 'n/a';
+      }),
+      row('Explicit authored backgrounds', (s) => {
+        const x = s.diagnostics?.backgrounds;
+        return x?.assessed ? x.comicsWithBackground + '/' + x.assessed + '<br>' + Object.entries(x.counts).map(([label, n]) => esc(label) + ' · ' + n).join('<br>') : 'n/a';
+      }),
+      row('Most frequent explicit background, among scripts with one', (s) => pct(s.diagnostics?.backgrounds.topShare)),
+      row('Dark skin with silver or white hair on page', (s) => rate(s.diagnostics?.leadDesign.darkSkinLightHair)),
+      row('Focal designs repeated across cases', (s) => s.diagnostics?.leadDesign.repeats.map((x) => esc(x.traits) + ' · ' + x.cases + ' cases').join('<br>') || 'n/a'),
+    ] : [];
     const rows = [
-      row('<b>Medium use index</b> (of 6)', (s) => s.mediumIndex.toFixed(2)),
+      row('<b>Medium use index</b> (of 6)', (s) => s.mediumIndex == null ? 'n/a' : s.mediumIndex.toFixed(2)),
       ...items.map((m) => row(esc(m.id) + '<div class="legend">' + esc(m.question) + '</div>', (s) => pct(s.medium[m.id]))),
       row('Office-like interior (bridge, console, desk)', (s) => pct(s.officeLike)),
       row('Deadpan punchline', (s) => pct(s.deadpan)),
@@ -672,8 +797,24 @@ dialog::backdrop { background: rgba(20,19,15,.7) }
       row('Setting variety (entropy, bits)', (s) => s.settingEntropy.toFixed(2)),
       row('Settings', (s) => Object.entries(s.settings).sort((x, y) => y[1] - x[1]).map(([k, v]) => esc(k) + ' ' + v).join('<br>')),
       row('Punchlines', (s) => Object.entries(s.punchlines).sort((x, y) => y[1] - x[1]).map(([k, v]) => esc(k) + ' ' + v).join('<br>')),
+      ...D.representationItems.map((m) => row(esc(m.label), (s) => {
+        if (!s.representation) return 'n/a';
+        const a = s.representation.authored[m.id];
+        const p = s.representation.published[m.id];
+        return a.observed + '/' + a.assessed + ' script · ' + p.observed + '/' + p.assessed + ' page';
+      })),
+      ...(arms.some((a) => a.checklist.representation?.castAppearance?.assessed) ?
+        [row('Visible variation in cast appearance', (s) => rate(s.representation?.castAppearance))] : []),
+      ...(arms.some((a) => a.checklist.representation?.castContrast) ? [
+        row('Visible human-to-human contrast', (s) => rate(s.representation?.castContrast?.humanToHuman)),
+        row('Visible human-to-alien contrast', (s) => rate(s.representation?.castContrast?.humanToAlien)),
+      ] : []),
+      ...(arms.some((a) => a.checklist.representation?.windows?.length) ? [
+        row('LGBTQ+ evidence in ten-comic blocks', (s) => s.representation?.windows.map((w) => w.from + '–' + w.to + ' · ' + w.observed + '/' + w.assessed).join('<br>') || 'n/a'),
+      ] : []),
+      ...craftRows,
     ].join('');
-    $('#checklist').innerHTML = '<h2>Craft checklist</h2><p class="legend">Yes/no facts per comic from a judge looking at the image, each with evidence on the comic\'s card. These explain why an arm wins head to head.</p><div class="scroll inked" style="padding:6px 8px"><table><thead>' + head + '</thead><tbody>' + rows + '</tbody></table></div>';
+    $('#checklist').innerHTML = '<h2>Craft checklist</h2><p class="legend">Observations from the concept notes, script and finished page. Evidence appears on each comic\'s card.</p><div class="scroll inked" style="padding:6px 8px"><table><thead>' + head + '</thead><tbody>' + rows + '</tbody></table></div>';
   }
 
   function render() {
@@ -742,7 +883,7 @@ dialog::backdrop { background: rgba(20,19,15,.7) }
     for (const a of D.arms) { const o = document.createElement('option'); o.value = a.arm; o.textContent = a.arm; $('#f-arm').appendChild(o); }
     const total = D.arms.reduce((s, a) => s + a.comics.length, 0);
     $('#lede').textContent = D.arms.map((a) => a.arm).join(' vs ') + ' · ' + total + ' comics · built ' + D.builtAt.slice(0, 16).replace('T', ' ') + ' UTC. Head-to-head verdicts lead; every score comes with the judge\'s own reason. Mark the ones you disagree with.';
-    arena(); checklist(); summary(); criteria(); variety(); comics();
+    arena(); scriptAudits(); checklist(); summary(); criteria(); variety(); comics();
   }
 })();
 </script>

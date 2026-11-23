@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { ARENA_CRITERIA, ARENA_SCHEMA, arenaPrompt, bradleyTerry, cohensKappa, combine, winRates, type PairResult } from '../src/arena.ts';
+import { ARENA_CRITERIA, ARENA_SCHEMA, arenaPrompt, bradleyTerry, cohensKappa, combine, respectOutcome, winRates, type PairResult } from '../src/arena.ts';
 import { CHECKLIST_SCHEMA, MEDIUM_ITEMS, entropy, summarize, type Checklist } from '../src/checklist.ts';
 
 const pair = (c: string, result: 1 | 0 | -1, flipped = false): PairResult => ({
@@ -25,6 +25,21 @@ describe('arena', () => {
     expect(r.overall).toMatchObject({ wins: 2, losses: 1, ties: 1, flips: 1, pairs: 4 });
     expect(r.overall!.ci[0]).toBeLessThanOrEqual(r.overall!.winRate);
     expect(r.overall!.ci[1]).toBeGreaterThanOrEqual(r.overall!.winRate);
+  });
+
+  test('respect forfeits affect overall only and incomplete pairs never count as ties', () => {
+    const pass = { pass: true, reason: 'The retry loop is the target.' };
+    const fail = { pass: false, reason: 'Panel 2 directs ridicule at the pilot.' };
+    const rounds = [
+      { ...pair('a', 1), respect: respectOutcome(fail, pass, 1) },
+      { ...pair('b', -1), respect: respectOutcome(pass, fail, -1) },
+      { ...pair('c', -1), respect: respectOutcome(fail, fail, -1) },
+      { ...pair('d', -1), respect: respectOutcome(null, pass, -1) },
+    ];
+    expect(rounds.map((p) => p.respect.status)).toEqual(['a-forfeit', 'b-forfeit', 'double-forfeit', 'incomplete']);
+    expect(winRates(rounds).overall).toMatchObject({ wins: 1, losses: 1, ties: 0, pairs: 2 });
+    expect(winRates(rounds).funnier).toMatchObject({ wins: 3, losses: 1, pairs: 4 });
+    expect(winRates(rounds, { rawOverall: true }).overall).toMatchObject({ wins: 3, losses: 1, pairs: 4 });
   });
 
   test('Bradley-Terry ranks a consistent winner first', () => {
@@ -86,5 +101,24 @@ describe('checklist', () => {
 
   test('the schema requires every medium item with evidence', () => {
     for (const m of MEDIUM_ITEMS) expect(CHECKLIST_SCHEMA.required).toContain(m.id);
+  });
+
+  test('reports script and page evidence independently in planned blocks of ten', () => {
+    const no = { yes: false, evidence: '' };
+    const yes = { yes: true, evidence: 'A reference to her wife in panel 2.' };
+    const unobserved = { racialBackground: no, genderVariety: no, orientation: no, trans: no, nonbinary: no };
+    const order = Array.from({ length: 30 }, (_, i) => `case-${i}#1`);
+    const items = order.slice(0, 29).map((id, i) => ({
+      id,
+      checklist: {
+        ...cl('other interior', 'visual gag', []),
+        authoredRepresentation: { ...unobserved, orientation: i === 0 || i === 17 ? yes : no },
+        publishedRepresentation: { ...unobserved, orientation: i === 17 ? yes : no },
+      },
+    }));
+    const { representation } = summarize(items.reverse(), order);
+    expect(representation.authored.orientation).toEqual({ observed: 2, assessed: 29, rate: 2 / 29 });
+    expect(representation.published.orientation).toEqual({ observed: 1, assessed: 29, rate: 1 / 29 });
+    expect(representation.windows.map(({ assessed, gap }) => [assessed, gap])).toEqual([[10, true], [10, false], [9, false]]);
   });
 });

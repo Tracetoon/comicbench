@@ -18,6 +18,8 @@ export interface CodexCall {
   /** Reasoning effort; medium unless set. */
   effort?: 'low' | 'medium' | 'high' | 'xhigh';
   addDirs?: string[];
+  /** Inline authors get only the supplied prompt, with local file tools disabled. */
+  noTools?: boolean;
   model?: string;
   timeoutMs?: number;
   /** Where to keep the prompt, Codex's log and its last message (a folder). */
@@ -49,6 +51,11 @@ export async function codexExec(c: CodexCall): Promise<CodexResult> {
   writeFileSync(join(c.logDir, 'prompt.md'), c.prompt);
   const args = [...codexCommand(), 'exec', '--skip-git-repo-check', '--ephemeral', '--ignore-user-config'];
   args.push('-s', c.sandbox ?? 'read-only', '-C', c.cwd);
+  if (c.noTools) {
+    args.push('--ignore-rules', '--disable', 'shell_tool', '--disable', 'unified_exec');
+    args.push('--disable', 'multi_agent', '--disable', 'multi_agent_v2', '-c', 'web_search="disabled"');
+    args.push('--disable', 'view_image', '--disable', 'image_generation');
+  }
   // --ignore-user-config also drops the user's [windows] sandbox setting, and
   // without it Codex can't sandbox commands on Windows: workspace-write falls
   // back to read-only and every shell call is rejected. Set it explicitly.

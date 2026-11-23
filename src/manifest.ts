@@ -30,14 +30,31 @@ export function readRoundManifest(round: string): RoundManifest {
   return manifest;
 }
 
+/**
+ * A round's manifest for reading its results, whatever version wrote it. A
+ * frozen reference (round 3's comics, say) keeps its older manifest; only the
+ * fields every version has are guaranteed.
+ */
+export function readAnyManifest(round: string): Partial<RoundManifest> & { schema: string; name: string; casesDir: string; cases: { id: string }[] } {
+  const manifest = JSON.parse(readFileSync(join(round, 'manifest.json'), 'utf8'));
+  return { ...manifest, cases: Array.isArray(manifest.cases) ? manifest.cases : [] };
+}
+
+/**
+ * Whether two rounds can be compared head to head. They must cover the same
+ * cases; anything else that differs (the runtime under test, the model, the
+ * image route, a legacy manifest) is reported, not refused, because a round
+ * is often compared with a frozen reference made under an earlier setup.
+ */
 export function comparableRounds(a: string, b: string) {
-  const A = readRoundManifest(a);
-  const B = readRoundManifest(b);
-  const keys = ['rubricVersion', 'model', 'runtimeHash', 'imageRoute', 'author', 'cases', 'order', 'samples', 'split', 'jobs'] as const;
-  for (const key of keys) {
-    if (A[key] === undefined || B[key] === undefined || JSON.stringify(A[key]) !== JSON.stringify(B[key])) {
-      throw new Error(`Round manifests disagree on ${key}.`);
-    }
+  const A = readAnyManifest(a);
+  const B = readAnyManifest(b);
+  const ids = (m: { cases: { id: string }[] }) => m.cases.map((c) => c.id).sort().join(',');
+  if (ids(A) !== ids(B)) throw new Error('Round manifests cover different cases; compare rounds of the same split.');
+  const differences: string[] = [];
+  if (A.schema !== B.schema) differences.push(`manifest schema (${A.schema} vs ${B.schema})`);
+  for (const key of ['rubricVersion', 'model', 'runtimeHash', 'imageRoute', 'author', 'samples', 'split'] as const) {
+    if (JSON.stringify(A[key]) !== JSON.stringify(B[key])) differences.push(key);
   }
-  return { A, B };
+  return { A: A as RoundManifest, B: B as RoundManifest, differences };
 }

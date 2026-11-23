@@ -11,7 +11,7 @@ import { basename, join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { codexExec } from './codex.ts';
 import { sha256 } from './cases.ts';
-import { readRoundManifest } from './manifest.ts';
+import { readAnyManifest } from './manifest.ts';
 import { isPageRole, PAGE_ROLE_PROMPT, PAGE_ROLE_SCHEMA, type PageRole } from './judges.ts';
 import { RUBRIC_VERSION } from './rubric.ts';
 import { mean } from './stats.ts';
@@ -345,6 +345,13 @@ export function lookConcentration(traitLists: string[][]): { topShare: number | 
   return { topShare: top.size / looks.length, distinctLooks: clusters.length, topLook: top.label };
 }
 
+/** A round's comic ids from its folders, case then sample. */
+function listComics(round: string): string[] {
+  const root = join(round, 'comics');
+  if (!existsSync(root)) return [];
+  return readdirSync(root).sort().flatMap((c) => readdirSync(join(root, c)).sort().map((n) => `${c}#${n}`));
+}
+
 /** Shannon entropy in bits of a list of labels. */
 export function entropy(labels: string[]): number {
   if (!labels.length) return 0;
@@ -422,9 +429,12 @@ async function readPageRole(dir: string, image: string, imageHash: string, model
 }
 
 export async function runChecklist(o: { round: string; model?: string; jobs?: number }) {
-  const manifest = readRoundManifest(o.round);
+  const manifest = readAnyManifest(o.round);
+  // A legacy reference round has no recorded order or runtime: use its comic folders and the bench snapshot.
+  const order = manifest.order ?? listComics(o.round);
+  const tracetoonRoot = manifest.tracetoon && existsSync(join(manifest.tracetoon, 'src', 'comic', 'composition.ts')) ? manifest.tracetoon : join(o.round, '..', '..', '.comicbench-cache', 'tracetoon-bench');
   const model = o.model ?? (manifest.model === 'codex default' ? undefined : manifest.model);
-  const compositionModule = pathToFileURL(join(manifest.tracetoon, 'src', 'comic', 'composition.ts')).href;
+  const compositionModule = pathToFileURL(join(tracetoonRoot, 'src', 'comic', 'composition.ts')).href;
   const { resolveComposition } = await import(compositionModule) as { resolveComposition: (script: unknown) => { frames: Frame[] } | undefined };
   const root = join(o.round, 'comics');
   const jobs: { id: string; dir: string; image: string }[] = [];
@@ -477,7 +487,7 @@ export async function runChecklist(o: { round: string; model?: string; jobs?: nu
     const script = existsSync(join(j.dir, 'packet', 'comic.json')) ? JSON.parse(readFileSync(join(j.dir, 'packet', 'comic.json'), 'utf8')) : undefined;
     return [{ id: j.id, checklist: JSON.parse(readFileSync(f, 'utf8')) as Checklist, script }];
   });
-  const summary = { checklistVersion: CHECKLIST_VERSION, rubricVersion: RUBRIC_VERSION, model, round: basename(o.round), planned: manifest.order.length, ...summarize(items, manifest.order), errors };
+  const summary = { checklistVersion: CHECKLIST_VERSION, rubricVersion: RUBRIC_VERSION, model, round: basename(o.round), planned: order.length, ...summarize(items, order), errors };
   writeFileSync(join(o.round, 'checklist.json'), JSON.stringify(summary, null, 2) + '\n');
   return summary;
 }

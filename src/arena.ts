@@ -259,7 +259,8 @@ export async function runArena(o: {
   a: string; b: string; out?: string; cases?: string; model?: string; model2?: string;
   share2?: number; jobs?: number; only?: string[]; pairing?: 'matched';
 }) {
-  const { A: manifestA, B: manifest } = comparableRounds(o.a, o.b);
+  const { A: manifestA, B: manifest, differences } = comparableRounds(o.a, o.b);
+  if (differences.length) console.log(`note: the rounds differ in ${differences.join(', ')}`);
   const model = o.model ?? (manifest.model === 'codex default' ? undefined : manifest.model);
   const nameA = basename(o.a);
   const nameB = basename(o.b);

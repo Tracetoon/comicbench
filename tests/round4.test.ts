@@ -63,7 +63,10 @@ test('arena and offline review retain raw verdicts, forfeits and missing planned
     expect(() => new Function(html.match(/<script>([\s\S]+)<\/script>/)?.[1] ?? 'throw new Error("missing script")')).not.toThrow();
 
     writeFileSync(join(b, 'manifest.json'), JSON.stringify({ ...candidate, runtimeHash: 'changed-runtime' }));
-    expect(() => comparableRounds(a, b)).toThrow('disagree on runtimeHash');
+    // A different runtime is what a round tests, so it is reported, not refused; different cases are refused.
+    expect(comparableRounds(a, b).differences).toContain('runtimeHash');
+    writeFileSync(join(b, 'manifest.json'), JSON.stringify({ ...candidate, cases: [{ id: 'other-case', sha256: {} }] }));
+    expect(() => comparableRounds(a, b)).toThrow('different cases');
   } finally {
     if (originalBin === undefined) delete process.env.COMICBENCH_CODEX_BIN;
     else process.env.COMICBENCH_CODEX_BIN = originalBin;

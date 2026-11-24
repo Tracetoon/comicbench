@@ -1,0 +1,19 @@
+{
+  "name": "r10",
+  "cases": "cases-local",
+  "split": "dev",
+  "samples": 2,
+  "arms": [
+    { "name": "r10-anime", "label": "Anime fantasy + required genre archetype (1 in 5) from 101 source-true diverse archetypes; no generic cast hints", "genre": "genres/anime-fantasy-cast.md", "skill": ".comicbench-cache/skills/r10", "tracetoon": ".comicbench-cache/tracetoon-r10", "jobs": 6 },
+    { "name": "r10-space", "label": "Space opera + required genre archetype (1 in 5) from 109 source-true diverse archetypes; no generic cast hints", "genre": "genres/space-opera-cast.md", "skill": ".comicbench-cache/skills/r10", "tracetoon": ".comicbench-cache/tracetoon-r10", "jobs": 6 }
+  ],
+  "references": [
+    { "round": "results/r9-anime", "label": "Anime fantasy + memes, backgrounds, style mix; generic cast hints (round 9)" },
+    { "round": "results/r9-space", "label": "Space opera + memes, backgrounds; generic cast hints (round 9)" }
+  ],
+  "arenas": [["r9-anime", "r10-anime"], ["r9-space", "r10-space"]],
+  "secondJudge": { "model": "gpt-6.2-astra", "share": 0.3 },
+  "canary": 4,
+  "slots": 12,
+  "reviewTracetoon": ".comicbench-cache/tracetoon-bench"
+}

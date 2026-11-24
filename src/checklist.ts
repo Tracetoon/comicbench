@@ -20,7 +20,7 @@ import { mean } from './stats.ts';
 export const SETTINGS = ['office-like interior', 'other interior', 'open outdoors (sky, space, road, wilderness)', 'dungeon, cave or ruin', 'battle or chase', 'crowd, tavern, guild or market'] as const;
 export const RENDER_LOOKS = ['full-color anime', 'color comic (not anime)', 'black-and-white manga', 'other'] as const;
 export const PUNCHLINES = ['deadpan understatement', 'visual gag', 'slapstick', 'escalation', 'reversal', 'wordplay', 'literal reading', 'other'] as const;
-export const CHECKLIST_VERSION = 6;
+export const CHECKLIST_VERSION = 7;
 export const CONFLICT_KINDS = ['fleet', 'duel', 'other'] as const;
 export const FRAME_FEATURES = ['angled', 'inset', 'borderless', 'breakout'] as const;
 export const BEAT_CHOICES = ['framing', 'background', 'lettering'] as const;
@@ -96,6 +96,9 @@ export const CHECKLIST_SCHEMA = {
     renderLook: { type: 'string', enum: [...RENDER_LOOKS] },
     castRoles: object({ nemesisOnPage: observation, partyPunchline: observation }),
     genreMeme: object({ state: state('present', 'absent', 'unclear'), meme: string, evidence: string }),
+    castFitsGenre: object({ state: state('present', 'absent', 'unclear'), offGenre: { type: 'array', items: string }, evidence: string }),
+    stylingTell: observation,
+    requiredOnPage: object({ state: state('present', 'absent', 'unclear', 'inapplicable'), evidence: string }),
     backgroundFocus: observation,
     punchline: { type: 'string', enum: [...PUNCHLINES] },
     imageCarriesJoke: yesNo,
@@ -105,7 +108,7 @@ export const CHECKLIST_SCHEMA = {
     ...diagnostics,
     ...Object.fromEntries(MEDIUM_ITEMS.map((m) => [m.id, yesNo])),
   },
-  required: ['setting', 'settingDescription', 'place', 'renderLook', 'castRoles', 'genreMeme', 'backgroundFocus', 'punchline', 'imageCarriesJoke', 'castContrast', 'authoredRepresentation', 'publishedRepresentation', ...Object.keys(diagnostics), ...MEDIUM_ITEMS.map((m) => m.id)],
+  required: ['setting', 'settingDescription', 'place', 'renderLook', 'castRoles', 'genreMeme', 'castFitsGenre', 'stylingTell', 'requiredOnPage', 'backgroundFocus', 'punchline', 'imageCarriesJoke', 'castContrast', 'authoredRepresentation', 'publishedRepresentation', ...Object.keys(diagnostics), ...MEDIUM_ITEMS.map((m) => m.id)],
   additionalProperties: false,
 };
 
@@ -117,6 +120,9 @@ export function checklistPrompt(script?: string, design?: string, pageRole?: Pag
 - \`place\`: the specific place in two to four plain words, as a reader would name it ("guild counter", "campfire on a road", "starship bridge", "tavern").
 - \`renderLook\`: how the page is drawn. "full-color anime" means anime-style faces and cel shading in full color; "black-and-white manga" means ink and screentone without full color.
 - \`genreMeme\`: is a recognizable genre meme, famous line or famous-scene allusion (from well-known science fiction, fantasy or anime) visible on the page? Name it in \`meme\` in a few words ("hand-wave mind trick", "mimic chest bites the hero"); use an empty string when absent.
+- \`castFitsGenre\`: does every character look like they belong in this genre as its well-known source works draw it (costume, styling, species, setting)? Present when all fit; absent when any looks imported from another setting or from present-day pop culture, and list each such character in \`offGenre\` with what is out of place ("modern dreadlocks on a rabbit-eared scout", "a present-day nationality named in a fantasy kingdom"). Varied skin tones and the genre's own races fit.
+- \`stylingTell\`: present when a character's identity (orientation, gender identity, background) is signalled by a pop-culture styling cue such as an undercut, shaved sides or a pride accessory rather than by the story. Absent otherwise.
+- \`requiredOnPage\`: the script may mark one persona \`required\` (in \`personas\` and its character description). Is that character recognisably on the page as described? Inapplicable when the script has no required persona.
 - \`backgroundFocus\`: does the page match backgrounds to panel focus: at least one dialogue or reaction panel with a blurred, out-of-focus, simplified or speed-line background, while an establishing or action panel keeps a detailed one? Absent when every panel has the same level of background detail.
 - \`castRoles.nemesisOnPage\`: is an opposing figure (a villain, monster or rival named as such in the script, or clearly cast as the opposition) visible on the page? Unclear without a script. \`castRoles.partyPunchline\`: does the final joke land on a supporting party member rather than the hero or lead? Use absent when the lead delivers it and unclear when there is no party.
 - \`punchline\`: the shape of the final joke.
@@ -157,6 +163,9 @@ export interface Checklist {
   renderLook?: (typeof RENDER_LOOKS)[number];
   castRoles?: { nemesisOnPage: Observation; partyPunchline: Observation };
   genreMeme?: { state: Observation['state']; meme: string; evidence: string };
+  castFitsGenre?: { state: Observation['state']; offGenre: string[]; evidence: string };
+  stylingTell?: Observation;
+  requiredOnPage?: { state: Observation['state'] | 'inapplicable'; evidence: string };
   backgroundFocus?: Observation;
   punchline: (typeof PUNCHLINES)[number];
   imageCarriesJoke: Evidence;
@@ -424,7 +433,7 @@ export function memeSummary(items: { checklist: Checklist; script?: any; offers?
   };
 }
 
-export function summarize(items: { id: string; checklist: Checklist; script?: any; offer?: CastOfferLike; offers?: string[] }[], order: string[] = items.map(({ id }) => id)) {
+export function summarize(items: { id: string; checklist: Checklist; script?: any; offer?: CastOfferLike; offers?: string[]; required?: string }[], order: string[] = items.map(({ id }) => id)) {
   const n = items.length;
   const share = (f: (c: Checklist) => boolean) => (n ? items.filter((i) => f(i.checklist)).length / n : NaN);
   const dist = (key: 'setting' | 'punchline') => {
@@ -481,6 +490,13 @@ export function summarize(items: { id: string; checklist: Checklist; script?: an
     },
     cast: castSummary(items),
     memes: memeSummary(items),
+    genreCast: {
+      offGenre: tally(items.map(({ checklist }) => (checklist.castFitsGenre ? checklist.castFitsGenre.state === 'absent' : undefined))),
+      offGenreCharacters: items.flatMap(({ id, checklist }) => (checklist.castFitsGenre?.offGenre ?? []).map((c) => `${id}: ${c}`)),
+      stylingTells: tally(items.map(({ checklist }) => present(checklist.stylingTell))),
+      required: items.filter((i) => i.required).length,
+      requiredOnPage: tally(items.filter((i) => i.required).map(({ checklist }) => present(checklist.requiredOnPage))),
+    },
     backgroundFocus: tally(items.map(({ checklist }) => present(checklist.backgroundFocus))),
     diagnostics: summarizeDiagnostics(items),
   };
@@ -576,7 +592,9 @@ async function checklistImpl(o: { round: string; model?: string; jobs?: number; 
     const context = existsSync(join(j.dir, 'packet', 'context.json')) ? JSON.parse(readFileSync(join(j.dir, 'packet', 'context.json'), 'utf8')) : undefined;
     const offer = context?.genreOptions?.[0]?.castOffer as CastOfferLike | undefined;
     const offers = (context?.genreOptions?.[0]?.memeOffer as { id: string }[] | undefined)?.map((m) => m.id);
-    return [{ id: j.id, checklist: JSON.parse(readFileSync(f, 'utf8')) as Checklist, script, ...(offer ? { offer } : {}), ...(offers ? { offers } : {}) }];
+    const option = context?.genreOptions?.[0];
+    const required = (option?.requiredCast ?? option?.castOffer?.personas?.find((p: { required?: boolean }) => p.required))?.id as string | undefined;
+    return [{ id: j.id, checklist: JSON.parse(readFileSync(f, 'utf8')) as Checklist, script, ...(offer ? { offer } : {}), ...(offers ? { offers } : {}), ...(required ? { required } : {}) }];
   });
   const summary = { checklistVersion: CHECKLIST_VERSION, rubricVersion: RUBRIC_VERSION, model, round: basename(o.round), planned: order.length, ...summarize(items, order), errors };
   writeFileSync(join(o.round, 'checklist.json'), JSON.stringify(summary, null, 2) + '\n');

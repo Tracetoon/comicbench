@@ -20,7 +20,9 @@ export interface GenreOption {
   jokeHooks: string[];
   notes?: string;
   /** The five personas this comic casts from, when the genre has a roster (Tracetoon's casting.ts castOffer). */
-  castOffer?: { kind: 'party' | 'side-only'; personas: { id: string; role: string; name: string; details: string }[] };
+  castOffer?: { kind: 'party' | 'side-only'; personas: { id: string; role: string; name: string; details: string; required?: true }[] };
+  /** A diverse archetype this comic must cast, for a genre without a cast offer (Tracetoon's casting.ts diverseHint). */
+  requiredCast?: { id: string; role: string; name: string; details: string; required?: true };
   /** Three genre memes this comic may use (Tracetoon's memes.ts memeOffer). */
   memeOffer?: { id: string; tier: number; roles: string[]; meme: string; use: string }[];
   /** The style the host assigned this comic (Tracetoon's memes.ts stylePick). */
@@ -105,7 +107,11 @@ Read these packet files (they sit next to this one):
   and anything the repo pins or the user asked for (\`request\`).${input.castHint ? `
   It also has \`castHint\`: one person this comic could include. Use it when
   it fits the story, as an ordinary member of the cast, never the topic or
-  the joke; skip it when it doesn't fit.` : ''}${input.genres.some((g) => g.castOffer) ? `
+  the joke; skip it when it doesn't fit.` : ''}${input.genres.some((g) => g.requiredCast || g.castOffer?.personas.some((p) => p.required)) ? `
+  A persona marked \`required\` (or a genre's \`requiredCast\`) must be in this
+  comic's cast if you choose that genre: write them as described, in the
+  genre's own look, and list their id in \`personas\`. Show any relationship
+  through what the characters say and do.` : ''}${input.genres.some((g) => g.castOffer) ? `
   A genre with a \`castOffer\` comes with five personas picked for this comic.
   If you choose that genre, cast from those five only (crowds and passers-by
   are fine) and list the ids you used in \`personas\`. A \`side-only\` offer

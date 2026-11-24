@@ -168,10 +168,16 @@ export async function tracetoonModules(root: string) {
         return { ...(offer ? { memeOffer: offer } : {}), ...(style ? { assignedStyle: style } : {}) };
       }
     : undefined;
+  // A cast offer (round 8 on) and, from round 10, a required diverse archetype from the genre's own list.
   const castOffer =
     casting?.castOffer && genreFile
-      ? (genrePath: string, seed: string): GenreOption['castOffer'] =>
-          casting.castOffer(genreFile.parseGenreFile(readFileSync(genrePath, 'utf8')).genre?.cast, seed)
+      ? (genrePath: string, seed: string): { castOffer?: GenreOption['castOffer']; requiredCast?: GenreOption['requiredCast'] } => {
+          const g = genreFile.parseGenreFile(readFileSync(genrePath, 'utf8')).genre;
+          const hint = casting.diverseHint?.(g?.diverseCast, seed);
+          const plain = casting.castOffer(g?.cast, seed);
+          const offer = plain && hint ? casting.withRequired(plain, hint) : plain;
+          return { ...(offer ? { castOffer: offer } : {}), ...(hint && !offer ? { requiredCast: hint } : {}) };
+        }
       : undefined;
   return { draw: draw.draw, svgToPng: raster.svgToPng, pageText: script.pageText, styleById: styles.styleById, imageSize: compose.imageSize, comicSummary: composition.comicSummary, sceneOptions: genres.sceneOptions as ((g: unknown, recent: string[], o: { seed?: string }) => unknown[]) | undefined, genreById: genres.genreById as (id: string) => unknown, castHint: casting?.castHint as ((seed: string) => string | undefined) | undefined, castOffer, memeExtras };
 }
@@ -286,14 +292,15 @@ async function oneComic(c: Case, sample: number, o: RoundOpts, tt: Tt, genreText
       // The Tracetoon under test offers five personas when the genre has a roster.
       ...(() => {
         const seed = `${basename(o.out)}:${id}:${sample}`;
-        const offer = tt.castOffer?.(o.genre, seed);
+        const cast = tt.castOffer?.(o.genre, seed);
+        const offer = cast?.castOffer;
         const extras = tt.memeExtras?.(
           o.genre,
           seed,
           offer ? [...new Set(offer.personas.map((p) => p.role))] : undefined,
           seen.flatMap((r) => (typeof r.summary.meme === 'string' ? [r.summary.meme] : [])),
         );
-        return { ...(offer ? { castOffer: offer } : {}), ...(extras ?? {}) };
+        return { ...(cast ?? {}), ...(extras ?? {}) };
       })(),
       // The Tracetoon under test offers scenes only if it has a scene library.
       ...(tt.sceneOptions

@@ -62,6 +62,8 @@ export function writePacket(
     castHint?: string;
     /** The personas offered, when the Tracetoon under test offers a cast for the genre. */
     castOffer?: GenreOption['castOffer'];
+    /** A required diverse archetype, for a genre without a cast offer. */
+    requiredCast?: GenreOption['requiredCast'];
     /** Memes offered and the assigned style, when the Tracetoon under test has them. */
     memeOffer?: GenreOption['memeOffer'];
     assignedStyle?: string;
@@ -80,6 +82,7 @@ export function writePacket(
         ...(opts.castOffer ? { archetypes: opts.castOffer.personas.map((p) => p.name), castOffer: opts.castOffer } : {}),
         ...(opts.memeOffer?.length ? { memeOffer: opts.memeOffer } : {}),
         ...(opts.assignedStyle ? { assignedStyle: opts.assignedStyle } : {}),
+        ...(opts.requiredCast ? { requiredCast: opts.requiredCast } : {}),
       },
     ],
     ...(opts.recentComics ? { recentComics: opts.recentComics } : {}),
@@ -345,6 +348,8 @@ if (import.meta.main) {
       console.log(`  Nemesis on page: ${coverage(s.castRoles.nemesisOnPage)}; party member lands the punchline: ${coverage(s.castRoles.partyPunchline)}`);
       if (s.memes.offered || s.memes.onPage.observed) console.log(`  Memes: ${s.memes.offered} offered, ${s.memes.scripted} scripted (${s.memes.outsideOffer} outside the offer, ${s.memes.repeats} repeats), ${coverage(s.memes.onPage)} on the page`);
       console.log(`  Backgrounds by panel focus: ${coverage(s.backgroundFocus)}`);
+      console.log(`  Genre cast: ${coverage(s.genreCast.offGenre)} comics with an off-genre character, ${coverage(s.genreCast.stylingTells)} with a styling tell; required archetype on the page ${coverage(s.genreCast.requiredOnPage)} of ${s.genreCast.required}`);
+      for (const c of s.genreCast.offGenreCharacters.slice(0, 12)) console.log(`    off-genre: ${c}`);
       if (s.cast) console.log(`  Cast offers: ${s.cast.withPersonas}/${s.cast.comics} scripts list personas, ${s.cast.distinctUsed} distinct used, largest ${pct(s.cast.topShare ?? NaN)}, ${s.cast.outsideOffer} outside the offer; side-only ${s.cast.sideOnlyKept}/${s.cast.sideOnly} kept to side characters`);
     } else if (cmd === 'campaign') {
       const specFile = positional[0];

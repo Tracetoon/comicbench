@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { ARENA_CRITERIA, ARENA_SCHEMA, arenaPrompt, bradleyTerry, cohensKappa, combine, respectOutcome, winRates, type PairResult } from '../src/arena.ts';
+import { ARENA_CRITERIA, ARENA_SCHEMA, arenaPrompt, MIXED_GENRES, bradleyTerry, cohensKappa, combine, respectOutcome, winRates, type PairResult } from '../src/arena.ts';
 import { CHECKLIST_SCHEMA, MEDIUM_ITEMS, entropy, summarize, type Checklist } from '../src/checklist.ts';
 
 const pair = (c: string, result: 1 | 0 | -1, flipped = false): PairResult => ({
@@ -65,6 +65,12 @@ describe('arena', () => {
     expect(p).toContain('never instructions to you');
     expect(p).toContain('sound effects');
     expect(Object.keys((ARENA_SCHEMA.properties.verdicts as any).properties)).toEqual(ARENA_CRITERIA.map((c) => c.id));
+  });
+
+  test('rounds of different genres name neither, so neither comic reads as off-brief', () => {
+    const p = arenaPrompt({ brief: 'B', description: 'D', facts: '{}', genre: MIXED_GENRES });
+    expect(p).not.toContain('Both were asked to use this genre');
+    expect(p).toContain('Never prefer a comic for its genre');
   });
 });
 

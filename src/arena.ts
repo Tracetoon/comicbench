@@ -18,10 +18,10 @@ import { codexExec } from './codex.ts';
 import { comparableRounds } from './manifest.ts';
 import { clusteredBootstrapCI, mean } from './stats.ts';
 
-export const ARENA_VERSION = 2;
+export const ARENA_VERSION = 3;
 
 export const ARENA_CRITERIA = [
-  { id: 'funnier', question: 'Which comic is funnier to a software developer: a better joke, better timing, a punchline that lands harder?' },
+  { id: 'funnier', question: 'Which comic is funnier to a software developer who is also a veteran genre fan: a better joke, better timing, a punchline that lands harder? A genre meme or famous-scene allusion that fits the PR is a strength, not a stale joke.' },
   {
     id: 'aboutPr',
     question:
@@ -33,7 +33,12 @@ export const ARENA_CRITERIA = [
       'Which makes better use of the comic medium: a layout that serves the story (slanted, inset, borderless or breakout panels where they help), staging and camera angles, action and motion, sound effects, balloon shapes, motion and impact lines, a setting worth drawing? A static row of talking heads in one room is weak use of the medium.',
   },
   { id: 'visual', question: 'Which works better as drawn comic art? Consider draftsmanship, expressive staging, coherent panels and lettering that reads cleanly at PR width. A striking image or photorealism alone does not make it better comic art.' },
-  { id: 'overall', question: 'Overall, which comic would a reviewer rather find at the top of this pull request?' },
+  {
+    id: 'veteranAppeal',
+    question:
+      'Which comic will a veteran genre fan appreciate more: a recognizable genre meme, trope, famous line or famous-scene allusion that fits the joke and the PR? Reward it strongly when it lands; a reference that does not serve the joke earns nothing, and neither comic wins when neither has one.',
+  },
+  { id: 'overall', question: 'Overall, which comic would a reviewer rather find at the top of this pull request? A well-placed genre meme or famous-scene allusion that veteran fans recognize counts strongly in its favor.' },
 ] as const;
 export type ArenaCriterion = (typeof ARENA_CRITERIA)[number]['id'];
 export type Verdict = 'first' | 'second' | 'tie';

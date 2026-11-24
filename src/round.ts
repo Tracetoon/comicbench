@@ -152,12 +152,23 @@ export async function tracetoonModules(root: string) {
   const casting = existsSync(join(root, 'src', 'comic', 'casting.ts')) ? await import(join(root, 'src', 'comic', 'casting.ts')) : undefined;
   // Cast offers (round 8 on): the genre file's roster, parsed by the Tracetoon under test.
   const genreFile = casting?.castOffer ? await import(join(root, 'src', 'comic', 'genreFile.ts')) : undefined;
+  // Genre memes and style mixes (round 9 on).
+  const memes = existsSync(join(root, 'src', 'comic', 'memes.ts')) ? await import(join(root, 'src', 'comic', 'memes.ts')) : undefined;
+  const genreFileMod = genreFile ?? (memes ? await import(join(root, 'src', 'comic', 'genreFile.ts')) : undefined);
+  const memeExtras = memes && genreFileMod
+    ? (genrePath: string, seed: string, roles: string[] | undefined, recent: string[]): { memeOffer?: GenreOption['memeOffer']; assignedStyle?: string } => {
+        const g = genreFileMod.parseGenreFile(readFileSync(genrePath, 'utf8')).genre;
+        const offer = memes.memeOffer(g?.memes, seed, { recent, ...(roles ? { roles } : {}) });
+        const style = memes.stylePick(g?.styleMix, seed);
+        return { ...(offer ? { memeOffer: offer } : {}), ...(style ? { assignedStyle: style } : {}) };
+      }
+    : undefined;
   const castOffer =
     casting?.castOffer && genreFile
       ? (genrePath: string, seed: string): GenreOption['castOffer'] =>
           casting.castOffer(genreFile.parseGenreFile(readFileSync(genrePath, 'utf8')).genre?.cast, seed)
       : undefined;
-  return { draw: draw.draw, svgToPng: raster.svgToPng, pageText: script.pageText, styleById: styles.styleById, imageSize: compose.imageSize, comicSummary: composition.comicSummary, sceneOptions: genres.sceneOptions as ((g: unknown, recent: string[], o: { seed?: string }) => unknown[]) | undefined, genreById: genres.genreById as (id: string) => unknown, castHint: casting?.castHint as ((seed: string) => string | undefined) | undefined, castOffer };
+  return { draw: draw.draw, svgToPng: raster.svgToPng, pageText: script.pageText, styleById: styles.styleById, imageSize: compose.imageSize, comicSummary: composition.comicSummary, sceneOptions: genres.sceneOptions as ((g: unknown, recent: string[], o: { seed?: string }) => unknown[]) | undefined, genreById: genres.genreById as (id: string) => unknown, castHint: casting?.castHint as ((seed: string) => string | undefined) | undefined, castOffer, memeExtras };
 }
 type Tt = Awaited<ReturnType<typeof tracetoonModules>>;
 
@@ -268,7 +279,17 @@ async function oneComic(c: Case, sample: number, o: RoundOpts, tt: Tt, genreText
       // The Tracetoon under test rotates casting only if it has casting.ts.
       ...(tt.castHint ? { castHint: tt.castHint(`${basename(o.out)}:${id}:${sample}`) } : {}),
       // The Tracetoon under test offers five personas when the genre has a roster.
-      ...(tt.castOffer ? (() => { const offer = tt.castOffer!(o.genre, `${basename(o.out)}:${id}:${sample}`); return offer ? { castOffer: offer } : {}; })() : {}),
+      ...(() => {
+        const seed = `${basename(o.out)}:${id}:${sample}`;
+        const offer = tt.castOffer?.(o.genre, seed);
+        const extras = tt.memeExtras?.(
+          o.genre,
+          seed,
+          offer ? [...new Set(offer.personas.map((p) => p.role))] : undefined,
+          seen.flatMap((r) => (typeof r.summary.meme === 'string' ? [r.summary.meme] : [])),
+        );
+        return { ...(offer ? { castOffer: offer } : {}), ...(extras ?? {}) };
+      })(),
       // The Tracetoon under test offers scenes only if it has a scene library.
       ...(tt.sceneOptions
         ? {

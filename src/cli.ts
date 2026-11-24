@@ -62,6 +62,9 @@ export function writePacket(
     castHint?: string;
     /** The personas offered, when the Tracetoon under test offers a cast for the genre. */
     castOffer?: GenreOption['castOffer'];
+    /** Memes offered and the assigned style, when the Tracetoon under test has them. */
+    memeOffer?: GenreOption['memeOffer'];
+    assignedStyle?: string;
   },
 ): string[] {
   const problems = caseProblems(caseDir);
@@ -72,9 +75,12 @@ export function writePacket(
     brief: readFileSync(join(caseDir, 'brief.md'), 'utf8'),
     description: readFileSync(join(caseDir, 'description.md'), 'utf8'),
     genres: [
-      opts.castOffer
-        ? { ...readGenre(opts.genre), archetypes: opts.castOffer.personas.map((p) => p.name), castOffer: opts.castOffer }
-        : readGenre(opts.genre),
+      {
+        ...readGenre(opts.genre),
+        ...(opts.castOffer ? { archetypes: opts.castOffer.personas.map((p) => p.name), castOffer: opts.castOffer } : {}),
+        ...(opts.memeOffer?.length ? { memeOffer: opts.memeOffer } : {}),
+        ...(opts.assignedStyle ? { assignedStyle: opts.assignedStyle } : {}),
+      },
     ],
     ...(opts.recentComics ? { recentComics: opts.recentComics } : {}),
     ...(opts.pinGenre ? { pinnedGenre: readGenre(opts.genre).id } : {}),
@@ -337,6 +343,8 @@ if (import.meta.main) {
       if (s.places.assessed) console.log(`  Places: ${s.places.distinctLooks} distinct over ${s.places.assessed}, largest ${pct(s.places.topShare ?? NaN)} ("${s.places.topLook}")`);
       console.log(`  Render look: ${Object.entries(s.renderLooks).filter(([, v]) => v).map(([k, v]) => `${k} ${v}`).join(', ') || 'n/a'}`);
       console.log(`  Nemesis on page: ${coverage(s.castRoles.nemesisOnPage)}; party member lands the punchline: ${coverage(s.castRoles.partyPunchline)}`);
+      if (s.memes.offered || s.memes.onPage.observed) console.log(`  Memes: ${s.memes.offered} offered, ${s.memes.scripted} scripted (${s.memes.outsideOffer} outside the offer, ${s.memes.repeats} repeats), ${coverage(s.memes.onPage)} on the page`);
+      console.log(`  Backgrounds by panel focus: ${coverage(s.backgroundFocus)}`);
       if (s.cast) console.log(`  Cast offers: ${s.cast.withPersonas}/${s.cast.comics} scripts list personas, ${s.cast.distinctUsed} distinct used, largest ${pct(s.cast.topShare ?? NaN)}, ${s.cast.outsideOffer} outside the offer; side-only ${s.cast.sideOnlyKept}/${s.cast.sideOnly} kept to side characters`);
     } else if (cmd === 'review') {
       const round = positional[0];

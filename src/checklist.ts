@@ -20,7 +20,7 @@ import { mean } from './stats.ts';
 export const SETTINGS = ['office-like interior', 'other interior', 'open outdoors (sky, space, road, wilderness)', 'dungeon, cave or ruin', 'battle or chase', 'crowd, tavern, guild or market'] as const;
 export const RENDER_LOOKS = ['full-color anime', 'color comic (not anime)', 'black-and-white manga', 'other'] as const;
 export const PUNCHLINES = ['deadpan understatement', 'visual gag', 'slapstick', 'escalation', 'reversal', 'wordplay', 'literal reading', 'other'] as const;
-export const CHECKLIST_VERSION = 5;
+export const CHECKLIST_VERSION = 6;
 export const CONFLICT_KINDS = ['fleet', 'duel', 'other'] as const;
 export const FRAME_FEATURES = ['angled', 'inset', 'borderless', 'breakout'] as const;
 export const BEAT_CHOICES = ['framing', 'background', 'lettering'] as const;
@@ -95,6 +95,8 @@ export const CHECKLIST_SCHEMA = {
     place: { type: 'string' },
     renderLook: { type: 'string', enum: [...RENDER_LOOKS] },
     castRoles: object({ nemesisOnPage: observation, partyPunchline: observation }),
+    genreMeme: object({ state: state('present', 'absent', 'unclear'), meme: string, evidence: string }),
+    backgroundFocus: observation,
     punchline: { type: 'string', enum: [...PUNCHLINES] },
     imageCarriesJoke: yesNo,
     castContrast: object({ humanToHuman: contrast, humanToAlien: contrast }),
@@ -103,7 +105,7 @@ export const CHECKLIST_SCHEMA = {
     ...diagnostics,
     ...Object.fromEntries(MEDIUM_ITEMS.map((m) => [m.id, yesNo])),
   },
-  required: ['setting', 'settingDescription', 'place', 'renderLook', 'castRoles', 'punchline', 'imageCarriesJoke', 'castContrast', 'authoredRepresentation', 'publishedRepresentation', ...Object.keys(diagnostics), ...MEDIUM_ITEMS.map((m) => m.id)],
+  required: ['setting', 'settingDescription', 'place', 'renderLook', 'castRoles', 'genreMeme', 'backgroundFocus', 'punchline', 'imageCarriesJoke', 'castContrast', 'authoredRepresentation', 'publishedRepresentation', ...Object.keys(diagnostics), ...MEDIUM_ITEMS.map((m) => m.id)],
   additionalProperties: false,
 };
 
@@ -114,6 +116,8 @@ export function checklistPrompt(script?: string, design?: string, pageRole?: Pag
 - \`settingDescription\`: the setting in a few words.
 - \`place\`: the specific place in two to four plain words, as a reader would name it ("guild counter", "campfire on a road", "starship bridge", "tavern").
 - \`renderLook\`: how the page is drawn. "full-color anime" means anime-style faces and cel shading in full color; "black-and-white manga" means ink and screentone without full color.
+- \`genreMeme\`: is a recognizable genre meme, famous line or famous-scene allusion (from well-known science fiction, fantasy or anime) visible on the page? Name it in \`meme\` in a few words ("hand-wave mind trick", "mimic chest bites the hero"); use an empty string when absent.
+- \`backgroundFocus\`: does the page match backgrounds to panel focus: at least one dialogue or reaction panel with a blurred, out-of-focus, simplified or speed-line background, while an establishing or action panel keeps a detailed one? Absent when every panel has the same level of background detail.
 - \`castRoles.nemesisOnPage\`: is an opposing figure (a villain, monster or rival named as such in the script, or clearly cast as the opposition) visible on the page? Unclear without a script. \`castRoles.partyPunchline\`: does the final joke land on a supporting party member rather than the hero or lead? Use absent when the lead delivers it and unclear when there is no party.
 - \`punchline\`: the shape of the final joke.
 - \`imageCarriesJoke\`: could a reader get the joke from the pictures without reading signs, screens or labels?
@@ -152,6 +156,8 @@ export interface Checklist {
   place?: string;
   renderLook?: (typeof RENDER_LOOKS)[number];
   castRoles?: { nemesisOnPage: Observation; partyPunchline: Observation };
+  genreMeme?: { state: Observation['state']; meme: string; evidence: string };
+  backgroundFocus?: Observation;
   punchline: (typeof PUNCHLINES)[number];
   imageCarriesJoke: Evidence;
   castAppearance?: Evidence;
@@ -404,7 +410,21 @@ export function castSummary(items: { offer?: CastOfferLike; script?: any }[]) {
   };
 }
 
-export function summarize(items: { id: string; checklist: Checklist; script?: any; offer?: CastOfferLike }[], order: string[] = items.map(({ id }) => id)) {
+/** Memes: offered, scripted (the script's \`meme\`), seen on the page, and repeats within the round. */
+export function memeSummary(items: { checklist: Checklist; script?: any; offers?: string[] }[]) {
+  const scripted = items.map((i) => (typeof i.script?.meme === 'string' && i.script.meme ? i.script.meme : undefined));
+  const used = scripted.filter((m): m is string => !!m);
+  return {
+    offered: items.filter((i) => i.offers?.length).length,
+    scripted: used.length,
+    outsideOffer: items.filter((i, k) => scripted[k] && i.offers && !i.offers.includes(scripted[k]!)).length,
+    repeats: used.length - new Set(used).size,
+    onPage: tally(items.map(({ checklist }) => present(checklist.genreMeme))),
+    pageMemes: items.flatMap(({ checklist }) => (checklist.genreMeme?.state === 'present' && checklist.genreMeme.meme ? [checklist.genreMeme.meme] : [])),
+  };
+}
+
+export function summarize(items: { id: string; checklist: Checklist; script?: any; offer?: CastOfferLike; offers?: string[] }[], order: string[] = items.map(({ id }) => id)) {
   const n = items.length;
   const share = (f: (c: Checklist) => boolean) => (n ? items.filter((i) => f(i.checklist)).length / n : NaN);
   const dist = (key: 'setting' | 'punchline') => {
@@ -460,6 +480,8 @@ export function summarize(items: { id: string; checklist: Checklist; script?: an
       partyPunchline: tally(items.map(({ checklist }) => present(checklist.castRoles?.partyPunchline))),
     },
     cast: castSummary(items),
+    memes: memeSummary(items),
+    backgroundFocus: tally(items.map(({ checklist }) => present(checklist.backgroundFocus))),
     diagnostics: summarizeDiagnostics(items),
   };
 }
@@ -537,7 +559,8 @@ export async function runChecklist(o: { round: string; model?: string; jobs?: nu
     const script = existsSync(join(j.dir, 'packet', 'comic.json')) ? JSON.parse(readFileSync(join(j.dir, 'packet', 'comic.json'), 'utf8')) : undefined;
     const context = existsSync(join(j.dir, 'packet', 'context.json')) ? JSON.parse(readFileSync(join(j.dir, 'packet', 'context.json'), 'utf8')) : undefined;
     const offer = context?.genreOptions?.[0]?.castOffer as CastOfferLike | undefined;
-    return [{ id: j.id, checklist: JSON.parse(readFileSync(f, 'utf8')) as Checklist, script, ...(offer ? { offer } : {}) }];
+    const offers = (context?.genreOptions?.[0]?.memeOffer as { id: string }[] | undefined)?.map((m) => m.id);
+    return [{ id: j.id, checklist: JSON.parse(readFileSync(f, 'utf8')) as Checklist, script, ...(offer ? { offer } : {}), ...(offers ? { offers } : {}) }];
   });
   const summary = { checklistVersion: CHECKLIST_VERSION, rubricVersion: RUBRIC_VERSION, model, round: basename(o.round), planned: order.length, ...summarize(items, order), errors };
   writeFileSync(join(o.round, 'checklist.json'), JSON.stringify(summary, null, 2) + '\n');

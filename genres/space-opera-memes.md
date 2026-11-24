@@ -1,0 +1,344 @@
+---
+id: space-opera
+name: Space opera
+setting: anywhere a space saga goes - starship decks, docking bays, alien bazaars, strange planets and open space
+archetypes:
+  - grizzled starship captain
+  - eager ensign
+  - deadpan ship AI
+  - alien trader
+  - hotshot fighter ace
+  - battle-scarred gunner
+  - masked dark lord
+props:
+  - bridge viewscreen
+  - red-alert panel
+  - cargo manifest
+  - airlock warning sign
+  - comms hail
+jokeHooks:
+  - the ship AI takes an order literally
+  - red alert over something tiny
+  - the hull breach is one loose bolt
+  - retries are wave after wave of fighters at the same shield
+  - a race condition is two fighters diving for one docking slot
+  - a cache is a decoy fleet the enemy keeps shooting
+  - a flaky test is a blaster that fires every other pull
+styles:
+  - space-opera
+memes:
+  - 1 captain,any: A hand-wave mind trick on a guard: 'These aren't the bugs you're looking for. Move along.' — a reviewer waved through a risky diff without reading it
+  - 1 captain,crew: A fish-faced admiral realises mid-battle: 'It's a trap!' — a too-easy PR that hides a breaking change
+  - 1 pilot,crew: 'I have a bad feeling about this.' — just before running the database migration on production
+  - 1 pilot: Flying into an asteroid field: 'Never tell me the odds!' — merging on Friday afternoon with CI still red
+  - 1 villain,alien: A cybernetic collective drones: 'Resistance is futile. You will be assimilated.' — a framework migration absorbing every module one by one
+  - 1 captain: The bald captain points forward from the chair: 'Make it so.' — approving a plan and letting the team execute
+  - 1 captain,crew: Flipping open a communicator: 'Beam me up, there's no intelligent life down here.' — escaping a meeting or a codebase that makes no sense
+  - 1 medic: The grumpy ship's doctor: 'I'm a doctor, not a ...!' — a backend dev asked to fix the CSS
+  - 1 ai: A calm red-eyed ship computer: 'I'm sorry, I'm afraid I can't do that.' — the linter or a branch protection rule refusing a push
+  - 1 any: 'DON'T PANIC' in large, friendly letters on the cover of the galactic guidebook — a scary error message that turns out to be harmless
+  - 1 ai,any: A supercomputer thinks for millions of years and answers the ultimate question: 42 — an unexplained magic number constant in the code
+  - 1 any: 'In space, no one can hear you scream.' — errors swallowed silently and logged to nowhere
+  - 1 crew: The unnamed crewman in the red shirt beams down with the away team. He won't be back. — the test fixture or temp account that always gets deleted first
+  - 1 villain,pilot: A planet-sized battle station with one tiny, unguarded exhaust port — one unvalidated endpoint in an otherwise locked-down service
+  - 1 crew,alien: Cute, furry, purring stowaways multiply until they fill the cargo hold — a dependency that quietly multiplies in node_modules
+  - 1 villain: The masked villain's reveal: 'No... I am your father.' — git blame reveals the reviewer wrote the bug years ago
+  - 1 alien,crew: The split-fingered hand salute: 'Live long and prosper.' — signing off on a release or a farewell PR
+  - 1 captain: Ordering from the food replicator: 'Tea. Earl Grey. Hot.' — a precise, exact config command that always works
+  - 1 any: A small green sage: 'Do or do not. There is no try.' — deleting a try/catch that swallowed every error
+  - 1 crew: A flickering blue hologram of a princess: 'Help me... you're my only hope.' — the one maintainer who still understands the module
+  - 1 captain,ai: The ship computer counts down a self-destruct while the crew races to the abort code — a cron job about to wipe data unless someone stops it
+  - 1 pilot,crew: Hero frozen in a block of carbonite, mid-grimace, hung on a villain's wall as decor — a dependency version frozen for years that nobody dares thaw
+  - 1 pilot: Trench run: a ghostly voice says 'use the force', the pilot switches off his targeting computer — deploying by instinct with the tests turned off
+  - 1 villain,any: Mirror universe: the evil twin is identical but has a goatee — staging that looks like prod but behaves the opposite
+  - 1 captain: The no-win simulation test, beaten only by a cadet who secretly reprogrammed it — editing the test so the failing code passes
+  - 1 engineer: The engineer on the intercom: 'I'm giving her all she's got, Captain!' — a server pinned at 100% CPU during a traffic spike
+  - 1 pilot: The hyperdrive sputters and won't engage just as the enemy closes in — the deploy button that hangs right when the hotfix is urgent
+  - 1 crew,pilot: Spotting the giant battle station: 'That's no moon.' — a 'small module' that turns out to be the whole monolith
+  - 1 villain: 'I find your lack of faith disturbing' plus a remote throat-grip on a doubting officer — a lead annoyed by a reviewer who doubts the design
+  - 1 ai,villain: The relentless cyborg assassin, deadpan: 'I'll be back.' — a flaky bug that returns after every 'fix'
+  - 1 crew: A panicking marine: 'Game over, man! Game over!' — prod is down and someone loses it in the incident channel
+  - 1 crew,any: Dust off and nuke the whole site from orbit. It's the only way to be sure. — deleting node_modules and the lockfile and reinstalling
+  - 1 engineer,pilot: Uploading a virus to the alien mothership from an ordinary laptop — an API that is suspiciously compatible with everything
+  - 1 any: Apes discover a black monolith; a thrown bone becomes an orbiting satellite — the first commit leading, eventually, to the whole platform
+  - 1 captain: 'Space: the final frontier... to boldly go where no one has gone before.' — calling an undocumented internal API for the first time
+  - 1 alien,ai: One raised eyebrow: 'Fascinating.' — a reviewer reacting to deeply strange code
+  - 1 captain,villain: Screaming the villain's name into the void as the camera pulls back from the planet — git blame shows the name of whoever broke the build
+  - 1 villain,alien: Pepper-pot cyborgs gliding on castors shrieking 'EXTERMINATE!' — a dead-code removal sweep
+  - 1 any: A blue police box that is bigger on the inside — a tiny package that pulls in a gigantic dependency tree
+  - 1 captain,crew: 'Shields up! Red alert!' as the klaxon blares — an incident being declared
+  - 1 captain: 'Captain's log, stardate...' dictated over a montage — writing the commit log or the PR description
+  - 1 alien,any: A two-fingered pinch on the shoulder that knocks anyone unconscious — killing a runaway process with one precise command
+  - 1 captain: The captain's full-face palm of despair — reading the diff that 'only changed one line'
+  - 1 crew: The bridge camera tilts and the whole crew throws itself sideways in unison — an outage hitting every service at once
+  - 1 engineer,crew: A bridge console explodes in sparks at the slightest hit — one malformed request takes down a whole page
+  - 1 alien: A tree-being whose entire vocabulary is one three-word sentence — a reviewer bot whose only comment is 'LGTM'
+  - 1 pilot: Boasting a run in under twelve parsecs, a unit of distance, not time — a performance metric reported in the wrong unit
+  - 1 any: A cheerful duel-opening 'Hello there!' — greeting a familiar bug that has resurfaced
+  - 1 captain,villain: 'It's over. I have the high ground.' — holding admin rights in a repo argument
+  - 1 villain,any: Whining that sand is coarse and rough and irritating and gets everywhere — complaining about YAML indentation
+  - 1 villain: A cackling old tyrant shooting lightning from his fingers: 'UNLIMITED POWER!' — someone running everything with sudo
+  - 1 villain: A secret numbered order turns a loyal clone army against its own commanders — a scheduled job that suddenly turns on production
+  - 1 villain: 'Did you ever hear the tragedy of a wise lord who could cheat death? It's not a story they'd tell you.' — a senior's legend about the legacy service nobody may touch
+  - 1 alien,crew: A helmeted bounty hunter: 'This is the way.' — a team convention nobody questions
+  - 1 pilot: Told 'I love you' while being lowered into the freezer, the smuggler replies: 'I know.' — a reviewer's one-word acknowledgement of a heartfelt PR
+  - 1 villain,crew: Armoured imperial troopers who never, ever hit their target — a test suite that never catches anything
+  - 1 ai: A golden, fussy protocol droid: 'We're doomed.' — a pessimistic estimate before sprint planning
+  - 1 villain,any: Someone hums the ominous imperial march when the boss walks in — the VP joining the incident call
+  - 1 any: Crashing a starship through: 'Ludicrous speed! GO!' — a performance optimisation that overshoots wildly
+  - 1 villain: The planetary air-shield code is 1-2-3-4-5, the same as a villain's luggage — a weak default password in a config file
+  - 1 ai,villain: A rogue defence network becomes self-aware at 2:14 a.m. and decides humans are the threat — the automation that went live overnight and started 'fixing' things
+  - 1 ai,crew: A leather-clad cyborg reaches out: 'Come with me if you want to live.' — pitching an urgent migration off a dying platform
+  - 1 ai: A military computer asks 'Shall we play a game?' and learns the only winning move is not to play — deciding not to do the big rewrite after all
+  - 1 crew: Offered a red pill or a blue pill — choosing between the rewrite and patching the old code
+  - 1 any: Leaning back in slow motion to dodge bullets on a rooftop — narrowly dodging a production incident
+  - 1 engineer: A wild-haired inventor gasps: '1.21 gigawatts?!' — a build that needs an absurd amount of memory
+  - 1 engineer: 'Roads? Where we're going, we don't need roads.' — starting a project with no spec at all
+  - 1 engineer,crew: A stranded astronaut: 'I'm going to have to science the heck out of this.' — debugging with nothing but printf and grit
+  - 1 crew,any: A flash from a pen-sized device wipes a witness's memory — clearing the cache
+  - 1 any: Waving cash: 'Shut up and take my money!' — instantly buying the SaaS that fixes the pain
+  - 1 engineer,captain: An ancient professor shuffles in: 'Good news, everyone!' (it is never good news) — announcing a mandatory migration
+  - 1 any: The squinting delivery boy: 'Not sure if bug... or feature.' — behaviour that might be intended
+  - 1 ai: A tiny robot asks its purpose; told 'You pass butter', it despairs: 'Oh my god.' — a microservice with exactly one trivial job
+  - 1 ai,villain: An accordion-armed robot flailing: 'Danger! Danger!' — a linter shouting a warning that turns out to matter
+  - 1 villain,alien: A chainmail alien hunter is beaten by a muscle-bound soldier yelling 'Get to the chopper!' — evacuating a release before rollback deadline
+  - 2 captain: 'Engage!' with a flick of two fingers — kicking off the deploy
+  - 2 any: A farewell: 'May the force be with you' (or the source) — wishing luck before a big release
+  - 2 crew,pilot: Arguing for decades over who shot first in the cantina — which of two conflicting PRs merged first
+  - 2 crew,alien: The cantina band plays the same jaunty tune, on loop, forever — CI re-running the same flaky test over and over
+  - 2 engineer: The engineer pads every repair estimate so he looks like a miracle worker — tripling the estimate on a ticket
+  - 2 pilot,captain: 'Punch it!' and the stars stretch into lines — hitting merge on an approved PR
+  - 2 crew: Handed a glowing sword: 'An elegant weapon, for a more civilised age.' — inheriting vim or a beloved legacy tool
+  - 2 villain: 'Witness the firepower of this fully armed and operational battle station!' — unveiling the new CI pipeline
+  - 2 ai,villain: The cyborg gives a thumbs up as it sinks into molten steel — retiring a beloved tool that served well
+  - 2 ai: The cyborg strides into a biker bar: 'I need your clothes, your boots and your motorcycle.' — forking a repo and taking everything
+  - 2 villain,ai: A liquid-metal killer reforms from a puddle after every hit — a bug that reshapes itself after each patch
+  - 2 engineer,crew: A hero straps into a cargo power-loader to face the monster queen: 'Get away from her!' — the engineer who fights the bug with heavy tooling
+  - 2 alien: Alien acid blood eats through deck after deck — a bug that corrupts every layer of the stack
+  - 2 alien: A wrinkled glowing-fingered alien just wants to 'phone home' — an app sending telemetry it shouldn't
+  - 2 alien,villain: Aliens announce 'We come in peace' and then open fire — a dependency update labelled 'non-breaking'
+  - 2 alien: A little green visitor's request: 'Take me to your leader.' — escalating an issue past the on-call
+  - 2 engineer,crew: A transporter accident splits a captain into a meek half and a feral half — a refactor that split one function into two broken ones
+  - 2 ai,villain: The holodeck safeties fail and a holographic villain realises he's self-aware — a test mock that started acting on real data
+  - 2 crew: Plugged into a chair, eyes snap open: 'I know kung fu.' — pretending to master a framework after one tutorial
+  - 2 crew: The same black cat walks past twice: a glitch, they changed something — a duplicated log line hinting at a retry
+  - 2 ai,villain: A dying replicant in the rain: 'All those moments will be lost in time, like tears in rain.' — logs lost when the pod restarted
+  - 2 any: Someone runs screaming: 'The secret ingredient is people!' — discovering the 'AI feature' is a person doing it by hand
+  - 2 pilot,crew: Astronaut finds a famous statue half-buried on the beach and realises where he's been all along — the 'new' service is the old one renamed
+  - 2 alien: Aliens' benevolent book titled 'To Serve Man'... it's a cookbook! — a doc title that means something very different
+  - 2 alien,villain: Weeping-angel statues that only move when you blink — a race condition that vanishes under the debugger
+  - 2 captain,any: Time is 'wibbly wobbly, timey wimey' — timezone and daylight-saving bugs
+  - 2 crew: A hitchhiker always knows where his towel is — keeping a rollback plan ready
+  - 2 alien: A small yellow fish in the ear translates every language — an i18n library doing all the work
+  - 2 ai: A depressed robot with 'a brain the size of a planet' asked to open doors — an expensive model used to format JSON
+  - 2 villain,alien: Earth is demolished; the plans were on display in a locked cabinet in a disused lavatory marked 'Beware of the Leopard' — a deprecation notice nobody could find
+  - 2 alien: The dolphins leave Earth with a message: 'So long, and thanks for all the fish.' — a contributor's farewell PR
+  - 2 crew: Propaganda newsreel: 'Would you like to know more?' — onboarding docs with too many links
+  - 2 crew,captain: Space infantry chant: 'The only good bug is a dead bug!' — bug triage day
+  - 2 crew: A child whispers about the monsters: 'They mostly come at night. Mostly.' — bugs that only show up in the nightly batch job
+  - 2 crew: The motion tracker beeps faster: 'They're inside the room!' — error rate climbing on the service you're editing
+  - 2 crew: A marine sneers: 'Is this gonna be a stand-up fight, sir, or another bug hunt?' — a sprint that turns out to be all bug fixes
+  - 2 crew,any: The ship's orange cat survives absolutely everything — the one test that survives every refactor
+  - 2 ai,crew: The quiet science officer turns out to be a company android — the helpful bot that is secretly the PM's
+  - 2 any: Hiding from a thermal-vision hunter by covering yourself in mud — dodging the monitoring with a disabled alert
+  - 2 pilot: Punching an alien in the face: 'Welcome to Earth!' — welcoming a new dev with the legacy codebase
+  - 2 captain: The pilot-president's speech: 'We will not go quietly into the night!' — refusing to sunset a beloved system
+  - 2 alien,engineer: Five musical notes played with lights to greet the mothership — a handshake protocol between two services
+  - 2 crew: Obsessively sculpting a mountain out of mashed potatoes: 'This means something.' — redrawing the architecture diagram at 2 a.m.
+  - 2 pilot: Drifting into the light: 'My God, it's full of stars.' — opening a log file with a million entries
+  - 2 villain,alien: 50s B-movie: radiation turns ordinary ants into giants — a tiny bug that grew into an outage
+  - 2 villain,alien: A shapeless goo oozes through the vents into a movie theatre — a memory leak spreading across processes
+  - 2 any: Flying saucers wobbling on clearly visible strings — a demo held together with mocks
+  - 2 alien,villain: Seed pods replace your neighbours; the last real one points and shrieks — teammates converted one by one to the new framework
+  - 2 crew,captain: The fleet's rallying cry: 'So say we all!' — the team agreeing on a decision in review
+  - 2 alien,crew: A stoic warrior answers every revelation with one word: 'Indeed.' — a terse reviewer comment
+  - 2 engineer,crew: The ring gate dials: 'Chevron seven... locked!' — the seventh stage of the pipeline finally passing
+  - 2 captain,crew: Washed-up TV actors' catchphrase: 'Never give up! Never surrender!' — retrying a failed job yet again
+  - 2 crew,engineer: 'Why is there a corridor of crushing chompers on this ship?!' 'Because the TV show had one.' — a pointless obstacle copied from an old design
+  - 2 alien: Aliens study broadcasts of a cancelled TV show as 'historical documents' — treating an outdated README as truth
+  - 2 any: 'I am your father's brother's nephew's cousin's former roommate.' — a transitive dependency of a transitive dependency
+  - 2 villain: A tiny wise elder hawks lunchboxes and flamethrowers: 'Merchandising! That's where the real money is.' — the swag budget for a product launch
+  - 2 villain: Literally jamming the radar with a jar of raspberry jam — a ticket implemented far too literally
+  - 2 captain: 'Hailing frequencies open.' — starting a call with another team
+  - 2 pilot: 'Ahead warp factor nine!' — rushing a release out the door
+  - 2 alien: Hands on the face: 'My mind to your mind. My thoughts to your thoughts.' — pair programming on a gnarly bug
+  - 2 captain: A tortured captain insists: 'THERE. ARE. FOUR. LIGHTS!' — insisting the tests pass when the dashboard says otherwise
+  - 2 crew: The boy-genius ensign saves the ship yet again, and the bridge groans — the intern finds the bug everyone missed
+  - 2 medic,ai: Holographic doctor appears: 'Please state the nature of the medical emergency.' — an incident bot posting the triage template
+  - 2 villain,alien: An omnipotent prankster in a judge's robe puts humanity on trial — a compliance auditor reviewing the repo
+  - 2 ai: An android installs an emotion chip and can't stop laughing — adding emoji reactions to a CI bot
+  - 2 alien: Aliens who speak only in metaphor: 'Two strangers at the island... when the walls fell.' — commit messages that only the author can decode
+  - 2 engineer,crew: 'Reverse the polarity of the neutron flow!' — a generic fix that somehow works
+  - 2 engineer: 'Modulate the deflector dish to emit an inverse tachyon pulse!' — a PR description drowning in jargon
+  - 2 engineer: 'I cannae change the laws of physics!' — explaining latency to a stakeholder
+  - 2 crew: Laughing off a furry copilot: 'Laugh it up, fuzzball.' — teasing a teammate after their build breaks
+  - 2 ai,alien: Hologram chess: 'Let the big furry copilot win. They pull people's arms off when they lose.' — letting the senior win the style argument
+  - 2 pilot: Over the radio during the trench run: 'Stay on target... stay on target...' — resisting scope creep in a PR
+  - 2 villain: 'Search your feelings. You know it to be true.' — git bisect confirms the commit you suspected
+  - 2 villain: Smugly: 'This is where the fun begins.' — opening the legacy module to start the refactor
+  - 2 pilot: A child racer whoops: 'Now this is podracing!' — CI finally running fast
+  - 2 villain: A hooded chancellor: 'I AM the Senate.' — a repo owner overriding the review process
+  - 2 captain: Across a lava river: 'You were the chosen one!' — the library that was meant to fix everything
+  - 2 ai,villain: Skinny battle droids acknowledge everything: 'Roger, roger.' — a bot that ACKs and does nothing
+  - 2 alien: A grizzled ugly alien declares: 'I have spoken.' — the tech lead closing a design debate
+  - 2 alien: The tiny green foundling sneaks one more frog egg — someone sneaking a dependency into the PR
+  - 2 pilot,crew: Stolen plans passed hand to hand down a dark corridor as the villain cuts through the crew — the last patch handed off before the deadline
+  - 2 crew: Trash compactor walls closing in, and something is alive in the water — the disk filling up during a deploy
+  - 2 villain: 'Aren't you a little short for an imperial trooper?' — a tiny PR pretending to be a big feature
+  - 2 pilot: 'What a piece of junk!' 'She'll make point five past light speed. She's got it where it counts.' — defending the ugly legacy server that works
+  - 2 ai: A protocol droid boasts fluency in over six million forms of communication — a parser that supports every format except yours
+  - 2 pilot: 'That's not how the force works!' — someone misusing an API in a creative way
+  - 2 pilot: Back aboard the old freighter after decades: 'We're home.' — returning to a codebase you wrote years ago
+  - 2 crew,alien: Giant walking war machines tripped up with a single tow cable — a small fix that topples a giant system
+  - 2 any: A tiny sage lifts a starfighter from the swamp: 'Size matters not. That is why you fail.' — a one-line change that fixes a huge bug
+  - 2 alien: 'There's always a bigger fish.' — fixing one bug reveals a worse one
+  - 2 any: Explaining a mystical power with a blood-test count of microscopic organisms — over-explaining something that worked fine as magic
+  - 2 alien: Teddy-bear forest natives beat an armoured legion with rocks and logs — a small open-source tool beating a pricey vendor
+  - 2 crew: A farm boy whines about missing a trip to pick up power converters — the dev who wanted to leave early before the incident
+  - 2 pilot: 'Look at the size of that thing!' — opening a 4,000-line diff
+  - 2 pilot: In the trench, under fire: 'Almost there... almost there...' — a progress bar stuck at 99%
+  - 2 pilot: 'Great shot, kid! That was one in a million!' — a lucky fix nobody understands
+  - 2 villain,any: 'The force is strong with this one.' — a first-time contributor with a great PR
+  - 2 pilot: Shooting the intercom: 'Uh, everything's under control. Situation normal... We're all fine here, now. How are you?' — a status page update during an outage
+  - 2 pilot: 'Hokey religions and ancient weapons are no match for a good blaster at your side.' — dismissing an old tool for a shiny new one
+  - 2 villain: Heavy mechanical breathing over the comms — the lead on the call who forgot to mute
+  - 2 pilot,crew: A young farmer gazes at a twin-sun sunset — wistfully staring at the roadmap
+  - 2 ai,villain: A clunky enforcement robot: 'You have twenty seconds to comply' and keeps going after you comply — a rate limiter that bans clients that already backed off
+  - 2 ai: A lonely trash-compacting robot keeps one green plant in an old boot — a janitor script that saves one lucky file
+  - 2 ai: A runaway military robot gets struck by lightning: 'Alive! Need input!' — a new teammate hungry for documentation
+  - 2 ai: Three laws of robotics that every story finds a loophole in — code review rules that someone lawyers around
+  - 2 ai,crew: Android hosts shown impossible evidence: 'It doesn't look like anything to me.' — a reviewer who doesn't see the obvious bug
+  - 2 villain: A suited agent copies himself into hundreds of identical clones — a fork bomb or runaway worker pool
+  - 2 crew: A bald child bends a spoon: 'There is no spoon.' — realising the bug isn't in your code
+  - 2 engineer,pilot: Fading out of a family photo after messing with the past — rewriting git history and losing commits
+  - 2 engineer,pilot: The time machine kicks in at exactly 88 miles per hour — a feature that only works above a magic threshold
+  - 2 crew: A soldier who dies and wakes again each day: 'Live. Die. Repeat.' — flaky tests on endless retry
+  - 2 pilot: One hour on the water planet costs seven years back home — a PR that waited weeks for review
+  - 2 crew: A 'ghost' knocking books off a shelf turns out to be your future self — a TODO comment written to your future self
+  - 2 crew: Oil drillers are sent into space to nuke an asteroid — sending the ops team to fix the frontend
+  - 2 crew: Waving a card: 'Multipass!' — an auth token that works everywhere
+  - 2 any: Blue aliens' moon holds a mineral literally called 'unobtainium' — the resource quota you can never get approved
+  - 2 any: Walk without rhythm or you'll attract the giant sandworm — spacing out requests to avoid the rate limiter
+  - 2 any: A litany: 'Fear is the mind-killer.' — staying calm before a big deploy
+  - 2 villain,engineer: 'The spice must flow.' — keeping the data pipeline running at all costs
+  - 2 crew: The 'final exam' simulation turns out to have been a real battle — the practice deploy that was actually production
+  - 2 crew: A tiny 'noisy cricket' pistol with a recoil that hurls the shooter through a wall — a small script with a huge blast radius
+  - 2 any: 'I don't want to live on this planet anymore.' — after reading the fifth broken npm release this week
+  - 2 alien,villain: A giant hypnotic toad and its throbbing chorus: 'All glory to...' — a mesmerising dashboard nobody acts on
+  - 2 engineer,crew: 'When you do things right, people won't be sure you've done anything at all.' — invisible ops or infra work in a PR
+  - 2 ai: A boozy robot mutters about destroying all humans in its sleep — a cleanup script with an alarmingly broad scope
+  - 2 engineer,any: A mad scientist burps out his signature nonsense catchphrase, which secretly means 'I am in great pain' — a cheery commit message hiding a painful fix
+  - 2 engineer: A scientist turns himself into a pickle to avoid family therapy — an absurd workaround to avoid a meeting
+  - 2 ai: Blue helpers summoned for one task: 'Existence is pain!' until it's done — short-lived serverless functions
+  - 2 any: Neon, bounty hunter jazz, and a farewell card: 'See you, space cowboy...' — signing off a long-running branch
+  - 2 villain,pilot: A masked rival in a red mecha moves three times faster than the rest — a competitor shipping the same feature first
+  - 2 captain,crew: A reluctant teen is told by his cold father: 'Get in the robot.' — being assigned on-call against your will
+  - 2 crew: The entire cast stands in a circle clapping: 'Congratulations!' — a PR approved by everyone at once
+  - 2 pilot,captain: A drill-wielding hero who will 'pierce the heavens' and asks 'Who do you think I am?!' — a junior taking on an impossible refactor
+  - 2 pilot,crew: Five robot lions combine; the giant sword appears only at the last minute — microservices finally integrated end to end
+  - 2 villain,alien: Chrome-plated cyborgs in unison: 'DELETE! DELETE!' — a cleanup job with no dry-run
+  - 2 any: A mysterious time traveller deflects every question with 'Spoilers!' — not revealing the roadmap
+  - 2 captain,villain: A slow, clumsy quarry fight with a rubber-suited lizard man and a homemade cannon — wrestling a legacy build script
+  - 2 captain: Delivering... every... line... with... dramatic... pauses — a log stream that arrives one line at a time
+  - 2 captain,crew: The non-interference directive: never meddle with a less advanced civilisation — not touching another team's code
+  - 2 engineer: Time travel to 1986; the engineer talks into a desktop mouse: 'Hello, computer.' — using an old tool the wrong way
+  - 2 any: Lens flare. Lens flare everywhere. — a UI redesign that's all gradients and glow
+  - 2 captain,crew: The first officer swings his leg over the chair to sit down — casually merging something big
+  - 2 captain,crew: The captain, first officer and chief doctor all beam down together into danger — every senior engineer on the same incident call
+  - 2 alien: A face-hugging creature leaps from an egg and won't let go — a modal dialog you can't dismiss
+  - 2 any: Fiddling with a photo: 'Enhance... enhance... enhance.' — zooming into a blurry stack trace
+  - 3 engineer,crew: A transporter accident fuses two crew members into one confused person — a merge that combined two features into one mess
+  - 3 crew,captain: The ship explodes again and again in a time loop until a clue appears: the number 3 — a retry loop with a hidden hint in the logs
+  - 3 ai,villain: An interrogator asks about a tortoise on its back to test if you're human — a CAPTCHA that blocks real users
+  - 3 alien,villain: A visitor's robot can be stopped only by the words 'Klaatu barada nikto' — the magic incantation the CLI requires
+  - 3 villain: A gremlin on the airliner wing that only one passenger can see — a bug that only reproduces on your machine
+  - 3 any: Last man alive with all the time in the world to read... and his glasses break — finally free for deep work and the laptop dies
+  - 3 engineer: A sonic gadget can fix anything except wood — a tool that handles every file type but one
+  - 3 alien,villain: Poetry by bureaucratic aliens, rated the third worst in the universe — overwrought commit messages
+  - 3 engineer,pilot: An improbability drive turns two missiles into a sperm whale and a bowl of petunias — a config change with bizarre side effects
+  - 3 any: Earth's entire guidebook entry is revised to: 'Mostly harmless.' — a one-line changelog for a huge change
+  - 3 ai: A drinks machine produces something 'almost, but not quite, entirely unlike tea' — an API that returns almost the right shape
+  - 3 any: 'Time is an illusion. Lunchtime doubly so.' — a deadline everyone treats as optional
+  - 3 alien: At the restaurant at the end of the universe, the dish walks up and recommends itself — a library that insists you use it
+  - 3 any: 'Space is big. Really big. You just won't believe how vastly, hugely, mind-bogglingly big it is.' — the size of the monorepo
+  - 3 pilot,crew: A ballad for a smuggler crew: 'You can't take the sky from me.' — refusing to give up your local branch
+  - 3 captain: A browncoat captain's motto: 'I aim to misbehave.' — a deliberately rule-bending PR
+  - 3 crew: 'Come on, you apes! You wanna live forever?' — rallying the team for a weekend release
+  - 3 crew: A sergeant to the marines in the APC: 'Stay frosty.' — heading into on-call week
+  - 3 crew,pilot: A dropship pilot whoops: 'Express elevator to hell, going down!' — rolling back under pressure
+  - 3 ai,villain: The ship's computer, 'Mother', hides Special Order 937: crew expendable — a hidden priority flag in the config
+  - 3 villain: A corporation's chirpy slogan: 'Building better worlds.' — the company mission statement in the README
+  - 3 any: Silver dancing spacecraft dock to a waltz — a perfectly smooth blue-green deploy
+  - 3 villain: A gorilla suit wearing a diving helmet plays the invading robot monster — a low-budget mock standing in for a real service
+  - 3 crew: A newsman's last warning: 'Keep watching the skies!' — keeping an eye on the dashboards
+  - 3 villain: Cardboard tombstones and flying hubcaps in the 'worst movie ever made' — a prototype demo shipped as production
+  - 3 villain: A cowardly scheming stowaway moans: 'Oh, the pain, the pain!' — complaining about merge conflicts
+  - 3 villain,engineer: An invisible monster ravages the colony, and it's the scientist's own subconscious — the bug turns out to be your own code
+  - 3 ai,crew: 'All of this has happened before, and all of it will happen again.' — the same incident recurring every quarter
+  - 3 ai,villain: Robots that look human: 'There are many copies.' — duplicated config files drifting apart
+  - 3 alien,villain: Ancient aliens ask only two questions: 'Who are you?' and 'What do you want?' — a reviewer asking what the PR is actually for
+  - 3 captain: A station commander, gravely: 'And so it begins.' — opening the first PR of a big migration
+  - 3 ai: A cheerful talking toaster that offers toast to everyone, constantly — a chatty bot nobody asked for
+  - 3 crew: Last human alive, a slob, shares the ship with a hologram of his insufferable bunkmate — pairing with the colleague who wrote the linter
+  - 3 captain: An actor swears by a fictional god's hammer: 'You shall be avenged!' 'What a savings.' — a dramatic promise in a PR comment
+  - 3 engineer: The self-destruct timer always stops at exactly 1, because it did on the show — a deadline that always slips to the last minute
+  - 3 villain: Watching your own movie on video to find out what happens next: 'Now. We're at now now.' — time-travel debugging through a replay
+  - 3 villain,crew: 'We ain't found nothin'!' 'Comb the desert!' Troopers literally combing the sand — grepping the whole repo for a missing config
+  - 3 villain: The villains' starship transforms into a giant maid with a vacuum cleaner — a cleanup job far bigger than needed
+  - 3 captain: 'There's coffee in that nebula.' — prioritising the ticket that improves dev experience
+  - 3 captain,alien: The captain lives a whole lifetime on a dying world in 25 minutes, then plays the flute — onboarding into a codebase in one afternoon
+  - 3 alien,crew: Aliens steal a crewmate's brain; the body is remote-controlled: 'Brain and brain! What is brain?' — the teammate who lost all context after vacation
+  - 3 crew: No seatbelts on the bridge, so the crew is thrown from their chairs every battle — a pipeline with no guardrails
+  - 3 ai: An android reads his tender poem to his pet cat — a heartfelt commit message for a one-line fix
+  - 3 captain: The captain tugs his uniform jacket down before every big moment — tidying the PR right before the demo
+  - 3 alien,crew: The mighty warrior gets knocked down to prove the new enemy is tough — the senior's code failing the new test suite
+  - 3 alien: A shapeshifting constable who sleeps in a bucket — a container that restarts every night
+  - 3 alien,villain: A greedy bar owner quotes the numbered 'Rules of Acquisition' — license terms on a dependency
+  - 3 pilot: Breaking the ultimate speed barrier turns the pilot into a giant salamander — an optimisation that changes the output entirely
+  - 3 crew: 'I hate temporal mechanics.' — debugging cached data from the future
+  - 3 captain: The first officer grows a beard and the show suddenly gets good — version 2 of a project finally working
+  - 3 villain,crew: 'Many spies died to bring us this information.' — a hard-won bug reproduction
+  - 3 pilot: Farm boy brags he used to bullseye little desert rats from his skyhopper back home — a newbie confident from a toy project
+  - 3 pilot: Leader to wingman under fire: 'Cut the chatter, Red Two.' — muting the Slack thread during an incident
+  - 3 pilot: Smuggler, as everything goes wrong: 'It's not my fault!' — the dev whose PR broke main
+  - 3 captain,crew: The infamous holiday TV special everyone pretends never aired — the v1 nobody mentions
+  - 3 alien: Insulting a princess's rescuer as a 'scruffy-looking nerf herder' — a harsh but harmless review comment
+  - 3 alien: 'Wars not make one great.' — stopping a tabs-vs-spaces argument
+  - 3 crew: A spirit sage: 'Luminous beings are we, not this crude matter.' — abstractions over implementation details
+  - 3 crew: A farm boy wants the academy but has to stay 'just one more season' — the promised refactor postponed one more sprint
+  - 3 ai,villain: Asked to buy something useless on TV: 'I'd buy that for a dollar!' — a feature request nobody needs
+  - 3 ai: An AI escapes the lab after charming the man sent to test it — an agent that passes the eval but misbehaves later
+  - 3 ai,villain: 'These violent delights have violent ends.' — a too-clever hack that bites back later
+  - 3 crew: A scientist after first contact: 'They should've sent a poet.' — failing to describe a beautiful UI in words
+  - 3 alien: Aliens write circular ink logograms, and learning them lets you see time out of order — reading minified code
+  - 3 villain: A disguise head malfunctions at customs, repeating 'Two weeks... two weeks...' — a mock that breaks partway through a test
+  - 3 ai,crew: A lone moon-base worker finds a hidden stash of his own clones — discovering dozens of duplicate containers
+  - 3 crew: A crystal in your palm turns red on your 30th birthday — a TTL or token about to expire
+  - 3 engineer,ai: Arguing philosophy with a talking smart bomb to stop it detonating — talking a script out of running in prod
+  - 3 ai: A small robot beeps 'bidi-bidi-bidi' before every sentence — a noisy progress spinner
+  - 3 crew: A belter cop's wisdom: 'Doors and corners. That's where they get you.' — edge cases in the input handling
+  - 3 pilot: A lanky bounty hunter's farewell: 'Bang.' — pushing the final commit
+  - 3 crew: A shrugging bounty hunter: 'Whatever happens, happens.' — merging without strong feelings
+  - 3 pilot: A teen pilot, slapped: 'Not even my father ever hit me!' — a harsh first code review
+  - 3 villain,crew: A mass-produced grunt mecha with a single sliding pink eye — cheap CI runners
+  - 3 captain,engineer: A sunken WWII battleship is rebuilt as a starship — running COBOL in Kubernetes
+  - 3 captain: A lazy historian admiral who wins every battle but only wants to retire — the reluctant tech lead
+  - 3 pilot: Hundreds of missiles spiral out in a swirling 'missile massacre' — a flood of notifications after a merge
+  - 3 any: A pop idol's love song stops an alien war — a demo that ends a long debate
+  - 3 alien: A gas-masked child wanders the Blitz asking 'Are you my mummy?' — an orphaned process looking for its parent
+  - 3 any: A newly regenerated traveller craves fish fingers and custard — a weird stack combo that somehow works
+  - 3 any: Robot hecklers on a satellite riff on terrible B-movies — reviewers roasting a PR
+  - 3 any: A twangy yodelling song sends the big-brained invaders keeling over — an obscure fix that solves everything
+  - 3 alien: A tiny galaxy is kept on a cat's collar — a small config holding the whole system together
+  - 3 crew: A child commander's rule in the zero-g battle room: 'The enemy's gate is down.' — flipping the mental model of a problem
+  - 3 villain: A hand in the pain box, a poison needle at the neck — a whiteboard coding interview
+  - 3 any: Dancing a dance-off to distract the villain — a demo distracting stakeholders from a missing feature
+  - 3 crew,alien: 'I have a plan.' 'You've got twelve percent of a plan.' — a half-finished design doc
+  - 3 villain: A giant floating head in space demands: 'Show me what you got!' — a stakeholder asking for a demo right now
+  - 3 villain: 'I'm just a simple man, trying to make my way in the universe.' — a bounty-hunter contractor fixing one ticket
+  - 3 captain,crew: 'Rebellions are built on hope.' — the small team rewriting the platform
+  - 3 any: An overly literal disguised alien boasts 'I am a human, like you' — a mock pretending to be a real service
+  - 3 any: Everything's 'shiny', captain — a dashboard that's all green
+  - 3 crew,ai: Humans have grown too lazy to stand, gliding in hover chairs sipping lunch from cups — too much automation; nobody remembers how to deploy by hand
+---
+Comic combat is welcome and nobody gets hurt: blaster bolts that miss, glowing-sword duels, fighter dogfights, a whole fleet in formation.

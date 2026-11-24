@@ -16,9 +16,11 @@ import { isPageRole, PAGE_ROLE_PROMPT, PAGE_ROLE_SCHEMA, type PageRole } from '.
 import { RUBRIC_VERSION } from './rubric.ts';
 import { mean } from './stats.ts';
 
-export const SETTINGS = ['office-like interior', 'other interior', 'ship exterior or open space', 'planet surface or outdoors', 'battle or chase', 'crowd, bar or market'] as const;
+// Genre-neutral since checklist v5 (round 8): space and fantasy comics share one scheme.
+export const SETTINGS = ['office-like interior', 'other interior', 'open outdoors (sky, space, road, wilderness)', 'dungeon, cave or ruin', 'battle or chase', 'crowd, tavern, guild or market'] as const;
+export const RENDER_LOOKS = ['full-color anime', 'color comic (not anime)', 'black-and-white manga', 'other'] as const;
 export const PUNCHLINES = ['deadpan understatement', 'visual gag', 'slapstick', 'escalation', 'reversal', 'wordplay', 'literal reading', 'other'] as const;
-export const CHECKLIST_VERSION = 4;
+export const CHECKLIST_VERSION = 5;
 export const CONFLICT_KINDS = ['fleet', 'duel', 'other'] as const;
 export const FRAME_FEATURES = ['angled', 'inset', 'borderless', 'breakout'] as const;
 export const BEAT_CHOICES = ['framing', 'background', 'lettering'] as const;
@@ -90,6 +92,9 @@ export const CHECKLIST_SCHEMA = {
   properties: {
     setting: { type: 'string', enum: [...SETTINGS] },
     settingDescription: { type: 'string' },
+    place: { type: 'string' },
+    renderLook: { type: 'string', enum: [...RENDER_LOOKS] },
+    castRoles: object({ nemesisOnPage: observation, partyPunchline: observation }),
     punchline: { type: 'string', enum: [...PUNCHLINES] },
     imageCarriesJoke: yesNo,
     castContrast: object({ humanToHuman: contrast, humanToAlien: contrast }),
@@ -98,7 +103,7 @@ export const CHECKLIST_SCHEMA = {
     ...diagnostics,
     ...Object.fromEntries(MEDIUM_ITEMS.map((m) => [m.id, yesNo])),
   },
-  required: ['setting', 'settingDescription', 'punchline', 'imageCarriesJoke', 'castContrast', 'authoredRepresentation', 'publishedRepresentation', ...Object.keys(diagnostics), ...MEDIUM_ITEMS.map((m) => m.id)],
+  required: ['setting', 'settingDescription', 'place', 'renderLook', 'castRoles', 'punchline', 'imageCarriesJoke', 'castContrast', 'authoredRepresentation', 'publishedRepresentation', ...Object.keys(diagnostics), ...MEDIUM_ITEMS.map((m) => m.id)],
   additionalProperties: false,
 };
 
@@ -107,6 +112,9 @@ export function checklistPrompt(script?: string, design?: string, pageRole?: Pag
 
 - \`setting\`: where most of the comic takes place. "office-like interior" means any room where people sit or stand at desks, consoles, screens or meeting tables, including a starship bridge or control room.
 - \`settingDescription\`: the setting in a few words.
+- \`place\`: the specific place in two to four plain words, as a reader would name it ("guild counter", "campfire on a road", "starship bridge", "tavern").
+- \`renderLook\`: how the page is drawn. "full-color anime" means anime-style faces and cel shading in full color; "black-and-white manga" means ink and screentone without full color.
+- \`castRoles.nemesisOnPage\`: is an opposing figure (a villain, monster or rival named as such in the script, or clearly cast as the opposition) visible on the page? Unclear without a script. \`castRoles.partyPunchline\`: does the final joke land on a supporting party member rather than the hero or lead? Use absent when the lead delivers it and unclear when there is no party.
 - \`punchline\`: the shape of the final joke.
 - \`imageCarriesJoke\`: could a reader get the joke from the pictures without reading signs, screens or labels?
 ${MEDIUM_ITEMS.map((m) => `- \`${m.id}\`: ${m.question}`).join('\n')}
@@ -141,6 +149,9 @@ Reply only with JSON matching the schema.`;
 export interface Checklist {
   setting: (typeof SETTINGS)[number];
   settingDescription: string;
+  place?: string;
+  renderLook?: (typeof RENDER_LOOKS)[number];
+  castRoles?: { nemesisOnPage: Observation; partyPunchline: Observation };
   punchline: (typeof PUNCHLINES)[number];
   imageCarriesJoke: Evidence;
   castAppearance?: Evidence;
@@ -361,7 +372,39 @@ export function entropy(labels: string[]): number {
 }
 
 /** Per-arm rates and distinctiveness from the comics' checklists and scripts. */
-export function summarize(items: { id: string; checklist: Checklist; script?: any }[], order: string[] = items.map(({ id }) => id)) {
+type CastOfferLike = { kind: 'party' | 'side-only'; personas: { id: string; role: string }[] };
+
+/** Offered versus used personas: the spread the host controls, and whether authors kept to it. */
+export function castSummary(items: { offer?: CastOfferLike; script?: any }[]) {
+  const offered = items.filter((i) => i.offer);
+  if (!offered.length) return null;
+  const used = new Map<string, number>();
+  let outside = 0;
+  let sideOnlyKept = 0;
+  const sideOnly = offered.filter((i) => i.offer!.kind === 'side-only');
+  for (const i of offered) {
+    const ids = Array.isArray(i.script?.personas) ? (i.script.personas as string[]) : [];
+    const allowed = new Map(i.offer!.personas.map((p) => [p.id, p.role]));
+    for (const id of ids) {
+      if (!allowed.has(id)) outside++;
+      else used.set(id, (used.get(id) ?? 0) + 1);
+    }
+    if (i.offer!.kind === 'side-only' && ids.length && ids.every((id) => ['side', 'nemesis'].includes(allowed.get(id) ?? ''))) sideOnlyKept++;
+  }
+  const counts = [...used.values()];
+  return {
+    comics: offered.length,
+    sideOnly: sideOnly.length,
+    sideOnlyKept,
+    withPersonas: offered.filter((i) => Array.isArray(i.script?.personas) && i.script.personas.length).length,
+    distinctUsed: used.size,
+    topShare: counts.length ? Math.max(...counts) / offered.length : null,
+    top: [...used.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5),
+    outsideOffer: outside,
+  };
+}
+
+export function summarize(items: { id: string; checklist: Checklist; script?: any; offer?: CastOfferLike }[], order: string[] = items.map(({ id }) => id)) {
   const n = items.length;
   const share = (f: (c: Checklist) => boolean) => (n ? items.filter((i) => f(i.checklist)).length / n : NaN);
   const dist = (key: 'setting' | 'punchline') => {
@@ -410,6 +453,13 @@ export function summarize(items: { id: string; checklist: Checklist; script?: an
       ])),
       windows,
     },
+    places: { ...lookConcentration(items.map(({ checklist }) => (checklist.place ? [checklist.place] : []))), assessed: items.filter((i) => i.checklist.place).length },
+    renderLooks: Object.fromEntries(RENDER_LOOKS.map((look) => [look, items.filter((i) => i.checklist.renderLook === look).length])),
+    castRoles: {
+      nemesisOnPage: tally(items.map(({ checklist }) => present(checklist.castRoles?.nemesisOnPage))),
+      partyPunchline: tally(items.map(({ checklist }) => present(checklist.castRoles?.partyPunchline))),
+    },
+    cast: castSummary(items),
     diagnostics: summarizeDiagnostics(items),
   };
 }
@@ -485,7 +535,9 @@ export async function runChecklist(o: { round: string; model?: string; jobs?: nu
     const f = join(j.dir, 'checklist.json');
     if (!current.has(j.id)) return [];
     const script = existsSync(join(j.dir, 'packet', 'comic.json')) ? JSON.parse(readFileSync(join(j.dir, 'packet', 'comic.json'), 'utf8')) : undefined;
-    return [{ id: j.id, checklist: JSON.parse(readFileSync(f, 'utf8')) as Checklist, script }];
+    const context = existsSync(join(j.dir, 'packet', 'context.json')) ? JSON.parse(readFileSync(join(j.dir, 'packet', 'context.json'), 'utf8')) : undefined;
+    const offer = context?.genreOptions?.[0]?.castOffer as CastOfferLike | undefined;
+    return [{ id: j.id, checklist: JSON.parse(readFileSync(f, 'utf8')) as Checklist, script, ...(offer ? { offer } : {}) }];
   });
   const summary = { checklistVersion: CHECKLIST_VERSION, rubricVersion: RUBRIC_VERSION, model, round: basename(o.round), planned: order.length, ...summarize(items, order), errors };
   writeFileSync(join(o.round, 'checklist.json'), JSON.stringify(summary, null, 2) + '\n');

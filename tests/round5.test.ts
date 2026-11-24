@@ -11,7 +11,7 @@ const unclear = { state: 'unclear', evidence: 'Source unavailable.', } as const;
 
 function checklist(): Checklist {
   return {
-    setting: 'ship exterior or open space',
+    setting: 'open outdoors (sky, space, road, wilderness)',
     settingDescription: 'The view from the bay.',
     punchline: 'visual gag',
     imageCarriesJoke: { yes: true, evidence: 'Panel 2 gives the payoff.' },

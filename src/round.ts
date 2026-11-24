@@ -21,6 +21,7 @@ import { basename, dirname, join, resolve } from 'node:path';
 import { caseProblems, loadCases, sha256, type Case } from './cases.ts';
 import { codexCommand, codexExec } from './codex.ts';
 import { writePacket } from './cli.ts';
+import type { GenreOption } from './packet.ts';
 import { readGenre } from './genre.ts';
 import {
   BLIND_IDS,
@@ -149,7 +150,14 @@ export async function tracetoonModules(root: string) {
   ]);
   // casting.ts exists only in Tracetoon builds that rotate casting (round 7 on).
   const casting = existsSync(join(root, 'src', 'comic', 'casting.ts')) ? await import(join(root, 'src', 'comic', 'casting.ts')) : undefined;
-  return { draw: draw.draw, svgToPng: raster.svgToPng, pageText: script.pageText, styleById: styles.styleById, imageSize: compose.imageSize, comicSummary: composition.comicSummary, sceneOptions: genres.sceneOptions as ((g: unknown, recent: string[], o: { seed?: string }) => unknown[]) | undefined, genreById: genres.genreById as (id: string) => unknown, castHint: casting?.castHint as ((seed: string) => string | undefined) | undefined };
+  // Cast offers (round 8 on): the genre file's roster, parsed by the Tracetoon under test.
+  const genreFile = casting?.castOffer ? await import(join(root, 'src', 'comic', 'genreFile.ts')) : undefined;
+  const castOffer =
+    casting?.castOffer && genreFile
+      ? (genrePath: string, seed: string): GenreOption['castOffer'] =>
+          casting.castOffer(genreFile.parseGenreFile(readFileSync(genrePath, 'utf8')).genre?.cast, seed)
+      : undefined;
+  return { draw: draw.draw, svgToPng: raster.svgToPng, pageText: script.pageText, styleById: styles.styleById, imageSize: compose.imageSize, comicSummary: composition.comicSummary, sceneOptions: genres.sceneOptions as ((g: unknown, recent: string[], o: { seed?: string }) => unknown[]) | undefined, genreById: genres.genreById as (id: string) => unknown, castHint: casting?.castHint as ((seed: string) => string | undefined) | undefined, castOffer };
 }
 type Tt = Awaited<ReturnType<typeof tracetoonModules>>;
 
@@ -259,6 +267,8 @@ async function oneComic(c: Case, sample: number, o: RoundOpts, tt: Tt, genreText
       recentComics: seen.map((r) => r.summary),
       // The Tracetoon under test rotates casting only if it has casting.ts.
       ...(tt.castHint ? { castHint: tt.castHint(`${basename(o.out)}:${id}:${sample}`) } : {}),
+      // The Tracetoon under test offers five personas when the genre has a roster.
+      ...(tt.castOffer ? (() => { const offer = tt.castOffer!(o.genre, `${basename(o.out)}:${id}:${sample}`); return offer ? { castOffer: offer } : {}; })() : {}),
       // The Tracetoon under test offers scenes only if it has a scene library.
       ...(tt.sceneOptions
         ? {

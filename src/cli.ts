@@ -12,7 +12,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 
 import { join, resolve } from 'node:path';
 import { caseProblems, loadCases } from './cases.ts';
 import { readGenre } from './genre.ts';
-import { comicPacketFiles } from './packet.ts';
+import { comicPacketFiles, type GenreOption } from './packet.ts';
 import { RUBRIC_VERSION } from './rubric.ts';
 import { judgmentProblems, report, respectRates, type ComicJudgment, type SetJudgment } from './score.ts';
 
@@ -60,6 +60,8 @@ export function writePacket(
     sceneOptions?: Record<string, unknown[]>;
     /** A casting suggestion, when the Tracetoon under test rotates casting. */
     castHint?: string;
+    /** The personas offered, when the Tracetoon under test offers a cast for the genre. */
+    castOffer?: GenreOption['castOffer'];
   },
 ): string[] {
   const problems = caseProblems(caseDir);
@@ -69,7 +71,11 @@ export function writePacket(
   const files = comicPacketFiles({
     brief: readFileSync(join(caseDir, 'brief.md'), 'utf8'),
     description: readFileSync(join(caseDir, 'description.md'), 'utf8'),
-    genres: [readGenre(opts.genre)],
+    genres: [
+      opts.castOffer
+        ? { ...readGenre(opts.genre), archetypes: opts.castOffer.personas.map((p) => p.name), castOffer: opts.castOffer }
+        : readGenre(opts.genre),
+    ],
     ...(opts.recentComics ? { recentComics: opts.recentComics } : {}),
     ...(opts.pinGenre ? { pinnedGenre: readGenre(opts.genre).id } : {}),
     ...(opts.sceneOptions ? { sceneOptions: opts.sceneOptions } : {}),
@@ -328,6 +334,10 @@ if (import.meta.main) {
       console.log(`  Space conflict: ${coverage(spaceConflict.considered)} considered, ${coverage(spaceConflict.selected)} selected, ${coverage(spaceConflict.scripted)} scripts, ${coverage(spaceConflict.rendered)} pages`);
       console.log(`  Recognizable roles: ${coverage(roleRead)} assessed, ${roleRead.intended} intended`);
       console.log(`  Explicit backgrounds: ${backgrounds.comicsWithBackground}/${backgrounds.assessed} scripts`);
+      if (s.places.assessed) console.log(`  Places: ${s.places.distinctLooks} distinct over ${s.places.assessed}, largest ${pct(s.places.topShare ?? NaN)} ("${s.places.topLook}")`);
+      console.log(`  Render look: ${Object.entries(s.renderLooks).filter(([, v]) => v).map(([k, v]) => `${k} ${v}`).join(', ') || 'n/a'}`);
+      console.log(`  Nemesis on page: ${coverage(s.castRoles.nemesisOnPage)}; party member lands the punchline: ${coverage(s.castRoles.partyPunchline)}`);
+      if (s.cast) console.log(`  Cast offers: ${s.cast.withPersonas}/${s.cast.comics} scripts list personas, ${s.cast.distinctUsed} distinct used, largest ${pct(s.cast.topShare ?? NaN)}, ${s.cast.outsideOffer} outside the offer; side-only ${s.cast.sideOnlyKept}/${s.cast.sideOnly} kept to side characters`);
     } else if (cmd === 'review') {
       const round = positional[0];
       if (!round) throw new Error('usage: comicbench review <round> [<round>...] [--arena <arena-dir>...] [--script-audit <dir>...] [--tracetoon <dir>] [--out <dir>]');

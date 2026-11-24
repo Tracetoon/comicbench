@@ -83,7 +83,7 @@ describe('checklist', () => {
       { id: 'a#1', checklist: cl('office-like interior', 'deadpan understatement', []) },
       { id: 'b#1', checklist: cl('battle or chase', 'slapstick', ['actionOrMotion', 'soundEffects', 'motionLines', 'image']) },
       { id: 'c#1', checklist: cl('office-like interior', 'deadpan understatement', ['shotVariety']), script: { scene: 'cantina' } },
-      { id: 'd#1', checklist: cl('planet surface or outdoors', 'visual gag', ['dynamicPanels']), script: { scene: 'cantina' } },
+      { id: 'd#1', checklist: cl('open outdoors (sky, space, road, wilderness)', 'visual gag', ['dynamicPanels']), script: { scene: 'cantina' } },
     ]);
     expect(s.officeLike).toBe(0.5);
     expect(s.deadpan).toBe(0.5);

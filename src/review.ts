@@ -204,8 +204,10 @@ function armData(round: string, out: string) {
   for (const c of comics) for (const n of c.comic?.cast ?? []) names.set(n.toLowerCase(), new Set([...(names.get(n.toLowerCase()) ?? []), c.case]));
   const layouts: Record<string, number> = {};
   for (const c of comics) if (c.comic) layouts[c.comic.layout || 'unknown'] = (layouts[c.comic.layout || 'unknown'] ?? 0) + 1;
+  const labelFile = join(round, 'label.txt');
   return {
     arm,
+    label: existsSync(labelFile) ? readFileSync(labelFile, 'utf8').trim() : '',
     manifest: {
       skillHash: manifest.skill?.hash?.slice(0, 12) ?? '',
       genre: manifest.genre?.path ? basename(manifest.genre.path) : '',
@@ -353,6 +355,10 @@ button:focus-visible, select:focus-visible, textarea:focus-visible, summary:focu
 .casehead h3 { font: 400 1.5rem var(--display); letter-spacing: .03em }
 .casehead .src { font: .8rem var(--mono); color: var(--muted) }
 .casebody { margin-top: 6px; font-size: .9rem }
+.armgroup { margin-top: 18px; border-top: 2px dashed var(--rule); padding-top: 10px }
+.armhead { margin: 0; font-size: 1.05rem }
+.armlabel { font: 500 .9rem var(--body); color: var(--muted); margin: 2px 0 6px }
+.armrow { --card: 420px; margin-top: 8px }
 .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--card, 520px)), 1fr)); gap: 22px; margin-top: 14px; align-items: start }
 .card { padding: 14px; min-width: 0; display: grid; gap: 12px }
 .cardtop { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between }
@@ -475,6 +481,7 @@ dialog::backdrop { background: rgba(20,19,15,.7) }
     '<span class="chip ' + (pass == null ? 'plain' : pass ? 'ok' : 'bad') + '" title="' + esc(reason || '') + '">' + (pass == null ? '·' : pass ? '✓' : '✗') + ' ' + esc(name) + '</span>';
 
   function armById(id) { return D.arms.find((a) => a.arm === id); }
+  function armLabel(id) { const a = armById(id); return a && a.label ? ' <span class="armlabel">' + esc(a.label) + '</span>' : ''; }
 
   function calBadge(arm, id) {
     const control = D.controlFor[id];
@@ -493,7 +500,7 @@ dialog::backdrop { background: rgba(20,19,15,.7) }
       const judged = a.comics.filter((c) => c.status === 'judged').length;
       const gated = a.comics.filter((c) => c.status === 'gated').length;
       const checked = a.comics.filter((c) => c.status === 'checked').length;
-      return '<article class="arm inked"><h3>' + esc(a.arm) + '</h3>' +
+      return '<article class="arm inked"><h3>' + esc(a.arm) + '</h3>' + (a.label ? '<p class="armlabel">' + esc(a.label) + '</p>' : '') +
         '<div class="big">' + f1(r.headline) + ' <small style="font:600 .85rem var(--body);color:var(--muted)">headline</small></div>' +
         '<dl class="kv">' +
         '<dt>Comic score</dt><dd>' + f1(r.comicMean) + ' [' + f1(r.comicCI && r.comicCI[0]) + ', ' + f1(r.comicCI && r.comicCI[1]) + ']</dd>' +
@@ -634,11 +641,14 @@ dialog::backdrop { background: rgba(20,19,15,.7) }
     }
     $('#comics').innerHTML = '<h2>The comics (' + xs.length + ')</h2>' + (order.length ? order.map((k) => {
       const info = D.cases[k] || {};
-      const cs = byCase.get(k).sort((a, b) => a.sample - b.sample || a.arm.localeCompare(b.arm));
+      // One row per arm, in the page's arm order, with that arm's samples side by side.
+      const armOrder = D.arms.map((a) => a.arm);
+      const cs = byCase.get(k).sort((a, b) => armOrder.indexOf(a.arm) - armOrder.indexOf(b.arm) || a.sample - b.sample);
+      const byArm = armOrder.map((arm) => cs.filter((x) => x.arm === arm)).filter((g) => g.length);
       const means = D.arms.map((a) => { const m = mean(cs, a.arm); return m == null ? '' : '<span class="chip plain">' + esc(a.arm) + ' ' + m.toFixed(0) + '</span>'; }).join(' ');
       return '<section class="case"><div class="casehead"><h3>' + esc(info.title || k) + '</h3><span class="src">' + esc(k) + '</span>' + means + '</div>' +
         '<details class="casebody"><summary>What the pull request changed (the evidence the judges had)</summary><pre>' + esc(info.brief || '') + '</pre><pre>' + esc(info.description || '') + '</pre></details>' +
-        '<div class="row">' + cs.map(card).join('') + '</div></section>';
+        byArm.map((g) => '<div class="armgroup"><h4 class="armhead">' + esc(g[0].arm) + armLabel(g[0].arm) + '</h4><div class="row armrow">' + g.map(card).join('') + '</div></div>').join('') + '</section>';
     }).join('') : '<p class="empty">No comics match these filters.</p>');
   }
 

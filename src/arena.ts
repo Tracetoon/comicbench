@@ -283,7 +283,8 @@ export async function runArena(o: {
   const errors: string[] = [];
   const plannedKeys: string[] = [];
   const pairs = manifest.cases.filter(({ id }) => !o.only || o.only.includes(id)).flatMap(({ id: c, sha256: caseHashes }) => {
-    const ids = manifestA.order.filter((id) => id.startsWith(`${c}#`));
+    // A legacy reference manifest has no recorded order: use its drawn comics.
+    const ids = (manifestA.order ?? [...drawnA.keys()].sort()).filter((id) => id.startsWith(`${c}#`));
     const kase = cases.get(c);
     if (!kase || JSON.stringify(kase.meta.sha256) !== JSON.stringify(caseHashes) || caseProblems(kase.dir).length) {
       throw new Error(`Missing or different frozen case ${c}.`);

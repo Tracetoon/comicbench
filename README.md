@@ -113,6 +113,51 @@ the manifest and checkpoint hashes and carries the recorded script failures
 forward. Use `--draw-jobs` to parallelize the resumed pipeline. For these
 pilots the phone reader's observations are diagnostic.
 
+## Running a whole benchmark round (campaign)
+
+`comicbench campaign <spec.json>` runs a full benchmark round in one command,
+as parallel as the work allows. It covers every arm's comics, every checklist,
+every arena and the review page.
+
+```sh
+bun src/cli.ts campaign campaigns/<round>.json [--slots 12] [--canary 4] [--keep-awake off]
+```
+
+The spec names the arms (genre, skill, Tracetoon snapshot, `jobs`), the frozen
+reference rounds, the arenas as pairs of round names, and the second judge. See
+`campaigns/check-smoke.json`.
+
+- **References are checked right away**, while the arms draw.
+- **Arms run side by side** (`jobs` workers each, default 6).
+- **Each comic is judged as it lands.** It is checked and judged against the
+  references as soon as it is drawn, not after the whole round.
+- **One gate (`src/gate.ts`) shares Codex between all of it:**
+  - at most `--slots` calls at once (default 12);
+  - comic work goes first;
+  - a rate-limited call backs off (30 s doubling, up to 10 minutes, 6 tries);
+  - while Codex is rate-limiting, the slots shrink by a third, and they
+    recover after ten quiet minutes.
+- **A canary stops a broken run early.** After `canary` comics per arm, any
+  crash, failed check, missing image, or persona, meme or style outside the
+  host's offer stops the run.
+- **The machine is kept awake** while the run lasts (`src/awake.ts`). The power
+  plan is untouched.
+
+Every step caches per item, so:
+- the final summaries are cache reads;
+- results match running `run`, `checklist` and `arena` one after another;
+- rerunning a spec resumes.
+
+The campaign writes `results/<name>/`:
+- `campaign.log`;
+- `campaign.json` (phase times, Codex calls and time per lane, rate limits and
+  backoff, the average number of earlier comics each comic saw);
+- `measures.log`;
+- `review/`.
+
+More workers mean each comic sees slightly fewer finished comics in
+`recentComics`. `campaign.json` records how many it saw.
+
 ## Checking the judges and reviewing a round
 
 - `comicbench script-audit <round-a> <round-b> --out <dir>`: an AI comparison

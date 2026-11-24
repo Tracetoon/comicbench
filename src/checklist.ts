@@ -500,7 +500,22 @@ async function readPageRole(dir: string, image: string, imageHash: string, model
   return reply.json;
 }
 
+/**
+ * Checks every drawn comic of a round (each answer cached by key in the comic's
+ * checklist.json) and writes the round summary. `only` checks just those comic
+ * ids and skips the summary: a campaign checks each comic as it lands, then
+ * calls this again without it, which reads the cache and summarizes.
+ */
 export async function runChecklist(o: { round: string; model?: string; jobs?: number }) {
+  return (await checklistImpl(o)) as Exclude<Awaited<ReturnType<typeof checklistImpl>>, { checked: number }>;
+}
+
+/** Checks just these comics of a round (cached per comic), writing no summary. */
+export async function checkComics(o: { round: string; model?: string; jobs?: number; only: string[] }) {
+  return (await checklistImpl(o)) as { errors: string[]; checked: number };
+}
+
+async function checklistImpl(o: { round: string; model?: string; jobs?: number; only?: string[] }) {
   const manifest = readAnyManifest(o.round);
   // A legacy reference round has no recorded order or runtime: use its comic folders and the bench snapshot.
   const order = manifest.order ?? listComics(o.round);
@@ -514,7 +529,7 @@ export async function runChecklist(o: { round: string; model?: string; jobs?: nu
     for (const n of readdirSync(join(root, c)).sort()) {
       const art = join(root, c, n, 'art');
       const page = existsSync(art) ? readdirSync(art).find((f) => /^page\.(png|jpe?g|webp)$/.test(f)) : undefined;
-      if (page) jobs.push({ id: `${c}#${n}`, dir: join(root, c, n), image: join(art, page) });
+      if (page && (!o.only || o.only.includes(`${c}#${n}`))) jobs.push({ id: `${c}#${n}`, dir: join(root, c, n), image: join(art, page) });
     }
   const errors: string[] = [];
   const current = new Set<string>();
@@ -553,6 +568,7 @@ export async function runChecklist(o: { round: string; model?: string; jobs?: nu
       }
     }),
   );
+  if (o.only) return { errors, checked: current.size };
   const items = jobs.flatMap((j) => {
     const f = join(j.dir, 'checklist.json');
     if (!current.has(j.id)) return [];

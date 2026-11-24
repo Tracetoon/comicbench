@@ -21,6 +21,7 @@ import { basename, dirname, join, resolve } from 'node:path';
 import { caseProblems, loadCases, sha256, type Case } from './cases.ts';
 import { codexCommand, codexExec } from './codex.ts';
 import { writePacket } from './cli.ts';
+import { withSlot } from './gate.ts';
 import type { GenreOption } from './packet.ts';
 import { readGenre } from './genre.ts';
 import {
@@ -60,6 +61,10 @@ export interface RoundOpts {
   stopAfter?: 'check';
   /** Resume concurrency is independent of the frozen author order. */
   drawJobs?: number;
+  /** Called after each comic finishes (a campaign checks and judges it right away). */
+  onComic?: (s: ComicState) => void;
+  /** Checked before each new comic; true stops the round (a failed canary). */
+  shouldStop?: () => boolean;
 }
 
 /** Tracetoon's CLI bundled into one file (built once per round), for the author's packet. */
@@ -197,7 +202,7 @@ export async function rendition(tt: Tt, page: string, width: number, out: string
   writeFileSync(out, await tt.svgToPng(svg, width));
 }
 
-interface ComicState {
+export interface ComicState {
   case: string;
   sample: number;
   dir: string;
@@ -399,7 +404,7 @@ async function oneComic(c: Case, sample: number, o: RoundOpts, tt: Tt, genreText
   let page = existsSync(art) ? readdirSync(art).find((f) => /^page\.(png|jpeg|jpg|webp)$/.test(f)) : undefined;
   if (!page) {
     try {
-      await tt.draw(script, art, { provider: 'codex' });
+      await withSlot(() => tt.draw(script, art, { provider: 'codex' }));
     } catch (e) {
       return state({ status: 'error', stage: 'draw', error: (e as Error).message.slice(0, 500) });
     }
@@ -629,6 +634,10 @@ export async function runRound(o: RoundOpts) {
   await Promise.all(
     Array.from({ length: Math.max(1, o.drawJobs ?? o.jobs) }, async () => {
       for (let t = queue.shift(); t; t = queue.shift()) {
+        if (o.shouldStop?.()) {
+          queue.length = 0;
+          break;
+        }
         let s: ComicState;
         try {
           s = await oneComic(t.c, t.sample, o, tt, genreText, recent, saved.get(`${t.c.meta.id}#${t.sample}`));
@@ -643,6 +652,7 @@ export async function runRound(o: RoundOpts) {
         states.push(s);
         console.error(`${s.case}/${s.sample}: ${s.status}${s.stage ? ` (${s.stage}${s.error ? `: ${s.error.slice(0, 160)}` : ''})` : ''}`);
         writeFileSync(join(o.out, 'progress.json'), JSON.stringify(states, null, 2));
+        o.onComic?.(s);
       }
     }),
   );

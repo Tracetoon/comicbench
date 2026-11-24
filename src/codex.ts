@@ -7,6 +7,7 @@
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
+import { backoffMs, gate, RATE_LIMIT, sleep, withSlot } from './gate.ts';
 
 export interface CodexCall {
   prompt: string;
@@ -44,7 +45,25 @@ export function codexCommand(): string[] {
   return bin.endsWith('.ts') ? [process.execPath, bin] : [bin];
 }
 
+/** Rate-limit retries before a call gives up. */
+export const RATE_LIMIT_TRIES = 6;
+
+/**
+ * One Codex call through the process gate (gate.ts): it waits for a slot, and
+ * a rate-limited reply is retried with backoff, the slot released meanwhile.
+ */
 export async function codexExec(c: CodexCall): Promise<CodexResult> {
+  for (let attempt = 0; ; attempt++) {
+    const r = await withSlot(() => codexOnce(c));
+    if (r.ok || !r.limited || attempt + 1 >= RATE_LIMIT_TRIES) return r;
+    gate.limited();
+    const wait = backoffMs(attempt);
+    gate.stats.backoffMs += wait;
+    await sleep(wait);
+  }
+}
+
+async function codexOnce(c: CodexCall): Promise<CodexResult & { limited?: boolean }> {
   mkdirSync(c.logDir, { recursive: true });
   const out = join(c.logDir, 'last-message.txt');
   const log = join(c.logDir, 'codex.log');
@@ -84,7 +103,8 @@ export async function codexExec(c: CodexCall): Promise<CodexResult> {
   const sandbox = /^sandbox:\s*(\S+)/m.exec(`${stdout}\n${stderr}`)?.[1];
   const text = existsSync(out) ? readFileSync(out, 'utf8') : '';
   const base = { text, ms, model, sandbox };
-  if (code !== 0) return { ok: false, ...base, error: `codex exit ${code}: ${stderr.trim().slice(-500)}` };
+  // Only a failed call's own output counts: a model reply can quote "429" or "rate limit".
+  if (code !== 0) return { ok: false, ...base, limited: RATE_LIMIT.test(stderr), error: `codex exit ${code}: ${stderr.trim().slice(-500)}` };
   if (!c.schema) return { ok: true, ...base };
   try {
     return { ok: true, ...base, json: JSON.parse(text) };

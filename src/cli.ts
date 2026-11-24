@@ -346,6 +346,17 @@ if (import.meta.main) {
       if (s.memes.offered || s.memes.onPage.observed) console.log(`  Memes: ${s.memes.offered} offered, ${s.memes.scripted} scripted (${s.memes.outsideOffer} outside the offer, ${s.memes.repeats} repeats), ${coverage(s.memes.onPage)} on the page`);
       console.log(`  Backgrounds by panel focus: ${coverage(s.backgroundFocus)}`);
       if (s.cast) console.log(`  Cast offers: ${s.cast.withPersonas}/${s.cast.comics} scripts list personas, ${s.cast.distinctUsed} distinct used, largest ${pct(s.cast.topShare ?? NaN)}, ${s.cast.outsideOffer} outside the offer; side-only ${s.cast.sideOnlyKept}/${s.cast.sideOnly} kept to side characters`);
+    } else if (cmd === 'campaign') {
+      const specFile = positional[0];
+      if (!specFile) throw new Error('usage: comicbench campaign <spec.json> [--slots 12] [--canary 4] [--keep-awake off]');
+      const { runCampaign } = await import('./campaign.ts');
+      const r = await runCampaign({
+        spec: JSON.parse(readFileSync(resolve(specFile), 'utf8')),
+        ...(flags.get('slots')?.[0] ? { slots: Number(flags.get('slots')![0]) } : {}),
+        ...(flags.get('canary')?.[0] ? { canary: Number(flags.get('canary')![0]) } : {}),
+        ...(flags.get('keep-awake')?.[0] === 'off' ? { keepAwake: false } : {}),
+      });
+      if (r.stopped || r.errors.length) process.exitCode = 1;
     } else if (cmd === 'review') {
       const round = positional[0];
       if (!round) throw new Error('usage: comicbench review <round> [<round>...] [--arena <arena-dir>...] [--script-audit <dir>...] [--tracetoon <dir>] [--out <dir>]');
@@ -363,7 +374,7 @@ if (import.meta.main) {
       });
       console.log(`Review page: ${join(out, 'index.html')}`);
     } else {
-      console.error('usage: comicbench <validate|packet|score|run|script-audit|compare|arena|checklist|reliability|calibrate|anchors|review|datasets fetch> ...');
+      console.error('usage: comicbench <validate|packet|score|run|campaign|script-audit|compare|arena|checklist|reliability|calibrate|anchors|review|datasets fetch> ...');
       process.exit(2);
     }
   } catch (e) {

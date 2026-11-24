@@ -266,10 +266,23 @@ function pairResult(c: string, a: ArenaComic, b: ArenaComic, ab: any, ba: any): 
   };
 }
 
-export async function runArena(o: {
+type ArenaOpts = {
   a: string; b: string; out?: string; cases?: string; model?: string; model2?: string;
   share2?: number; jobs?: number; only?: string[]; pairing?: 'matched';
-}) {
+  /** Judge just these pairs ("aId|bId") and write no report: a campaign streams pairs as comics land. */
+  onlyPairs?: Set<string>;
+};
+
+export async function runArena(o: Omit<ArenaOpts, 'onlyPairs'>) {
+  return (await arenaImpl(o)) as { out: string; report: NonNullable<Awaited<ReturnType<typeof arenaImpl>>['report']> };
+}
+
+/** Judges just these pairs (cached per pair), writing no report. */
+export async function judgePairs(o: ArenaOpts & { onlyPairs: Set<string> }) {
+  return (await arenaImpl(o)) as { out: string; errors: string[]; judged: number };
+}
+
+async function arenaImpl(o: ArenaOpts) {
   const { A: manifestA, B: manifest, differences } = comparableRounds(o.a, o.b);
   if (differences.length) console.log(`note: the rounds differ in ${differences.join(', ')}`);
   const model = o.model ?? (manifest.model === 'codex default' ? undefined : manifest.model);
@@ -321,7 +334,8 @@ export async function runArena(o: {
   );
   const results: PairResult[] = [];
   const secondResults: { primary: PairResult; second: PairResult }[] = [];
-  await pool(pairs, o.jobs ?? 3, async ({ c, a, b }) => {
+  const todo = o.onlyPairs ? pairs.filter(({ a, b }) => o.onlyPairs!.has(`${a.id}|${b.id}`)) : pairs;
+  await pool(todo, o.jobs ?? 3, async ({ c, a, b }) => {
     const kase = cases.get(c)!;
     const prompt = arenaPrompt({
       brief: readFileSync(join(kase.dir, 'brief.md'), 'utf8'),
@@ -347,6 +361,7 @@ export async function runArena(o: {
       errors.push(`${c} ${a.id} vs ${b.id}: ${(e as Error).message.slice(0, 300)}`);
     }
   });
+  if (o.onlyPairs) return { out, report: undefined, errors, judged: results.length };
   results.sort((x, y) => `${x.a}|${x.b}`.localeCompare(`${y.a}|${y.b}`));
   const label = (v: 1 | 0 | -1) => (v === 1 ? 'a' : v === -1 ? 'b' : 'tie');
   const raw = winRates(results, { rawOverall: true });

@@ -19,3 +19,6 @@ judges score it. The design is in [docs/plan.md](docs/plan.md).
 - **Report honestly.** Keep failed or inconclusive results on record.
 - **Never commit downloaded cases or `results/`.** Tests fake every model
   and image call.
+- **Run benchmark rounds with `comicbench campaign <spec>`,** not
+  hand-written scripts. Specs live in `campaigns/`. Every model call goes
+  through the gate in `src/gate.ts`; never bypass it.

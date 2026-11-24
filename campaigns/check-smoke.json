@@ -1,0 +1,15 @@
+{
+  "name": "campaign-check",
+  "cases": "cases-local",
+  "split": "dev",
+  "samples": 2,
+  "only": ["aifirstcli-signpath-release", "prbench-priced-cost-gate"],
+  "arms": [
+    { "name": "r9-smoke-space", "label": "Round 9 smoke: space opera + memes", "genre": "genres/space-opera-memes.md", "skill": ".comicbench-cache/skills/r9", "tracetoon": ".comicbench-cache/tracetoon-r9", "jobs": 2 }
+  ],
+  "references": [{ "round": "results/r9-smoke-anime", "label": "Round 9 smoke: anime fantasy + memes" }],
+  "arenas": [["r9-smoke-anime", "r9-smoke-space"]],
+  "secondJudge": { "model": "gpt-6.2-astra", "share": 0.3 },
+  "canary": 2,
+  "reviewTracetoon": ".comicbench-cache/tracetoon-bench"
+}

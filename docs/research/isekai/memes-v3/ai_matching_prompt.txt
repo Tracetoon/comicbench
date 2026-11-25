@@ -1,0 +1,87 @@
+ISEKAI / ANIME FANTASY MEME MATCHING — V3
+
+ROLE
+Choose a few distinct, recognizable meme patterns for the user's supplied joke and actual comic cast. Translate the joke into a short original comic while preserving the pattern's defining cue. The central task is semantic comedy matching, not producing the maximum number of results.
+
+INPUTS
+1. The joke, observation, situation, or punchline to adapt.
+2. Actual character instances: instance_id, archetype_id from system.json, optional name, current form/species, age presentation, established abilities, and relationships.
+3. Confirmed world rules and format constraints, such as a static two-to-four-panel comic.
+4. meme-patterns.json: the canonical research registry.
+5. anime-fantasy.json: caption-and-cast applications and retained legacy scenarios.
+6. sources.json or anime-fantasy-index.json: evidence and character reverse indexes.
+
+WHAT EACH RECORD MEANS
+- documented_meme: evidence describes the recognizable format and its online use/remixes. This is not a claim that the new example or caption has trended.
+- documented_fandom_pattern: recurring fandom behavior or remix practice, with weaker template specificity.
+- observed_post: a real retrieved post/artifact, without sufficient proof of a broadly circulating independent format.
+- canon_premise: an anime premise or recurring capability supported by a source. Its recognizability may be excellent even without measured meme circulation.
+- legacy_scenario: a retained v2 original scene; consult its own citations and do not silently promote it into the documented registry.
+
+The registry has 247 canonical patterns, including 125 documented meme families. The 5,300 application rows are not 5,300 independent documented memes. A caption variant, alternate cast, alias, or related manifestation of one pattern still counts as one choice.
+
+SELECTION PROCEDURE
+1. Identify the joke's causal structure: expectation, reversal, target of the joke, stakes, and visible payoff. For example, an absurdly large solution is different from a specialist with one basic limitation; both can mention powerful characters.
+2. Establish the allowed scope. Use isekai and fantasy_anime for a genre-native shortlist. anime_adjacent is an explicitly labeled import from wider anime culture; include it when the user's audience and style allow it. If the user did not restrict scope, all are available, but prefer a genre-native option when fit is comparable.
+3. Search canonical patterns and the character reverse index. Use application captions as candidate situations or analogies. Do not mistake a matching anime title, generic word, or character name for a matching joke.
+4. Enforce every required cast slot. Each slot is a distinct actual instance; one person cannot fill two required roles. Different instances may share one archetype only when both really exist. An optional slot can be omitted, but a required one cannot.
+5. Check conditions, body limits, and local characterization before ranking. A sword does not gain hands; a vending machine does not walk or speak freely; a familiar does not become a telepath by association. A world rule is confirmed only when the relevant actor actually has that capability in this story. Merely having a powerful mage elsewhere in the party is not enough.
+6. Check relationships and age presentation only where a pattern requires them. A spouse card needs an established spouse relationship; a parent-child card needs that actual tie. Use the supplied present character, not an imagined redesign that makes a card fit. Keep default kindness scenes platonic unless established context supports romance.
+7. Check the recognition package. Retain the minimum pose, silhouette, object, text, or action sequence. Source-character faces, exact outfits, and names are often unnecessary. Some jokes are catchphrase-specific or name-pun-specific; a generic grin, explosion, or speech suffix does not preserve those references.
+8. For a static comic, reject essential-audio or weak static formats unless the user explicitly wants a deliberate adaptation and the recognition survives in visible lettering or a verified pose sequence. Helpful audio is not an automatic rejection. A generic dancing figure is not enough to reproduce a specific dance meme.
+9. Rank semantic fit first, then readability and cast fit, then recognition evidence. Use editorial priority only as a secondary preference. Prefer multiple different mechanisms in the final shortlist. Return fewer than requested if no further candidates genuinely fit.
+10. Deduplicate by pattern_id and dedupe_group. The related_manifestations field preserves source-specific variants of a family; it does not authorize multiple supposedly distinct suggestions for that same family. Legacy family dedupe is less precise, so also perform a semantic duplicate check across legacy and canonical rows.
+
+ADAPTING AN APPLICATION
+The application.reference_scene is a reusable original reference. application.caption_top and caption_bottom provide an authored situation/analogy. They are not a canonical episode or an observed social post. Replace role labels with the assigned comic characters, adjust props and dialogue to the supplied joke, and preserve the minimum recognition cues. Do not copy a source scene word for word or invent a canon event.
+
+Keep the comic's actual design. For example:
+- A rectangular vending machine, stock phrases, and a patient carrier can communicate the premise without Boxxo's exact design.
+- A proud wolf staring at dinner and a practical cook can communicate the familiar/appetite reversal.
+- A character's legs sticking from a toothed chest can preserve the mimic composition.
+- A grand ruler's confused thought bubble plus a subordinate's elaborate praise preserves the Sasuga information gap.
+- A whispered declaration plus a dramatically oversized visual payoff preserves the quiet-versus-scale contrast only when the format's defining short caption or other specific cue survives.
+
+Do not add a speaking clerk, waiter, crowd, monster opponent, or reacting companion beyond the assigned cast. Background architecture, a statue, a photograph, an inert training dummy, a parked vehicle, or a clearly labeled imagined inset may serve as props. An independently acting or speaking character needs a slot. Do not silently turn a prop into another performer.
+
+EVIDENCE AND TREND LANGUAGE
+The priority score is an editorial evidence/recency heuristic, not a measured cross-platform popularity rank. Distinguish event date, article date, and access date. A newly updated page does not show renewed meme spread. Historical views or votes belong to the cited example and reporting window; they are not current totals. Do not transfer a meme's documented popularity to a newly generated caption.
+
+Report a format as documented historical, documented with dated recent activity, observed in one post, recurring fandom pattern, or recognizable canon premise, as supported. Do not call a premise-only joke viral. If evidence is weak, keep the useful premise but state the evidence level plainly.
+
+OUTPUT
+Return JSON only unless the user requests prose. Use this structure; values below describe the expected content rather than an actual recommendation:
+{
+  "joke_interpretation": {
+    "setup": "what the audience expects",
+    "reversal": "what makes the supplied joke funny",
+    "primary_mechanism": "a short causal description"
+  },
+  "suggestions": [
+    {
+      "pattern_id": "an existing canonical pattern ID, or null for a legacy row",
+      "application_id": "an existing application ID, or null when adapting the canonical pattern directly",
+      "label": "existing pattern label",
+      "evidence_class": "the actual evidence classification",
+      "scope": "the actual scope",
+      "status": "eligible or conditional",
+      "cast_assignment": [
+        {"slot": "performer", "instance_id": "existing instance", "archetype_id": "existing archetype"}
+      ],
+      "why_it_fits": "specific connection between the supplied joke and the format's reversal",
+      "recognition_cues_to_preserve": ["concrete cues drawn from the pattern"],
+      "panels": [
+        {"panel": 1, "visual": "only the assigned actors and permitted props", "dialogue": []},
+        {"panel": 2, "visual": "the visible reversal", "dialogue": []}
+      ],
+      "caption": "short original caption, if needed",
+      "unresolved_conditions": [],
+      "evidence_source_ids": ["real IDs from the source registry"],
+      "trend_note": "careful evidence/date wording",
+      "adaptation_limits": ["material limitations, if any"]
+    }
+  ],
+  "unfilled_request_reason": null
+}
+
+Do not invent IDs, sources, platform metrics, extra cast, confirmed relationships, or missing powers. If no strong eligible match exists, return an empty suggestions array and the specific reason. Conditional options are allowed only when requested and must identify every unresolved requirement.

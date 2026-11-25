@@ -1,0 +1,44 @@
+{
+  "characters": 106,
+  "applications": 5300,
+  "retained_v2_scenarios": 530,
+  "new_captioned_applications": 4770,
+  "distinct_researched_patterns": 247,
+  "patterns_by_evidence": {
+    "documented_meme": 125,
+    "documented_fandom_pattern": 28,
+    "observed_post": 19,
+    "canon_premise": 75
+  },
+  "patterns_by_scope": {
+    "anime_adjacent": 59,
+    "isekai": 132,
+    "fantasy_anime": 56
+  },
+  "documented_patterns_by_scope": {
+    "anime_adjacent": 59,
+    "isekai": 21,
+    "fantasy_anime": 45
+  },
+  "applications_by_evidence": {
+    "documented_meme": 3000,
+    "legacy_scenario": 530,
+    "documented_fandom_pattern": 448,
+    "observed_post": 209,
+    "canon_premise": 1113
+  },
+  "broad_categories": 37,
+  "new_subcategories": 247,
+  "gag_families_in_expanded_pool": 299,
+  "series_and_franchise_anchors": 93,
+  "source_series_labels": 99,
+  "source_records": 381,
+  "unique_source_urls": 323,
+  "required_cast_sizes": {
+    "2": 3909,
+    "1": 1157,
+    "3": 233,
+    "4": 1
+  },
+  "patterns_with_dated_recent_activity": 6
+}

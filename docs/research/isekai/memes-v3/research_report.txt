@@ -1,0 +1,232 @@
+ISEKAI AND ANIME FANTASY MEME RESEARCH — V3
+November 25, 2026
+
+RESULT AND COUNTING UNIT
+The useful expansion is the canonical vocabulary: 247 researched families, including 125 documented memes. The 5,300-row application pool is a separate convenience layer. Five duplicate/variant research cards were consolidated rather than counted again. Elf Senshi and the broad Izutsumi cat-remix practice were conservatively classified as documented fandom patterns, because the retrieved evidence is broader than the particular example joke.
+
+The registry is divided into 132 isekai patterns, 56 fantasy-anime patterns, and 59 broader anime imports. Within the documented subset, those counts are 21, 45, and 59. This distinction matters: the claimed elevenfold documented expansion includes the broader anime imports, whereas a strictly isekai-only project has a smaller established-format vocabulary. Title-driven isekai premises supply much of the additional genre-specific variety.
+
+RESEARCH APPROACH
+Three delegated tracks covered core isekai, niche/literal-premise series, and fantasy/broader anime formats. A fourth coordinating track recovered baseline formats and researched portable reactions, poses, catchphrases, and dances. Two independent cross-reviews checked overlap and source classification. A separate matcher review checked executable casting, filters, and ranking.
+
+The resulting source register contains 381 records from 323 distinct URLs, including the prior 119 records. Multiple records can cite one page for different claims; those are not multiple independent sources. The maximum applicable source score is used rather than adding citations together. The source register deliberately retains publication dates, actual activity dates where available, retrieval dates, historical metrics, and limitations as separate fields.
+
+WHAT WAS ADDED BEYOND THE SMALL ORIGINAL MEME SET
+Core isekai now includes the Aqua crying family, purification trouble, theatrical self-introductions, lonely Yunyun and the separate name-pun poster, Chunchunmaru naming, Subaru victory and staircase formats, fan birthday aura edits, fake Overlord traitor spoilers, repeated Splat text, database chanting, and additional observed or recurring fandom jokes. The distinction between exact formats and looser behavior is preserved in each record.
+
+Fantasy anime adds moral-precedent callbacks, gun substitutions, arbitrary orders, odd gift enthusiasm, perspective-drawing failures, cover parodies, dungeon cooking and cat behavior, physical-comedy dances, judgment panels, equivalent-exchange jokes, burnout reactions, delayed consequences, overconfident predictions, and stylized reactions. Broader anime imports add strong portable mechanisms such as confident mislabeling, unearned credit, overdramatic ordinary actions, conspicuous disguises, silent defeat, catchphrase loops, and familiar redraw compositions.
+
+RECENT DOCUMENTED FORMATS
+Yo My Fault Bruh is documented as an August 2026 fan animation followed by cross-character reanimations. Its useful structure is the immediate switch from aggression to apology when the target turns around. The source's historical views belong to cited uploads; they are not a current November audience estimate. [FMT-S049]
+
+Higuruma Stressed Out is documented from a February 2026 anime sequence and its reaction-video spread. This is particularly reusable for receptionists, accountants, managers, healers, or anyone overwhelmed by repeated demands. [FMT-S060]
+
+Subaru's staircase/Aura Monster format has a fan-animation history and documented 2025–2026 spread. The adaptation must preserve the dramatic staircase ascent and its disproportionate aura framing rather than becoming an arbitrary walking scene. [CORE evidence linked on CORE-018]
+
+The cooking head-bob is a 2026 redraw/animation format based on a Yosuga no Sora visual-novel image. It is not a canonical Campfire Cooking scene. Its smiling cook and repeated motion can be translated into panels, while the audio-dependent version remains separately flagged. [ROOT-S039]
+
+WHY THE NICHE SERIES ARE USEFUL
+Reborn as a Vending Machine gives four distinct mechanisms: an appliance occupies the hero role; stock phrases are inadequate for an emergency; the hero depends on a carrier; ordinary retail products solve dungeon problems. Nippon TV explicitly verifies the body, speech, movement, and consumer-product premise. Only the supporting fandom evidence earns a circulation label; the individual mechanics are not all declared viral. [NICHE-001–NICHE-004; source links on each card]
+
+Campfire Cooking supports a dismissed grocery skill becoming essential, food acting as a stat system, formidable creatures behaving like hungry pets, monster encounters becoming menu planning, a cute slime's destructive enthusiasm, and a goddess undermining her authority with pastry crumbs. These are distinct joke mechanisms even when the cast overlaps. The cards retain their actual evidence levels and specific source links.
+
+Reincarnated as a Sword provides a weapon acting as a protective parent, a disciplined fighter's curry fixation, and telekinetic camp cooking. Those mechanisms must respect the local sword's actual communication and movement abilities. The catalog does not grant hands to the weapon. [NICHE-011–NICHE-013]
+
+The Red Ranger Becomes an Adventurer in Another World supplies a useful genre collision: transformation poses cause actual collateral explosions, a giant robot exceeds the scale of an ordinary fantasy problem, and friendship becomes a literal activation rule. The latter two have narrower observed-post evidence rather than a broad documented-template claim. [NICHE-047–NICHE-049]
+
+Other researched premises include the animator editing reality in ZENSHU, ordinary management in a demon army, online shopping as a fantasy trade engine, evil-faction branding versus civic administration, a pig's private thoughts being readable, a dragon's mighty destiny beginning inside an egg, parental habits inside an otome villainess, level-one loot advantages, agricultural overkill, bespoke potion wording, retired shopkeepers attracting more work, and a sage forgetting to teach common sense. All are tied to source records. Some require variants that the current character catalog does not directly supply; their limitations remain explicit.
+
+RECOGNITION WITHOUT COPYING A CHARACTER DESIGN
+Each card identifies a minimum recognition package: a pose, silhouette, object, text cue, action sequence, or a combination. For a literal premise, an immobile rectangular appliance plus a carrier may be enough. For a template, a generic facial emotion is often insufficient: the mimic chest needs the headfirst body composition, the glasses format needs opaque glint and bridge adjustment, and a named speech tic needs its defining short utterance.
+
+Several specific attack jokes remain distinct only if their different cues survive. A whisper followed by overwhelming scale, a once-per-day explosion followed by collapse, an eye-origin beam, and a portal-array arsenal must not all be rendered as the same generic bright blast. The same principle applies to Anya's awkward broad smile versus the narrower smug-mage expression.
+
+MUSIC AND MOTION
+The registry includes audio and dance formats because the user asked for a broad meme pool, but marks their portability. Essential-audio or weak static formats can be removed with --static-only. Helpful audio alone does not make a format unusable: lettering and repeated panels can preserve some jokes. Generic dance staging does not reproduce a specific choreography. The linked documentation supplies the reference trail when a more exact pose sequence is needed.
+
+CASTING AND WORLD RULES
+Every canonical pattern has required role slots, allowed archetype IDs, their main/party/world categories, and catalog functions. Every application narrows its performer to one focus archetype and preserves alternate candidates for the other slots. All 106 catalog archetypes are covered in the canonical mappings. A required role always needs a separate actual instance.
+
+Extra actors were removed from example prose during review. A speaking waiter, reacting crowd, or independent opponent cannot silently appear outside the slot list. Inert training props, parked vehicles, photographs, statues, and clearly labeled imagined insets are treated as props only while they remain non-speaking/non-independent.
+
+Powers and special relationships are explicit conditions. Machine speech limits, telekinetic swords, food buffs, naming-based evolution, transformed bodies, binding commands, and time stopping require the relevant story facts. The matcher preserves unknown conditions instead of inventing them. Spouse and adult-child variants have specific relationship gates. The actor catalog itself is byte-for-byte unchanged.
+
+MATCHING AND APPLICATION GENERATION
+The pool retains the original 530 rows and adds 4,770 deterministic caption/cast applications. Authored caption briefs cover software, work, daily life, adventure, games, commerce, household tasks, social situations, and travel. Each pattern is assigned a causal comedy operation; only briefs for that operation are applied. Examples and captions are original adaptations, not copied episode transcripts or social posts.
+
+This expansion is intentionally not a claim of 4,770 new comedic mechanisms. The reference scene recurs across a pattern's applications, with different analogical captions and compatible performers. The canonical registry is the useful unit for variety, and the matcher returns one result per pattern by default. The legacy four-field export is supplied for compatibility but loses evidence and condition metadata.
+
+The Python matcher filters cast, conditions, evidence class, scope, and static suitability. For a nonempty joke it ranks lexical/topic fit first and evidence priority second. It suppresses series-name-only matching and repeated occurrences across fields. An AI using the matching prompt should then judge the actual reversal, preserve cues, and write the final panel sequence. Lexical overlap alone cannot establish that a joke is good.
+
+PRIORITY INTERPRETATION
+Documented patterns receive the strongest recognition evidence weight, followed by fandom patterns and single observed artifacts. Canon-only premises receive no online-popularity credit. Dated activity can add a small recentness bonus; an article update date or fresh crawl cannot. The score is capped by the pattern's evidence class. The final snapshot has six patterns with a dated activity signal in the previous 180 days. This is not a claim that other formats are inactive.
+
+The result is an evidence-prioritized shortlist tool, not live trend analytics or a reliable universal popularity ordering. Historical engagement counts across different platforms, formats, and time windows are not directly comparable, so they are stored with context instead of presented as one synthetic audience number.
+
+DEDUPLICATION DECISIONS
+The Being Subaru suffering manifestation and duplicate Meduka card were folded into the same suffering family. The duplicated Sailor Moon redraw and unearned-credit exit were merged. Philip-sama's ironic praise remains a related manifestation of the Sasuga family. Names, evidence, original variant examples, and cast cues remain accessible under related_manifestations; five research records therefore do not inflate the canonical total.
+
+LIMITATIONS
+The corpus is broad rather than literally exhaustive. Most documentation comes from English-language meme histories and accessible public posts, with official/distributor sources for premises. A documented format is not necessarily recognizable to every age group or fandom. Strictly isekai-only and static-only filters reduce the available set. Current popularity must be rechecked if it is a production requirement; the snapshot is dated and does not continuously refresh itself.
+
+The existing catalog has no exact pig protagonist, so the Butareba card identifies portable monster analogues and the missing exact body. Literal mechanics that would change a character require a declared variant. No unverified apple-reincarnation anime was added. No newly authored caption is described as an observed viral post.
+
+USEFUL PRIMARY / DOCUMENTATION LINKS
+
+[ROOT-S039] How It Feels to Cook a Yummy Meal
+https://knowyourmeme.com/memes/how-it-feels-to-cook-a-yummy-meal-as-a-boy
+
+[ROOT-S040] Frieren Stuck in a Mimic Chest
+https://knowyourmeme.com/memes/frieren-stuck-in-mimic-chest
+
+[NICHE-S001] Reborn as a Vending Machine — Nippon TV program catalog
+https://www.ntv.co.jp/english/pc/2023/07/Reborn-as-a-Vending-Machine.html
+
+[FMT-S049] Yo My Fault Bruh
+https://knowyourmeme.com/memes/yo-my-fault-bruh
+
+[FMT-S081] Yo My Fault Bruh
+https://www.newgrounds.com/portal/view/1057618
+
+[FMT-S060] Higuruma Stressed Out
+https://knowyourmeme.com/memes/higuruma-stressed-out
+
+[CORE-S017] Aura Monster / Subaru Walking Up Stairs
+https://knowyourmeme.com/memes/aura-monster-subaru-walking-up-stairs
+
+[CORE-S018] What is the Aura Monster or Re:Zero stairs meme?
+https://trending.knowyourmeme.com/editorials/guides/what-is-the-aura-monster-or-rezero-stairs-meme-the-viral-subaru-staircase-edit-from-rezero-explained
+
+[NICHE-S005] Campfire Cooking series synopsis
+https://www.crunchyroll.com/series/GG5H5X3EE
+
+[NICHE-S073] Reincarnated as a SwordII official character profiles
+https://tenken-anime.com/?lang=en
+
+[NICHE-S044] Be wary of your surroundings when performing a Sentai pose
+https://knowyourmeme.com/photos/2986575-anime-manga
+
+[NICHE-S045] Holy Peak — Red Ranger isekai
+https://www.reddit.com/r/wholesomeanimemes/comments/1rj94q9/holy_peak/
+
+[NICHE-S043] The Red Ranger Becomes an Adventurer — official title page
+https://kadokawa-anime.com/titles/entry-218.html
+
+[NICHE-S059] Why Matsuken SambaII became the villainess ending
+https://en.mantan-web.jp/e_article/20250125dog00m200013000c.html
+
+[NICHE-S058] From Bureaucrat to Villainess episode guide
+https://tv.apple.com/us/show/from-bureaucrat-to-villainess/umc.cmc.5zxzlyynxaqqqjufwni87xwmb
+
+CATEGORY COVERAGE
+
+Authority And Rules — 8 patterns
+Orders, ceremonial status, overblown refusals, moral precedents, and territory claims.
+
+Bodies And Limitations — 8 patterns
+Fragility, memory lapses, transformations, size changes, and expertise without basics.
+
+Bureaucracy And Leadership — 6 patterns
+Administration, logistics, personnel placement, settlement growth, and routine management.
+
+Combat And Resources — 9 patterns
+Excessive power, spectacular openings, mana limits, and anticlimactic victory.
+
+Companions And Care — 3 patterns
+Guardians, parental weapons, supportive pairs, and established command relationships.
+
+Creative Magic — 2 patterns
+Drawing edits reality, while creative solutions create later problems.
+
+Dialogue And Language — 14 patterns
+Catchphrases, repeated dialogue, sentence endings, translation notes, and name shouting.
+
+Divine Bargains — 7 patterns
+Reincarnation offers, gods with mundane weaknesses, wishes, and supernatural contracts.
+
+Equipment And Props — 8 patterns
+Weapons, costumes, mimic chests, oversized gear, and objects defeating their owners.
+
+Expressive Reactions — 16 patterns
+Smugness, shock, denial, burnout, panic, and extremely flat responses.
+
+Familiars And Pets — 5 patterns
+Legendary creatures acting like pets, cute destructive helpers, and monster labor.
+
+Fandom And Meta — 6 patterns
+Sequel waiting, spoilers, title cards, powerscaling arguments, and cover parodies.
+
+Farming And Crafting — 7 patterns
+Tools, practical trades, agricultural overkill, alchemy, and obsessive manufacturing.
+
+Food And Cooking — 8 patterns
+Cooking as power, ingredients, appetite, cozy meals, and food overriding priorities.
+
+Friendship And Affection — 9 patterns
+Awkward invitations, understated care, denied kindness, gifts, and unexpected alliances.
+
+Homes And Slow Life — 4 patterns
+Retirement becoming work, fragile homes, expanding households, and unwanted business.
+
+Immortality And Time — 2 patterns
+Tiny habits over centuries and family relationships displaced by world time.
+
+Imported Genre Rules — 5 patterns
+Tokusatsu physics, giant robots, borrowed attacks, and literal friendship power.
+
+Information And Logic — 5 patterns
+Confident wrong labels, empty explanations, fake evidence, and misunderstood graphics.
+
+Masterminds And Plans — 2 patterns
+Accidental foresight, invented conspiracies, and sincere or ironic genius worship.
+
+Modern Conveniences — 4 patterns
+Online groceries, smartphones, consumer products, and cross-world shopping.
+
+Monsters And Morality — 2 patterns
+Appearance, faction branding, and actual kindness or trustworthiness disagree.
+
+Music And Choreography — 15 patterns
+Dance formats, soundtrack cues, openings, endings, and group motion.
+
+Names And Identity — 9 patterns
+Bad names, erased identities, obvious disguises, creator embarrassment, and revelations.
+
+Object And Monster Lives — 6 patterns
+Appliance and weapon protagonists, nonhuman constraints, and unusual self-images.
+
+Otome And Villainesses — 3 patterns
+Role expectations, parental habits, elegant speech, hidden bosses, and social misreading.
+
+Party Competence — 8 patterns
+Useful roles, dysfunctional teammates, misjudged support, and unearned credit.
+
+Performative Coolness — 10 patterns
+Introductions, whispered attacks, melodramatic trivial actions, and public personas.
+
+Preparation And Tactics — 5 patterns
+Excessive caution, narrow specialization, effortless dodging, and strategic retreat.
+
+Recognizable Poses — 9 patterns
+Specific desk, reaction, approach, defeat, and redraw compositions.
+
+Reincarnation And Origins — 5 patterns
+Transfer departments, missed bonuses, inconvenient bodies, and recruitment rituals.
+
+Reverse Isekai — 4 patterns
+Returnee priorities, modern-life magic, unexpected visitors, and food tourism.
+
+Skills And Interfaces — 15 patterns
+Appraisal, loot, menus, skill wording, impossible stats, and hidden mechanics.
+
+Suffering And Resets — 4 patterns
+Repeated ordeal, exhausted veteran acceptance, defeat poses, and suffering summaries.
+
+Trade And Customers — 4 patterns
+Invoices, advertising, unfair exchange, savings goals, and unexpected customer demand.
+
+Travel And Transport — 3 patterns
+Mounts, carried heroes, dramatic stops, ordinary journeys, and stylized running.
+
+Visual And Sound Gags — 7 patterns
+Mimetic lettering, perspective failures, repeated impacts, sound mismatch, and freeze-frames.

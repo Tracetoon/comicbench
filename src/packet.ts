@@ -39,7 +39,13 @@ export interface GenreOption {
   memeOffer?: { id: string; tier: number; roles: string[]; meme: string; use: string }[];
   /** The style the host assigned this comic (Tracetoon's memes.ts stylePick). */
   assignedStyle?: string;
-  /** Three anime gag scenes this isekai cast can perform, matched to the PR (Tracetoon's isekai/memeMatch.ts isekaiMemeOffer). */
+  /** Three pitches for the brainstorm (Tracetoon's isekai/pitches.ts drawPitches). */
+  pitches?: { id: string; label: string; premise: string; family: string; withLead: boolean; players: { slot: string; description: string; archetype: string; title: string; role: string; optional: boolean }[] }[];
+  /** Memes the author may attach (Tracetoon's isekai/pitches.ts memeChoices). */
+  memeList?: { id: string; name: string; allusion: string; series: string; suits: string[] }[];
+  /** The judge's pick (Tracetoon's isekai/pitches.ts pickGag). */
+  pick?: { gag: { id: string; pitch: string; meme?: string }; pitch: { id: string; players: { archetype: string; optional: boolean }[] }; score: number };
+  /** Round 13: three anime gag scenes this isekai cast can perform, matched to the PR (Tracetoon's isekai/memeMatch.ts isekaiMemeOffer). */
   sceneOffer?: {
     id: string;
     title: string;
@@ -96,8 +102,10 @@ export interface ComicPacketInput {
   skillFiles: string[];
   /** The full diff, for looking up a change by its ref; not inlined. */
   patchPath?: string;
-  /** Where the author writes its output. */
-  out: { comic: string; design: string };
+  /** Where the author writes its output (`gags`: the brainstorm, for a genre with pitches). */
+  out: { comic: string; design: string; gags?: string };
+  /** The command that checks the gags file, for a genre with pitches. */
+  gagsCheckCommand?: string;
   /** The command that lints comic.json, e.g. `tracetoon comic check --run <id>`. */
   checkCommand: string;
 }
@@ -171,20 +179,31 @@ Read these packet files (they sit next to this one):
   - Set \`castPreset\` to the cast's preset id, \`lead\` to
     {"persona": the lead's archetype id, "name": their name}, \`place\` to the
     one place the whole comic happens, and every panel's \`background\` to
-    detailed, soft or speed-lines.` : ''}${input.genres.some((g) => g.sceneOffer?.length) ? `
-  A genre's \`sceneOffer\` is three anime gag scenes this cast can perform,
-  matched to this PR. If you choose that genre, the comic is built on exactly
-  one of them:
-  - Read the PR for its actual mechanism (overkill, hidden dependence,
-    resource exhaustion, a misunderstanding, delayed consequences…) and pick
-    the scene whose cause and payoff fit it best. The order is a retrieval aid,
-    not the answer.
-  - Keep the cast: each non-optional slot is played by the cast member the
-    offer names, and they appear on the page. Add no new ability, species,
-    relationship or world rule to make a scene fit.
-  - Adapt it as an original scene with your characters' own names, readable
-    without lore; never a named character from any series.
-  - Set \`meme\` to its id.` : ''}${input.genres.some((g) => g.lead || g.castOffer?.personas.some((p) => p.lead)) ? `
+    detailed, soft or speed-lines.` : ''}${input.genres.some((g) => g.pick) ? `
+  This comic's gag is already picked: \`pick\` in \`genreOptions\` holds the
+  gag the judge scored best, its pitch (the situation and who plays it) and
+  any meme attached to it. Write that gag as the comic: keep its situation,
+  its players (on the page, with the lead) and its payoff, and make it read
+  for this PR. Set \`pitch\` to the pitch id, \`gag\` to the gag id, and \`meme\`
+  to the attached meme's id (leave \`meme\` out when none is attached). A meme
+  is an allusion: evoke it as its \`allusion\` says; never name the work or its
+  characters.` : input.genres.some((g) => g.pitches?.length) ? `
+  A genre with \`pitches\` brainstorms first. Each pitch is a situation with
+  its ending left open, and the members of this cast who play it. If you
+  choose that genre, don't write the comic yet:
+  1. For each pitch, write 2 different gags that finish the situation
+     with a payoff about this PR's actual mechanism (overkill, hidden
+     dependence, resource exhaustion, a misunderstanding, delayed
+     consequences…). Keep each pitch's players; add no new ability, species,
+     relationship or world rule.
+  2. Only then read the genre's \`memeList\`. Where a meme genuinely fits a
+     gag, attach it (\`meme\`, and \`memeUse\`: how it shows on the page).
+     Most gags carry none; never bend a gag to fit a meme.
+  3. Write them to ${input.out.gags ?? 'comic-gags.json'} as
+     {"gags": [{"id": "g1", "pitch": "<pitch id>", "gag": "what happens, ending on the payoff", "prLink": "what in the PR it is about", "meme": "<optional id>", "memeUse": "<with meme>"}]}
+     and run \`${input.gagsCheckCommand ?? 'tracetoon comic gags'}\` until it reports no problems.
+  4. Stop there: reply with the path of the gags file. A fresh judge scores
+     the gags, the best is picked, and the comic is written from it.` : ''}${input.genres.some((g) => g.lead || g.castOffer?.personas.some((p) => p.lead)) ? `
   The persona marked \`lead\` (or a genre's \`lead\`) is this comic's main
   character if you choose that genre: they drive the episode and appear in
   most panels. Set \`lead\` to {"persona": its id, "name": their name in
@@ -205,6 +224,10 @@ Then:
 4. Run \`${input.checkCommand}\` and fix every error it lists; repeat until
    it says the script looks good. Warnings are worth fixing when you can.
 
+${input.genres.some((g) => g.pitches?.length && !g.pick) ? `
+If you chose a genre with \`pitches\`, steps 2–4 wait: follow its brainstorm
+steps above and stop after the gags file.
+` : ''}
 Reply with the path of \`comic.json\`, the genre and one sentence on the joke.
 `;
 }

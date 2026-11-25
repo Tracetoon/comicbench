@@ -161,14 +161,14 @@ export async function tracetoonModules(root: string) {
   // required archetype, memes, assigned style), so the bench can't drift from production.
   const optionFor =
     casting?.leadPick && genreFile
-      ? (genrePath: string, seed: string, recentMemes: string[], recentLeads: string[], recentPresets: string[] = [], description = ''): Partial<GenreOption> => {
+      ? (genrePath: string, seed: string, recentMemes: string[], recentLeads: string[], recentPresets: string[] = [], description = '', cooldown?: Cooldown): Partial<GenreOption> => {
           const g = genreFile.parseGenreFile(readFileSync(genrePath, 'utf8')).genre;
           if (!g) return {};
-          let opt = genres.genreOptions([], { pinned: g.id, catalog: [g], seed, recentMemes, recentLeads, recentPresets })[0] ?? {};
+          let opt = genres.genreOptions([], { pinned: g.id, catalog: [g], seed, recentMemes, recentLeads, recentPresets, ...(cooldown ? { cooldown } : {}) })[0] ?? {};
           // Round 13 on: an isekai cast's scenes are matched to the PR, as at production's packet step.
           if (genres.withSceneOffers) opt = genres.withSceneOffers([opt], { description }, recentMemes)[0] ?? opt;
-          const { castOffer, memeOffer, assignedStyle, requiredCast, lead, archetypes, isekaiCast, sceneOffer } = opt as GenreOption;
-          return { ...(castOffer ? { castOffer, archetypes } : {}), ...(memeOffer ? { memeOffer } : {}), ...(assignedStyle ? { assignedStyle } : {}), ...(requiredCast ? { requiredCast } : {}), ...(lead ? { lead } : {}), ...(isekaiCast ? { isekaiCast } : {}), ...(sceneOffer ? { sceneOffer } : {}) };
+          const { castOffer, memeOffer, assignedStyle, requiredCast, lead, archetypes, isekaiCast, sceneOffer, pitches, memeList } = opt as GenreOption;
+          return { ...(castOffer ? { castOffer, archetypes } : {}), ...(memeOffer ? { memeOffer } : {}), ...(assignedStyle ? { assignedStyle } : {}), ...(requiredCast ? { requiredCast } : {}), ...(lead ? { lead } : {}), ...(isekaiCast ? { isekaiCast } : {}), ...(sceneOffer ? { sceneOffer } : {}), ...(pitches ? { pitches } : {}), ...(memeList ? { memeList } : {}) };
         }
       : undefined;
   // The misread review (round 11 on): what a finished image could look like at a glance.
@@ -195,7 +195,9 @@ export async function tracetoonModules(root: string) {
           return { ...(offer ? { castOffer: offer } : {}), ...(hint && !offer ? { requiredCast: hint } : {}) };
         }
       : undefined;
-  return { draw: draw.draw, svgToPng: raster.svgToPng, pageText: script.pageText, styleById: styles.styleById, imageSize: compose.imageSize, comicSummary: composition.comicSummary, sceneOptions: genres.sceneOptions as ((g: unknown, recent: string[], o: { seed?: string }) => unknown[]) | undefined, genreById: genres.genreById as (id: string) => unknown, castHint: casting?.castHint as ((seed: string) => string | undefined) | undefined, castOffer, memeExtras, misread, optionFor };
+  // Brainstorm-then-select for isekai comics (round 14 on): cooldowns, the judge's prompt and the pick.
+  const pitches = existsSync(join(root, 'src', 'comic', 'isekai', 'pitches.ts')) ? await import(join(root, 'src', 'comic', 'isekai', 'pitches.ts')) : undefined;
+  return { draw: draw.draw, svgToPng: raster.svgToPng, pageText: script.pageText, styleById: styles.styleById, imageSize: compose.imageSize, comicSummary: composition.comicSummary, sceneOptions: genres.sceneOptions as ((g: unknown, recent: string[], o: { seed?: string }) => unknown[]) | undefined, genreById: genres.genreById as (id: string) => unknown, castHint: casting?.castHint as ((seed: string) => string | undefined) | undefined, castOffer, memeExtras, misread, optionFor, pitches };
 }
 type Tt = Awaited<ReturnType<typeof tracetoonModules>>;
 
@@ -267,7 +269,133 @@ export function readScriptCheckpoint(round: string, order: string[]): ScriptChec
 /** The arm's finished comics, newest first: what the next packet sees as recentComics. */
 export interface Recent {
   list: { id: string; summary: Record<string, unknown> }[];
+  /** Comics in flight (round 14 on), newest first: what each drew, held until it finishes. */
+  inFlight?: { id: string; hold: Hold }[];
 }
+
+/** What one comic holds out of rotation: scenarios, on-page characters, memes. */
+export interface Hold {
+  scenes: string[];
+  characters: string[];
+  memes: string[];
+}
+export type Cooldown = Hold;
+
+/** Tracetoon's per-repo windows (isekai/pitches.ts COOLDOWN): scenarios 10 comics, characters 3, memes 100. */
+const WINDOWS = { scenes: 10, characters: 3, memes: 100 } as const;
+
+/**
+ * The cooldown for the next comic in a round run in parallel: comics in flight
+ * count as the newest (each one comic in every window, with all it drew),
+ * then the finished comics, newest first, as production reads a repo's history.
+ */
+export function benchCooldown(recent: Recent): Cooldown {
+  const holds: Hold[] = [
+    ...(recent.inFlight ?? []).map((f) => f.hold),
+    ...recent.list.map(({ summary }) => ({
+      scenes: typeof summary.pitch === 'string' ? [summary.pitch] : [],
+      characters: Array.isArray(summary.archetypes) ? (summary.archetypes as string[]) : [],
+      memes: typeof summary.meme === 'string' ? [summary.meme] : [],
+    })),
+  ];
+  return {
+    scenes: holds.slice(0, WINDOWS.scenes).flatMap((h) => h.scenes),
+    characters: [...new Set(holds.slice(0, WINDOWS.characters).flatMap((h) => h.characters))],
+    memes: holds.slice(0, WINDOWS.memes).flatMap((h) => h.memes),
+  };
+}
+/** Point the instructions at the packet's own copy of the diff. */
+function pointAtPacketDiff(caseDir: string, packet: string): void {
+  const ins = join(packet, 'instructions.md');
+  writeFileSync(ins, readFileSync(ins, 'utf8').replaceAll(resolve(caseDir, 'changes.patch'), join(packet, 'changes.patch')));
+}
+
+/** Records (or updates) what an in-flight comic holds: its pitches and players, then its pick and meme. */
+function hold(recent: Recent, key: string, option: Partial<GenreOption>): void {
+  const lead = option.isekaiCast?.lead.archetype;
+  const pick = option.pick;
+  const h: Hold = {
+    scenes: pick ? [pick.pitch.id] : (option.pitches ?? []).map((p) => p.id),
+    characters: [...new Set([...(lead ? [lead] : []), ...(pick ? pick.pitch.players : (option.pitches ?? []).flatMap((p) => p.players)).map((p) => p.archetype)])],
+    memes: pick?.gag.meme ? [pick.gag.meme] : [],
+  };
+  const list = recent.inFlight ?? (recent.inFlight = []);
+  const at = list.findIndex((f) => f.id === key);
+  if (at >= 0) list[at] = { id: key, hold: h };
+  else list.unshift({ id: key, hold: h });
+}
+
+const GAG_SCORES_SCHEMA = {
+  type: 'object',
+  additionalProperties: false,
+  required: ['scores'],
+  properties: {
+    scores: {
+      type: 'array',
+      items: {
+        type: 'object',
+        additionalProperties: false,
+        required: ['gag', 'aboutPr', 'funny', 'veteranAppeal', 'visual', 'note'],
+        properties: {
+          gag: { type: 'string' },
+          aboutPr: { type: 'integer' },
+          funny: { type: 'integer' },
+          veteranAppeal: { type: 'integer' },
+          visual: { type: 'integer' },
+          note: { type: 'string' },
+        },
+      },
+    },
+  },
+};
+
+/**
+ * The brainstorm (round 14 on), as production runs it: the author writes the
+ * gags file and stops; a fresh judge sees only the PR and the gags; the host
+ * picks the best weighted total (Tracetoon's isekai/pitches.ts).
+ */
+async function brainstorm(a: { c: Case; dir: string; packet: string; o: RoundOpts; tt: Tt; option: Partial<GenreOption> }): Promise<{ pick: NonNullable<GenreOption['pick']> } | { error: string; stage: string }> {
+  const P = a.tt.pitches!;
+  const gagsFile = join(a.packet, 'comic-gags.json');
+  const judgeDir = join(a.dir, 'gag-judge');
+  const scoresFile = join(judgeDir, 'scores.json');
+  if (!existsSync(gagsFile)) {
+    const r = await codexExec({
+      prompt: `Your whole instruction is ${join(a.packet, 'instructions.md')}. Read it and follow it, including the skill files it names (in ${a.o.skill}). Write only inside ${a.packet}. Read only that folder and the skill folder: the packet holds every file you need.`,
+      cwd: a.packet,
+      sandbox: 'workspace-write',
+      logDir: join(a.dir, 'author', 'gags'),
+      model: a.o.model,
+      timeoutMs: 30 * 60_000,
+    });
+    if (r.sandbox && r.sandbox !== 'workspace-write')
+      throw new SandboxError(`Codex ran the author with sandbox ${r.sandbox}, not workspace-write; stopping so no comic is written without its tools.`);
+    if (!existsSync(gagsFile)) return { stage: 'gags', error: r.error ?? 'no comic-gags.json written' };
+  }
+  const gags = JSON.parse(readFileSync(gagsFile, 'utf8'));
+  const problems = P.gagProblems(gags, a.option.pitches, a.option.memeList ?? []) as { where: string; problem: string }[];
+  if (problems.length) return { stage: 'gags', error: problems.map((p) => `${p.where}: ${p.problem}`).join('; ') };
+  let scores = readJson<unknown>(scoresFile);
+  for (let attempt = 1; attempt <= 2 && (!scores || P.scoreProblems(scores, gags.gags).length); attempt++) {
+    const r = await codexExec({
+      prompt: P.gagJudgePrompt({ description: readFileSync(join(a.c.dir, 'description.md'), 'utf8'), gags: gags.gags, pitches: a.option.pitches, memes: a.option.memeList ?? [], out: 'your reply' }),
+      cwd: a.dir,
+      schema: GAG_SCORES_SCHEMA,
+      logDir: join(judgeDir, String(attempt)),
+      model: a.o.model,
+      noTools: true,
+      timeoutMs: 10 * 60_000,
+    });
+    scores = r.ok ? r.json : undefined;
+  }
+  if (!scores || P.scoreProblems(scores, gags.gags).length) return { stage: 'gag-judge', error: 'no valid gag scores after two tries' };
+  mkdirSync(judgeDir, { recursive: true });
+  writeFileSync(scoresFile, JSON.stringify(scores, null, 2) + '\n');
+  const pick = P.pickGag(gags.gags, (scores as { scores: unknown[] }).scores, a.option.pitches);
+  writeFileSync(join(a.dir, 'gag-pick.json'), JSON.stringify(pick, null, 2) + '\n');
+  return { pick };
+}
+
 export const RECENT_COUNT = 10;
 
 async function oneComic(c: Case, sample: number, o: RoundOpts, tt: Tt, genreText: string, recent: Recent, saved?: ComicState): Promise<ComicState> {
@@ -297,11 +425,14 @@ async function oneComic(c: Case, sample: number, o: RoundOpts, tt: Tt, genreText
     const checkCommand = `bun ${join(packet, 'tracetoon-check.js')} comic check --file ${comicJson} --context ${join(packet, 'context.json')} --evidence ${join(packet, 'brief.md')} ${join(packet, 'changes.patch')}`;
     const seen = recent.list.slice(0, RECENT_COUNT);
     writeFileSync(join(dir, 'recent.json'), JSON.stringify(seen.map((r) => r.id)) + '\n');
-    writePacket(c.dir, {
+    // Round 14 on: per-repo cooldowns, with comics in flight counted as the newest.
+    const cooldown = tt.pitches ? benchCooldown(recent) : undefined;
+    const packetArgs = {
       skillFiles: [join(o.skill, 'SKILL.md')],
       genre: o.genre,
       out: packet,
       checkCommand,
+      ...(tt.pitches ? { gagsCheckCommand: `bun ${join(packet, 'tracetoon-check.js')} comic gags --check --file ${join(packet, 'comic-gags.json')} --context ${join(packet, 'context.json')}` } : {}),
       recentComics: seen.map((r) => r.summary),
       // The Tracetoon under test rotates casting only if it has casting.ts.
       ...(tt.castHint ? { castHint: tt.castHint(`${basename(o.out)}:${id}:${sample}`) } : {}),
@@ -317,6 +448,7 @@ async function oneComic(c: Case, sample: number, o: RoundOpts, tt: Tt, genreText
               seen.flatMap((r) => (typeof r.summary.lead === 'string' ? [r.summary.lead] : [])),
               seen.flatMap((r) => (typeof r.summary.castPreset === 'string' ? [r.summary.castPreset] : [])),
               readFileSync(join(c.dir, 'description.md'), 'utf8'),
+              cooldown,
             ),
           };
         const cast = tt.castOffer?.(o.genre, seed);
@@ -342,10 +474,23 @@ async function oneComic(c: Case, sample: number, o: RoundOpts, tt: Tt, genreText
           }
         : {}),
       pinGenre: true,
-    });
-    // Point the instructions at the packet's own copy of the diff.
-    const ins = join(packet, 'instructions.md');
-    writeFileSync(ins, readFileSync(ins, 'utf8').replaceAll(resolve(c.dir, 'changes.patch'), join(packet, 'changes.patch')));
+    };
+    writePacket(c.dir, packetArgs);
+    pointAtPacketDiff(c.dir, packet);
+    writeFileSync(join(dir, 'packet-args.json'), JSON.stringify(packetArgs) + '\n');
+  }
+  // A brainstorming comic holds what it drew until it finishes.
+  const drawn = readJson<{ genreOptions?: Partial<GenreOption>[] }>(join(packet, 'context.json'))?.genreOptions?.[0];
+  if (drawn?.pitches?.length) hold(recent, `${id}#${sample}`, drawn);
+
+  // 1b. Brainstorm (round 14 on): gags, a fresh judge, the host's pick; then the author scripts the pick.
+  if (!existsSync(comicJson) && drawn?.pitches?.length && !drawn.pick && tt.pitches) {
+    const picked = await brainstorm({ c, dir, packet, o, tt, option: drawn });
+    if ('error' in picked) return state({ status: 'error', stage: picked.stage, error: picked.error });
+    const args = JSON.parse(readFileSync(join(dir, 'packet-args.json'), 'utf8'));
+    writePacket(c.dir, { ...args, option: { ...args.option, pick: picked.pick } });
+    pointAtPacketDiff(c.dir, packet);
+    hold(recent, `${id}#${sample}`, { ...drawn, pick: picked.pick });
   }
 
   // 2. Author.
@@ -417,6 +562,7 @@ async function oneComic(c: Case, sample: number, o: RoundOpts, tt: Tt, genreText
   // Later comics in this arm see this one among their recentComics.
   try {
     recent.list.unshift({ id: `${id}#${sample}`, summary: tt.comicSummary(script) });
+    if (recent.inFlight) recent.inFlight = recent.inFlight.filter((f) => f.id !== `${id}#${sample}`);
   } catch {
     /* an unreadable script just isn't remembered */
   }

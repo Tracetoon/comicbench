@@ -461,6 +461,45 @@ export function castSummary(items: { offer?: CastOfferLike; script?: any }[]) {
   };
 }
 
+/**
+ * The brainstorm (round 14 on), per round: pitches drawn and their spread,
+ * gags written, how often a meme was attached, what was picked, and how the
+ * judge scored the pick against the average gag.
+ */
+export function brainstormSummary(dirs: string[]) {
+  const rows = dirs.flatMap((d) => {
+    const ctx = readJson(join(d, 'packet', 'context.json')) as { genreOptions?: { pitches?: { id: string; family: string }[]; pick?: { gag: { id: string; pitch: string; meme?: string }; pitch: { withLead: boolean; family: string }; score: number; scores: { gag: string; total: number; aboutPr: number; funny: number; veteranAppeal: number; visual: number }[] } }[] } | undefined;
+    const option = ctx?.genreOptions?.[0];
+    if (!option?.pitches?.length) return [];
+    const gags = (readJson(join(d, 'packet', 'comic-gags.json')) as { gags?: { meme?: string }[] } | undefined)?.gags ?? [];
+    return [{ pitches: option.pitches, gags, pick: option.pick }];
+  });
+  if (!rows.length) return undefined;
+  const picks = rows.flatMap((r) => (r.pick ? [r.pick] : []));
+  const drawn = rows.flatMap((r) => r.pitches.map((p) => p.id));
+  const mean = (xs: number[]) => (xs.length ? Math.round((xs.reduce((s, x) => s + x, 0) / xs.length) * 100) / 100 : NaN);
+  const picked = picks.map((p) => p.scores.find((s) => s.gag === p.gag.id)!).filter(Boolean);
+  return {
+    comics: rows.length,
+    pitchesDrawn: drawn.length,
+    distinctPitches: new Set(drawn).size,
+    gags: rows.reduce((n, r) => n + r.gags.length, 0),
+    gagsWithMeme: rows.reduce((n, r) => n + r.gags.filter((g) => g.meme).length, 0),
+    picked: picks.length,
+    pickedWithMeme: picks.filter((p) => p.gag.meme).length,
+    pickedWithLead: picks.filter((p) => p.pitch.withLead).length,
+    distinctPickedPitches: new Set(picks.map((p) => p.gag.pitch)).size,
+    pickedFamilies: new Set(picks.map((p) => p.pitch.family)).size,
+    memesUsed: picks.flatMap((p) => (p.gag.meme ? [p.gag.meme] : [])),
+    memeRepeats: (() => {
+      const m = picks.flatMap((p) => (p.gag.meme ? [p.gag.meme] : []));
+      return m.length - new Set(m).size;
+    })(),
+    pickedScore: { total: mean(picked.map((s) => s.total)), aboutPr: mean(picked.map((s) => s.aboutPr)), funny: mean(picked.map((s) => s.funny)), veteranAppeal: mean(picked.map((s) => s.veteranAppeal)), visual: mean(picked.map((s) => s.visual)) },
+    meanGagScore: mean(picks.flatMap((p) => p.scores.map((s) => s.total))),
+  };
+}
+
 /** An isekai scene offered to a comic (Tracetoon's isekai/memeMatch.ts IsekaiSceneOffer). */
 export interface SceneLike {
   id: string;
@@ -747,7 +786,8 @@ async function checklistImpl(o: { round: string; model?: string; jobs?: number; 
     const required = (option?.requiredCast ?? option?.castOffer?.personas?.find((p: { required?: boolean }) => p.required))?.id as string | undefined;
     return [{ id: j.id, checklist: JSON.parse(readFileSync(f, 'utf8')) as Checklist, script, ...(offer ? { offer } : {}), ...(offers ? { offers } : {}), ...(scenes ? { scenes } : {}), ...(required ? { required } : {}), ...(addon ? { addon } : {}), ...(misread ? { misread } : {}), ...(leadAxis ? { leadAxis } : {}), ...(isekai ? { preset: isekai.preset.id } : {}), ...(lint ? { lint } : {}) }];
   });
-  const summary = { checklistVersion: CHECKLIST_VERSION, rubricVersion: RUBRIC_VERSION, model, round: basename(o.round), planned: order.length, ...summarize(items, order), errors };
+  const brainstorm = brainstormSummary(jobs.filter((j) => current.has(j.id)).map((j) => j.dir));
+  const summary = { checklistVersion: CHECKLIST_VERSION, rubricVersion: RUBRIC_VERSION, model, round: basename(o.round), planned: order.length, ...summarize(items, order), ...(brainstorm ? { brainstorm } : {}), errors };
   writeFileSync(join(o.round, 'checklist.json'), JSON.stringify(summary, null, 2) + '\n');
   return summary;
 }

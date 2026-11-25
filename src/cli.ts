@@ -52,6 +52,8 @@ export function writePacket(
     genre: string;
     out: string;
     checkCommand?: string;
+    /** The command that checks the gags file (round 14 on, a genre with pitches). */
+    gagsCheckCommand?: string;
     /** The round's earlier comics (newest first), as production's recentComics. */
     recentComics?: Record<string, unknown>[];
     /** Pin the genre so the repeat rule doesn't refuse a round's shared genre. */
@@ -94,7 +96,8 @@ export function writePacket(
     ...(opts.castHint ? { castHint: opts.castHint } : {}),
     skillFiles: opts.skillFiles.map((f) => resolve(f)),
     patchPath: resolve(caseDir, 'changes.patch'),
-    out: { comic: join(out, 'comic.json'), design: join(out, 'comic-design.json') },
+    out: { comic: join(out, 'comic.json'), design: join(out, 'comic-design.json'), gags: join(out, 'comic-gags.json') },
+    ...(opts.gagsCheckCommand ? { gagsCheckCommand: opts.gagsCheckCommand } : {}),
     // `comic check --file` (a Tracetoon release after 1.0.0-rc.45) lints outside a run;
     // the packet's own context and brief give it the repeat and anchor checks.
     checkCommand:

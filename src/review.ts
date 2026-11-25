@@ -153,6 +153,14 @@ function armData(round: string, out: string) {
         sample: Number(n),
         imagePrompt: existsSync(join(dir, 'art', 'prompt.txt')) ? readFileSync(join(dir, 'art', 'prompt.txt'), 'utf8').slice(0, 20000) : null,
         misread: existsSync(join(dir, 'art', 'misread.json')) ? JSON.parse(readFileSync(join(dir, 'art', 'misread.json'), 'utf8')) : null,
+        // Round 14 on: the brainstorm (pitches, gags with their scores, the pick).
+        brainstorm: (() => {
+          const ctx = existsSync(join(dir, 'packet', 'context.json')) ? JSON.parse(readFileSync(join(dir, 'packet', 'context.json'), 'utf8')) : undefined;
+          const option = ctx?.genreOptions?.[0];
+          if (!option?.pitches?.length) return null;
+          const gags = existsSync(join(dir, 'packet', 'comic-gags.json')) ? JSON.parse(readFileSync(join(dir, 'packet', 'comic-gags.json'), 'utf8')).gags : [];
+          return { pitches: option.pitches.map((p: any) => ({ id: p.id, label: p.label, premise: p.premise })), gags, memes: Object.fromEntries((option.memeList ?? []).map((m: any) => [m.id, m.name + ' (' + m.series + ')'])), pick: option.pick ? { gag: option.pick.gag.id, scores: option.pick.scores } : null };
+        })(),
         status,
         total: judgment ? comicScore(judgment) : null,
         gates: judgment?.gates ?? null,
@@ -614,6 +622,13 @@ dialog::backdrop { background: rgba(20,19,15,.7) }
       (gateReasons ? '<details open><summary>Gate reasons</summary><ul class="tight">' + gateReasons + '</ul></details>' : '') +
       phone + author +
       (x.imagePrompt ? '<details><summary>Image prompt (exactly what the image model was sent)</summary><pre>' + esc(x.imagePrompt) + '</pre></details>' : '') +
+      (x.brainstorm ? '<details><summary>Brainstorm (' + x.brainstorm.gags.length + ' gags' + (x.brainstorm.pick ? ', picked ' + esc(x.brainstorm.pick.gag) : '') + ')</summary>' +
+        '<ul class="tight">' + x.brainstorm.pitches.map((p) => '<li><b>' + esc(p.id) + ' · ' + esc(p.label) + ':</b> ' + esc(p.premise) + '</li>').join('') + '</ul>' +
+        '<ul class="tight">' + x.brainstorm.gags.map((g) => {
+          const sc = x.brainstorm.pick ? (x.brainstorm.pick.scores || []).find((s) => s.gag === g.id) : null;
+          const picked = x.brainstorm.pick && x.brainstorm.pick.gag === g.id;
+          return '<li>' + (picked ? '<b>★ ' : '<b>') + esc(g.id) + '</b> (' + esc(g.pitch) + (sc ? ', score ' + sc.total + ': PR ' + sc.aboutPr + ', funny ' + sc.funny + ', veteran ' + sc.veteranAppeal + ', visual ' + sc.visual : '') + '): ' + esc(g.gag) + (g.meme ? ' <i>Meme: ' + esc(x.brainstorm.memes[g.meme] || g.meme) + ': ' + esc(g.memeUse || '') + '</i>' : '') + '</li>';
+        }).join('') + '</ul></details>' : '') +
       (x.misread ? '<details><summary>Misread review (' + (x.misread.concern ? 'concern' : 'clear') + ', ' + x.misread.redraws + ' redraw' + (x.misread.redraws === 1 ? '' : 's') + ')</summary><ul class="tight">' +
         (x.misread.reviews || []).flatMap((r, i) => (r.items || []).map((it) => '<li><b>Review ' + (i + 1) + ', panel ' + esc(it.panel) + ' (' + esc(it.likelihood || 'likely') + '):</b> ' + esc(it.what) + ' could read as ' + esc(it.couldReadAs) + '</li>')).join('') +
         ((x.misread.reviews || []).every((r) => !(r.items || []).length) ? '<li>Nothing could be misread.</li>' : '') + '</ul></details>' : '') +

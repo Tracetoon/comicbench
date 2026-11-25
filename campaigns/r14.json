@@ -1,0 +1,19 @@
+{
+  "name": "r14",
+  "cases": "cases-local",
+  "split": "dev",
+  "samples": 2,
+  "arms": [
+    { "name": "r14-anime", "label": "Isekai cast + brainstorm: 3 random pitches (scenarios without punchlines), 6 gags, optional meme from the documented-meme list, fresh judge picks; per-repo cooldowns", "genre": "genres/anime-isekai.md", "skill": ".comicbench-cache/skills/r14", "tracetoon": ".comicbench-cache/tracetoon-r14", "jobs": 12 }
+  ],
+  "references": [
+    { "round": "results/r12-anime", "label": "Isekai cast, no memes (round 12)" }
+  ],
+  "arenas": [["r12-anime", "r14-anime"]],
+  "secondJudge": { "model": "gpt-6.2-astra", "share": 0.3 },
+  "canary": 3,
+  "slots": 24,
+  "judgeSlots": 12,
+  "drawSlots": 24,
+  "reviewTracetoon": ".comicbench-cache/tracetoon-bench"
+}

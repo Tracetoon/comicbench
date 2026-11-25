@@ -157,6 +157,20 @@ export async function tracetoonModules(root: string) {
   const casting = existsSync(join(root, 'src', 'comic', 'casting.ts')) ? await import(join(root, 'src', 'comic', 'casting.ts')) : undefined;
   // Cast offers (round 8 on): the genre file's roster, parsed by the Tracetoon under test.
   const genreFile = casting?.castOffer ? await import(join(root, 'src', 'comic', 'genreFile.ts')) : undefined;
+  // From round 11 the snapshot builds the whole genre option itself (cast offer, lead,
+  // required archetype, memes, assigned style), so the bench can't drift from production.
+  const optionFor =
+    casting?.leadPick && genreFile
+      ? (genrePath: string, seed: string, recentMemes: string[], recentLeads: string[]): Partial<GenreOption> => {
+          const g = genreFile.parseGenreFile(readFileSync(genrePath, 'utf8')).genre;
+          if (!g) return {};
+          const opt = genres.genreOptions([], { pinned: g.id, catalog: [g], seed, recentMemes, recentLeads })[0] ?? {};
+          const { castOffer, memeOffer, assignedStyle, requiredCast, lead, archetypes } = opt as GenreOption;
+          return { ...(castOffer ? { castOffer, archetypes } : {}), ...(memeOffer ? { memeOffer } : {}), ...(assignedStyle ? { assignedStyle } : {}), ...(requiredCast ? { requiredCast } : {}), ...(lead ? { lead } : {}) };
+        }
+      : undefined;
+  // The misread review (round 11 on): what a finished image could look like at a glance.
+  const misread = existsSync(join(root, 'src', 'comic', 'misread.ts')) ? await import(join(root, 'src', 'comic', 'misread.ts')) : undefined;
   // Genre memes and style mixes (round 9 on).
   const memes = existsSync(join(root, 'src', 'comic', 'memes.ts')) ? await import(join(root, 'src', 'comic', 'memes.ts')) : undefined;
   const genreFileMod = genreFile ?? (memes ? await import(join(root, 'src', 'comic', 'genreFile.ts')) : undefined);
@@ -179,7 +193,7 @@ export async function tracetoonModules(root: string) {
           return { ...(offer ? { castOffer: offer } : {}), ...(hint && !offer ? { requiredCast: hint } : {}) };
         }
       : undefined;
-  return { draw: draw.draw, svgToPng: raster.svgToPng, pageText: script.pageText, styleById: styles.styleById, imageSize: compose.imageSize, comicSummary: composition.comicSummary, sceneOptions: genres.sceneOptions as ((g: unknown, recent: string[], o: { seed?: string }) => unknown[]) | undefined, genreById: genres.genreById as (id: string) => unknown, castHint: casting?.castHint as ((seed: string) => string | undefined) | undefined, castOffer, memeExtras };
+  return { draw: draw.draw, svgToPng: raster.svgToPng, pageText: script.pageText, styleById: styles.styleById, imageSize: compose.imageSize, comicSummary: composition.comicSummary, sceneOptions: genres.sceneOptions as ((g: unknown, recent: string[], o: { seed?: string }) => unknown[]) | undefined, genreById: genres.genreById as (id: string) => unknown, castHint: casting?.castHint as ((seed: string) => string | undefined) | undefined, castOffer, memeExtras, misread, optionFor };
 }
 type Tt = Awaited<ReturnType<typeof tracetoonModules>>;
 
@@ -292,6 +306,15 @@ async function oneComic(c: Case, sample: number, o: RoundOpts, tt: Tt, genreText
       // The Tracetoon under test offers five personas when the genre has a roster.
       ...(() => {
         const seed = `${basename(o.out)}:${id}:${sample}`;
+        if (tt.optionFor)
+          return {
+            option: tt.optionFor(
+              o.genre,
+              seed,
+              seen.flatMap((r) => (typeof r.summary.meme === 'string' ? [r.summary.meme] : [])),
+              seen.flatMap((r) => (typeof r.summary.lead === 'string' ? [r.summary.lead] : [])),
+            ),
+          };
         const cast = tt.castOffer?.(o.genre, seed);
         const offer = cast?.castOffer;
         const extras = tt.memeExtras?.(
@@ -411,12 +434,47 @@ async function oneComic(c: Case, sample: number, o: RoundOpts, tt: Tt, genreText
   let page = existsSync(art) ? readdirSync(art).find((f) => /^page\.(png|jpeg|jpg|webp)$/.test(f)) : undefined;
   if (!page) {
     try {
-      await withSlot(() => tt.draw(script, art, { provider: 'codex' }));
+      await withSlot(() => tt.draw(script, art, { provider: 'codex' }), 'draw');
     } catch (e) {
       return state({ status: 'error', stage: 'draw', error: (e as Error).message.slice(0, 500) });
     }
     page = readdirSync(art).find((f) => /^page\.(png|jpeg|jpg|webp)$/.test(f));
     if (!page) return state({ status: 'error', stage: 'draw', error: 'no page image' });
+  }
+  // 4b. The misread review, as production runs it: a likely misreading is redrawn (up to twice) with things to avoid.
+  if (tt.misread) {
+    const record = join(art, 'misread.json');
+    let m = existsSync(record) ? JSON.parse(readFileSync(record, 'utf8')) : { reviews: [] as unknown[], redraws: 0, concern: false };
+    while (m.reviews.length === m.redraws) {
+      const image = join(art, readdirSync(art).find((f) => /^page\.(png|jpeg|jpg|webp)$/.test(f))!);
+      const r = await codexExec({ prompt: tt.misread.MISREAD_PROMPT, cwd: dir, images: [image], schema: tt.misread.MISREAD_SCHEMA, logDir: join(dir, 'misread', `review-${m.reviews.length + 1}`), model: o.model });
+      if (!r.ok || !tt.misread.isMisreadReview(r.json)) return state({ status: 'error', stage: 'misread', error: (r.error ?? 'bad misread reply').slice(0, 500) });
+      m.reviews.push(r.json);
+      m.concern = tt.misread.hasConcern(r.json);
+      writeFileSync(record, JSON.stringify(m, null, 2) + '\n');
+      if (!m.concern || m.redraws >= tt.misread.MISREAD_REDRAWS) break;
+      // Keep the flagged image, then redraw with what to avoid.
+      const keep = join(dir, 'misread', `drawn-${m.redraws + 1}`);
+      mkdirSync(keep, { recursive: true });
+      for (const f of readdirSync(art)) if (f !== 'misread.json') renameSync(join(art, f), join(keep, f));
+      script.avoid = [...(script.avoid ?? []), ...tt.misread.avoidFrom(r.json)].slice(-8);
+      writeFileSync(join(packet, 'comic.json'), JSON.stringify(script, null, 2) + '\n');
+      try {
+        await withSlot(() => tt.draw(script, art, { provider: 'codex' }), 'draw');
+      } catch (e) {
+        return state({ status: 'error', stage: 'draw', error: (e as Error).message.slice(0, 500) });
+      }
+      m.redraws++;
+      writeFileSync(record, JSON.stringify(m, null, 2) + '\n');
+    }
+    page = readdirSync(art).find((f) => /^page\.(png|jpeg|jpg|webp)$/.test(f));
+    if (!page) return state({ status: 'error', stage: 'draw', error: 'no page image after redraw' });
+    if (m.concern) {
+      (gates as Record<string, unknown>).misread = false;
+      for (const k of [...BLIND_IDS, ...CONTEXT_IDS]) scores[k] = null;
+      writeJudgment({ note: 'misread concern after redraws; not ranked' });
+      return state({ status: 'gated', stage: 'misread' });
+    }
   }
   const full = join(art, page);
   const w760 = join(art, 'page-760.png');

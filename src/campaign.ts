@@ -39,9 +39,14 @@ export interface CampaignSpec {
   /** Pairs of round names (arm or reference) to judge head to head. */
   arenas?: [string, string][];
   secondJudge?: { model: string; share?: number };
-  /** Comics per arm drawn before the canary check; 0 turns it off. */
+  /** Comics per arm drawn before the canary check (default 3); 0 turns it off. */
   canary?: number;
+  /** Text calls at once (default 24). */
   slots?: number;
+  /** Text slots always left for judging while it waits (default 12). */
+  judgeSlots?: number;
+  /** Image renders at once, outside the text slots (default 24). */
+  drawSlots?: number;
   /** Where results go (default: results). */
   results?: string;
   /** Tracetoon used to render the review page's brand mark. */
@@ -66,6 +71,7 @@ const readJson = (f: string) => (existsSync(f) ? JSON.parse(readFileSync(f, 'utf
 export function canaryProblems(s: ComicState): string[] {
   const out: string[] = [];
   if (s.status === 'error') out.push(`${s.case}#${s.sample}: ${s.stage ?? 'error'} ${s.error ?? ''}`.trim());
+  if (readJson(join(s.dir, 'art', 'misread.json'))?.concern === true) out.push(`${s.case}#${s.sample}: misread concern after redraws`);
   const check = readJson(join(s.dir, 'check.json'));
   if (check && check.ok === false) out.push(`${s.case}#${s.sample}: comic check failed`);
   if (s.status !== 'error' && !existsSync(join(s.dir, 'art', 'page.png'))) out.push(`${s.case}#${s.sample}: no image`);
@@ -92,6 +98,8 @@ export function pairsFor(o: { side: 'a' | 'b'; id: string; otherIds: string[] })
 export async function runCampaign(o: {
   spec: CampaignSpec;
   slots?: number;
+  judgeSlots?: number;
+  drawSlots?: number;
   keepAwake?: boolean;
   canary?: number;
   /** The CLI used for the final measures text (default: this repo's src/cli.ts). */
@@ -111,9 +119,9 @@ export async function runCampaign(o: {
   const phases: Record<string, number> = {};
   const mark = (phase: string) => (phases[phase] = Math.round((Date.now() - started) / 1000));
 
-  gate.setSlots(o.slots ?? spec.slots ?? 12);
+  gate.setSlots(o.slots ?? spec.slots ?? 24, { judge: o.judgeSlots ?? spec.judgeSlots ?? 12, draw: o.drawSlots ?? spec.drawSlots ?? 24 });
   const awake = o.keepAwake === false ? { stop: () => {}, how: 'off' } : keepAwake();
-  log(`campaign ${spec.name}: ${spec.arms.length} arms, ${spec.references?.length ?? 0} references, ${spec.arenas?.length ?? 0} arenas, ${gate.slots} slots, keep-awake ${awake.how}`);
+  log(`campaign ${spec.name}: ${spec.arms.length} arms, ${spec.references?.length ?? 0} references, ${spec.arenas?.length ?? 0} arenas, ${gate.slots} text slots (${gate.judgeSlots} kept for judging), ${gate.drawSlots} render slots, keep-awake ${awake.how}`);
 
   // Round directories by name.
   const dirs = new Map<string, string>();
@@ -173,7 +181,7 @@ export async function runCampaign(o: {
 
   // 2. Arms side by side; each comic is checked and judged as it lands.
   const done = new Map<string, string[]>(spec.arms.map((a) => [a.name, []]));
-  const canaryAt = o.canary ?? spec.canary ?? 4;
+  const canaryAt = o.canary ?? spec.canary ?? 3;
   const canaryStates: ComicState[] = [];
   let stop = false;
   let canaryChecked = canaryAt <= 0;
@@ -181,7 +189,7 @@ export async function runCampaign(o: {
     const id = `${s.case}#${s.sample}`;
     const dir = dirs.get(arm)!;
     done.get(arm)!.push(id);
-    log(`${arm} ${id}: ${s.status}${s.stage ? ` (${s.stage})` : ''}; ${gate.running}/${gate.slots} slots busy, ${pending.size} judging tasks`);
+    log(`${arm} ${id}: ${s.status}${s.stage ? ` (${s.stage})` : ''}; ${gate.running}/${gate.slots} text and ${gate.drawing} render slots busy, ${pending.size} judging tasks`);
     if (!canaryChecked) {
       canaryStates.push(s);
       if (spec.arms.every((a) => done.get(a.name)!.length >= canaryAt)) {
@@ -215,7 +223,7 @@ export async function runCampaign(o: {
           samples: spec.samples ?? 2,
           out: dirs.get(arm.name)!,
           tracetoon: resolve(arm.tracetoon),
-          jobs: arm.jobs ?? 6,
+          jobs: arm.jobs ?? 12,
           ...(spec.only ? { only: spec.only } : {}),
           onComic: onComic(arm.name),
           shouldStop: () => stop,
@@ -281,6 +289,8 @@ export async function runCampaign(o: {
     startedAt: new Date(started).toISOString(),
     seconds: phases,
     slots: gate.slots,
+    judgeSlots: gate.judgeSlots,
+    drawSlots: gate.drawSlots,
     keepAwake: awake.how,
     codex: gate.stats,
     meanRecentSeen: seen,

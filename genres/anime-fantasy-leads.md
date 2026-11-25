@@ -1,0 +1,504 @@
+---
+id: anime-fantasy
+name: Anime fantasy
+setting: a sword-and-sorcery world as fantasy anime draws it: guild halls, taverns, roadside campfires, dungeons and glowing gates, witch ateliers, magic academies, market towns, frontier villages and a demon lord's castle
+archetypes:
+  - ageless elf mage
+  - chuunibyou mage with one huge spell
+  - gruff dwarf warrior
+  - beast-eared scout
+  - self-important goddess
+  - summoned hero with one cheat skill
+  - guild receptionist
+  - demon lord buried in paperwork
+props:
+  - floating blue status window
+  - guild quest board
+  - adventurer rank card
+  - appraisal crystal
+  - spell glyph drawn in ink
+  - glowing magic circle
+  - tavern menu board
+  - grimoire page
+  - dungeon gate warning sign
+  - campfire stew pot
+jokeHooks:
+  - a status window announces a level up for something tiny
+  - a time loop sends the hero back to the last save point
+  - the mage casts one enormous spell a day, then collapses
+  - one stray stroke in a drawn glyph turns the spell into something else
+  - the elf calls a ten-year-old bug recent
+  - the guild clerk rejects the quest form over one missing field
+styles:
+  - anime-fantasy
+  - chibi-anime
+  - webtoon
+  - shonen-action
+cast:
+  - hero: a summoned hero with one odd cheat skill — arrived from our world with one strange power (perfect turnip appraisal, talking to doors) that is useless until exactly the right moment
+  - hero: an overpowered newcomer — flattens the boss by accident, then asks "did I overdo it?" while the guild staff stare
+  - hero: a vain hero — poses for a statue in every town and gives speeches mid-battle, but is secretly kind
+  - hero: a time-loop hero — wakes at the last save point after every failure, remembers each attempt and is very tired of this one
+  - mage: an ageless elf mage — calm and sleepy, collects useless spells (one polishes buckles), calls ten years ago "recently" and always opens the mimic chest
+  - mage: a chuunibyou mage — eyepatch, cape and a long dramatic incantation for one enormous spell a day, then face-plants out of mana
+  - mage: a deadpan apprentice mage — flat stare, flawless technique, quietly scolds their own master and keeps the party's budget
+  - mage: a fussy scholar mage — book-smart, horrified by monster food, explains the theory while the spell fizzles
+  - mage: an apprentice witch who draws spells — inks magic glyphs with a pen; one stray stroke turns the spell into something else
+  - warrior: a knight who leaps into every hit — gleeful tank in heavy plate who begs to be the target and never lands a swing
+  - warrior: a huge cowardly warrior — towering and scarred, terrified of everything right up until it counts
+  - warrior: a silent armoured veteran — never takes the helmet off, answers in one word, knows exactly one monster's weak spot
+  - warrior: a gruff dwarf warrior — beard, axe and ale; bickers with any elf in reach and rates every wall by its stonework
+  - warrior: a dwarf who cooks monsters — practical and unbothered, turns every defeated monster into a balanced meal in a portable pot
+  - healer: a self-important goddess — glowing robes, demands worship, wails when a plan fails, heals best when nobody is watching
+  - healer: a drunk priest — a flask in one hand and a holy book in the other, wiser than they look, right advice at the wrong time
+  - healer: the only sane healer — staff and kind eyes, permanently exasperated, the one who reads the quest's fine print
+  - scout: a beast-eared scout — cat, wolf or rabbit ears and a tail that give away every feeling; a sharp nose and always hungry
+  - scout: a grumpy halfling lockpicker — the oldest pro in the room, picks any lock and complains about everyone's footwork
+  - scout: a fox-spirit trickster — several tails and illusion tricks, answers questions with riddles, steals the last dumpling
+  - nemesis: a demon lord buried in paperwork — horns, cape and a throne piled with forms; would surrender if it meant less admin
+  - nemesis: a hoarding dragon — counts every coin twice and is furious over a single rounding error
+  - nemesis: a mimic chest — has fooled this party before and is smug about it
+  - nemesis: a lich who keeps backups — a skeletal sorcerer with spare souls hidden everywhere, very calm about being destroyed
+  - nemesis: a rival party — shinier armour, always arrives first and posts every clear on the guild board
+  - nemesis: a slime horde — dozens of wobbling slimes; each is harmless, together they flood the dungeon
+  - nemesis: a dark-knight general — imposing armour and a grand monologue, keeps losing to the weakest party member
+  - nemesis: a giant beast at the gate — sleeps across the dungeon entrance and nobody wants to be the one to wake it
+  - side: a guild receptionist — a cheerful smile, a stamp and a stack of forms; rejects quests over one missing field
+  - side: an innkeeper — has seen every party fail, keeps a tab and knows every rumour
+  - side: a blacksmith — judges your sword at a glance, fixes it with one tap and a long lecture
+  - side: a travelling merchant — a cart of suspicious bargains; every deal has a catch in the small print
+  - side: a strict witch teacher — tall pointed hat and long robe, spots a mistake in a glyph from across the room
+  - side: a tavern bard — lute and flourishes, rewrites the party's defeats as glorious victories
+  - side: a village elder — delivers a vague prophecy and quietly revises it afterwards
+  - side: a talking sword — sarcastic and opinionated, but can't swing itself
+  - side: a friendly slime — round and bouncy, absorbs anything, including the evidence
+  - side: a dragon in human form — horns, a tail and an endless appetite; eats the whole tavern menu
+  - side: a polite skeleton lord — a courteous undead noble whose over-devoted servants misread every order
+styleMix:
+  - anime-fantasy 7
+  - chibi-anime 2
+  - webtoon 1
+  - shonen-action 2
+memes:
+  - 1 hero: Hit by a truck while crossing the road, the hero wakes up in another world — a hard reset that drops the dev into an unfamiliar codebase
+  - 1 hero,side: A goddess in an endless white room offers the newly dead one cheat skill before reincarnation — onboarding where the new hire picks one tool, then gets dropped into production
+  - 1 any: Shouting 'Status open!' and reading stats off a floating blue window — running a status command and reading health checks like a stat sheet
+  - 1 hero: The guild's appraisal crystal cracks and explodes when the overpowered newcomer touches it — a benchmark tool overflowing because the new code is absurdly fast
+  - 1 hero,mage: The overpowered hero leaves a smoking crater, then asks innocently, 'Did I overdo it?' — a 'small refactor' that rewrote half the repo
+  - 1 mage,scout: The detection spell says it's a mimic; the mage opens the chest anyway and gets swallowed head-first — installing a dependency the scanner flagged, and getting bitten
+  - 1 healer,side: The useless goddess bawling and clinging to the hero's leg, begging him to fix her mess — a flagship tool failing loudly exactly when it's needed
+  - 1 mage: A mage chants the name of one enormous explosion spell, fires it, and collapses face-down, unable to move — a one-shot deploy that takes everything down, including the deployer
+  - 1 warrior: The armored knight who begs to tank every hit and is delighted by the punishment, but can't land a single swing — a dev who volunteers for every awful on-call shift but never closes a ticket
+  - 1 hero,mage: Reincarnated as a slime that swallows anything and copies the skills of whatever it eats — a module that absorbs every library it touches
+  - 1 hero: The hero dies and wakes at the last checkpoint remembering everything, trying again and again — rerunning a flaky test from the same seed until the cause shows itself
+  - 1 mage: The ancient elf calls something from fifty years ago 'just recently' — a maintainer calling a decade-old commit recent
+  - 1 side: The guild receptionist drops her papers in shock reading the newcomer's test results — a reviewer stunned by a first-time contributor's coverage numbers
+  - 1 any: Tsundere, face red: 'It's not like I fixed it for YOU or anything, idiot!' — a grudging approval from a reviewer who wanted to hate the PR
+  - 1 mage,nemesis: Eyepatch, bandaged arm, dramatic pose: 'My dark power is sealed... don't make me release it' — a dev naming their shell script like a forbidden technique
+  - 1 any: Shouting the full name of the attack at maximum volume before every single move — announcing each command in ALL CAPS commit messages
+  - 1 hero: Mid-fight, the hero lectures the villain about bonds and friendship until the villain reforms — winning an architecture argument by talking, not code
+  - 1 warrior,hero: Training montage: carrying boulders, running up mountains, then a sudden power-up — one weekend spent learning a framework, then crushing the ticket
+  - 1 nemesis,warrior: 'You are already dead.' A pause. 'NANI?!' — the build had already failed before anyone noticed
+  - 1 any: A giant sweat drop appears on the back of someone's head after a dumb remark — a reviewer reacting to a variable named 'temp2_final'
+  - 1 any: A glowing circle opens under the classroom floor and the whole class is summoned to another world — the entire team pulled into a surprise migration
+  - 1 warrior,hero: Cursed equipment: once equipped it can never be removed, and the jingle plays — a dependency that can't be uninstalled once added
+  - 1 side: The village NPC who repeats the exact same line no matter what you ask — an error message that never changes no matter what you try
+  - 1 any: Spending every last gem on gacha pulls and getting the common unit again — rerunning flaky CI over and over hoping for green
+  - 1 hero,mage: A minute-long magical-girl transformation sequence of ribbons and sparkles while the enemy politely waits — a painfully slow startup sequence
+  - 1 side: 'Senpai noticed me!', the junior swooning over a single acknowledgment — a senior dev leaving one approving comment on a junior's PR
+  - 1 side: Only one bed left at the inn; both blush and argue over who takes the floor (all chaste) — two services fighting over one port
+  - 1 nemesis,scout: The scouter reads the power level as over nine thousand and explodes — a metrics dashboard overflowing during a load test
+  - 1 scout: Sprinting with arms stretched straight behind the back, ninja style — rushing to land a hotfix
+  - 1 hero,scout: The hero splits into a hundred shadow clones to swarm the enemy — horizontal scaling that spins up far too many workers
+  - 1 warrior,hero: Screaming in rage until the hair turns golden and spiky — a rage-fuelled refactor at 2 a.m.
+  - 1 warrior,mage: Charging one attack for three whole episodes while everyone watches — a build that takes forever to finish
+  - 1 nemesis: Taking a potato chip... and EATING IT, as if it were a declaration of war — deleting stale branches with way too much drama
+  - 1 mage: Equivalent exchange: to gain something, something of equal value must be lost — a performance win paid for with memory
+  - 1 nemesis: A colossal face silently peeking over the enormous city wall — a gigantic PR looming over the review queue
+  - 1 hero: The dense protagonist misses a heartfelt confession: 'Huh? Did you say something?' — an author who somehow missed the blocking review comment
+  - 1 hero: Opening the game menu to find the logout button is gone — a process that can't be exited
+  - 1 side: A man points at a butterfly and asks, 'Is this a pigeon?' — calling a bug a feature, or vice versa
+  - 1 hero,warrior: A rubber-limbed kid declares he'll be king of the pirates, grinning — a wildly ambitious roadmap from day one
+  - 1 nemesis,mage: 'All according to keikaku.' (Translator's note: keikaku means plan.) — a deploy that works on the first try
+  - 1 any: The tournament arc that eats half the season — a code review that turns into a multi-week bracket
+  - 1 warrior,nemesis: A mid-fight flashback that lasts the entire episode — a review comment that turns into a history lesson
+  - 1 any: Giant 'menacing' katakana floating in the air behind a dramatic pose — an ominous silence before a big merge
+  - 1 warrior: An endless barrage of fists while shouting the same syllable over and over — spamming retries at a failing endpoint
+  - 1 nemesis: 'You thought it was your ally... but it was ME!' — the bug was in the trusted helper all along
+  - 1 any: Freeze frame, sepia tint, and a 'To Be Continued' arrow slides in — a PR split into a series of parts
+  - 1 any: A light novel title that is an entire paragraph explaining the plot — a PR title that's a full sentence
+  - 1 nemesis: 'He was the weakest of the four heavenly kings,' say the other three — the first failing test was the easy one
+  - 1 nemesis: The villain explains his whole plan in a monologue while the hero recovers — a verbose error log that hands you the fix
+  - 1 nemesis: 'This isn't even my final form!' — a bug that keeps mutating after each fix
+  - 1 scout,mage: The strategist pushes up his glasses and the lenses flash white — a dev about to propose a clever plan
+  - 1 any: Die in the game, die in real life: the death-game premise — tests that accidentally hit production
+  - 1 hero: Running late with toast in mouth and crashing into the new transfer student — a late standup collision with the new hire
+  - 1 mage,side: A cute creature with a fixed smile: 'Make a contract with me and become a magical girl!' — a vendor contract with suspiciously good terms
+  - 1 warrior,hero: A bald hero who wins every fight with one bored punch — a one-line fix to a week-long bug
+  - 1 nemesis,side: The villain trio gets punched into the sky and vanishes with a twinkle: 'blasting off again!' — a recurring bad PR rejected yet again
+  - 1 any: The soul floats out of the character's open mouth in shock — seeing the monthly cloud bill
+  - 1 any: A throbbing cross-shaped anger vein pops on the forehead — a reviewer seeing the same nit for the fifth time
+  - 1 side: A spectator gasps: 'Impossible! That's the forbidden technique!' and explains every move — a reviewer narrating a clever trick in the diff
+  - 1 scout: The enemy strikes, but it was only a log swapped in at the last second — a mock standing in for the real service in tests
+  - 1 nemesis,side: 'You've activated my trap card!' — a guard clause catching someone's bad input
+  - 1 hero: Hurling a capsule ball: 'I choose you!' — picking the reviewer for the PR
+  - 1 any: Gathering seven magic orbs to summon a dragon who grants exactly one wish — one wish allowed per sprint
+  - 1 warrior,side: Stated with total seriousness, as deep wisdom: 'People die if they are killed.' — a process stops if you kill it
+  - 2 nemesis: The demon lord loses his throne and ends up working the counter at a fast-food joint — a principal engineer reduced to fixing CSS
+  - 2 healer,side: The hero party kicks out its 'useless' support member, who was secretly holding everything together — deleting a 'useless' dependency that turned out to hold the build up
+  - 2 side: Reincarnated as a vending machine that can only say 'Welcome' and 'Too bad' — a service that only ever dispenses one response
+  - 2 scout: Reincarnated as a tiny spider at the bottom of a deadly dungeon, clawing her way up — starting from the lowest-privilege account
+  - 2 nemesis: The skeleton sorcerer-king everyone thinks is a scheming genius is actually panicking and winging it — a lead whose accidental decisions get praised as strategy
+  - 2 nemesis,side: Reborn as the otome-game villainess, she frantically dodges every doom flag — steering a project away from a known bad ending
+  - 2 healer,side: The adventuring party cooks and eats the monsters they just defeated — turning noisy error logs into a useful feature
+  - 2 hero: The overpowered reincarnated hero who just wants to grow turnips in peace — a senior dev who only wants small, quiet bug fixes
+  - 2 hero,mage: A calm voice in the hero's head answers every question with perfectly literal analysis — a type checker that's correct and useless
+  - 2 hero,warrior: The shield-only hero is falsely accused and the whole kingdom spits on his name — being blamed for an outage your commit didn't cause
+  - 2 any: Domain expansion: trapping everyone inside your own rule-bound pocket world — forcing every team onto your monorepo conventions
+  - 2 warrior: 'Water breathing, first form!', numbered sword forms announced one by one — a refactor done in numbered steps
+  - 2 side: A giant forest spirit waits at the rainy bus stop holding a leaf for an umbrella — waiting patiently for CI in the rain
+  - 2 any: Lying crumpled in a smoking crater in the famous pose of the fighter who always loses — a dev flattened after a merge conflict
+  - 2 any: Characters suddenly shrink into tiny chibi forms for a comic beat — a tiny PR after a huge one
+  - 2 warrior,hero: Reincarnated as a sentient sword who chooses its own wielder and levels by absorbing monster cores — a CLI tool that decides who's allowed to run it
+  - 2 nemesis,scout: Reincarnated as the dungeon itself, designing traps and spawning monsters for adventurers — a dev who now owns the test harness everyone suffers through
+  - 2 warrior: A grim, fully armored man who cares about killing goblins and literally nothing else — a dev who only ever fixes one class of bug
+  - 2 mage: Reborn as a baby with adult memories, casting advanced magic before he can walk — a new hire shipping complex features in week one
+  - 2 healer,side: The isekai hero introduces mayonnaise and the whole kingdom's cuisine is revolutionized — introducing a basic tool that feels like magic to the team
+  - 2 scout,mage: Modern knowledge cheat: teaching the nobles basic arithmetic and being hailed a genius — explaining a for-loop and being called a 10x engineer
+  - 2 hero: Summoned to another world with a smartphone that still somehow gets signal — the one tool that keeps working in a hostile environment
+  - 2 scout,side: An infinite item box where time stops, so the food stays hot forever — a cache that never expires
+  - 2 nemesis: The summoned hero learns the king who called him is the real villain — the requester's spec was the bug
+  - 2 side: Middle-aged uncle back from 17 years in another world, only able to talk about old game consoles — a dev back from long leave with outdated references
+  - 2 any: A cheerful chime: 'New skill acquired!' floats over the hero's head — learning a new git command
+  - 2 hero,warrior: Level-up fanfare and a screen of stat points to allocate — a version bump with new options to configure
+  - 2 hero,warrior: The system's daily quest: do the push-ups and run the laps, or face the penalty zone — daily dependency updates or the bot locks the repo
+  - 2 hero,nemesis: Commanding fallen enemies to 'Arise!' and rise as a shadow army — restoring deleted branches from the reflog
+  - 2 any: A seemingly useless skill like 'Cleaning' or 'Gardening' turns out to be absurdly overpowered — a 'cleanup' PR that turns out to be critical
+  - 2 any: A stat on the status window that just shows the infinity symbol — a config limit set to unlimited
+  - 2 hero,side: First guild quest: gather ten medicinal herbs from the meadow — a 'good first issue'
+  - 2 mage,hero: Asking the god for strictly average abilities, and getting the average of a human and a dragon — asking for a normal ticket and getting the hardest one
+  - 2 nemesis: The demon king reincarnates 2,000 years later and the magic academy rates him a failure — a legacy expert labelled 'not a culture fit'
+  - 2 nemesis,side: Noble lady laughing 'Oh-ho-ho-ho!' with the back of her hand to her mouth — a rival team gloating over their launch
+  - 2 side,nemesis: At the ball, the prince declares, 'I hereby annul our engagement!' — dropping a vendor in front of everyone
+  - 2 mage,side: Reborn in a world with no books, she makes paper from scratch so she can read — writing your own tooling because none exists
+  - 2 healer: The healer who settles fights by clubbing enemies with her staff — the 'support' engineer doing all the heavy lifting
+  - 2 side: An overworked office worker finds the deadly dungeon easier than his old job — on-call week feeling like a vacation after a crunch
+  - 2 nemesis: The dungeon boss buried in monster HR paperwork between adventurer raids — a lead drowning in process instead of code
+  - 2 mage: An elf mage who'll take any quest if paid in a grimoire of useless spells, like making flowers bloom — a utility library of tiny one-liners
+  - 2 nemesis,side: A giant toad swallows the party member whole, leaving only her legs kicking — a dependency swallowing the whole team for a week
+  - 2 side: Everyone forgets a beloved companion after her name is erased: 'Who?' — a forgotten service nobody remembers owning
+  - 2 hero: Giving monsters names makes them evolve into something much stronger — renaming variables and suddenly the code is better
+  - 2 warrior: The black-clad swordsman who only draws his second sword for the boss — saving the real fix for when the big bug shows up
+  - 2 scout,warrior: The deeper you descend into the abyss, the worse the curse when you try to climb back up — a debugging session too deep to return from
+  - 2 warrior: A slab of iron too big, thick and heavy to be called a sword — a function too big to be called a function
+  - 2 hero,mage: 'WHO ARE YOU CALLING SO SMALL A BEAN-SIZED SHRIMP?!', overreacting to any mention of height — an author touchy about their tiny PR
+  - 2 healer,side: One word, 'Sit!', and the enchanted necklace slams the half-demon face-first into the dirt — the kill command for a runaway process
+  - 2 hero,mage: Striking a pose: 'In the name of the moon, I'll punish you!' — a linter enforcing style with dramatic flair
+  - 2 warrior,scout: The swordsman with zero sense of direction who gets lost walking in a straight line — a dev who gets lost in the repo every time
+  - 2 warrior: Releasing the sword's true second form with its full name shouted — flipping a feature flag to full power
+  - 2 nemesis: 'Throughout heaven and earth, I alone am the honored one.' — the sole maintainer of a critical package
+  - 2 warrior,side: The cowardly swordsman who's a lightning-fast genius only while asleep — the best code written half-asleep at 3 a.m.
+  - 2 mage,hero: A quiet psychic with an emotion meter climbing to 100% before an explosion — a reviewer's patience meter as nits pile up
+  - 2 healer: One magic bean and the fighter is instantly back to full health — a restart that fixes everything
+  - 2 any: Two fighters perform the silly fusion dance, fingers touching, to merge into one — merging two branches into one
+  - 2 side: The bald sidekick who dies every arc and keeps getting wished back — the service that crashes every release and gets restarted
+  - 2 warrior: A thousand golden portals open and rain legendary weapons on the enemy — throwing every library at the problem
+  - 2 mage: 'I am the bone of my sword', a chant that unfolds a world of endless blades — a codegen tool spawning endless files
+  - 2 mage: Magic as glowing circles of glyphs that rotate around the caster's hands — a config file that only works with every symbol in place
+  - 2 any: Soldiers slam fists to their hearts: 'Dedicate your hearts!' — the team committing to a risky migration
+  - 2 side: The tiny dragon familiar perched on the hero's head, sneezing small fireballs — a small helper bot that occasionally sets things on fire
+  - 2 side: Beach episode: blindfolded watermelon splitting while everyone shouts directions — debugging blind without logs
+  - 2 any: Hot-spring episode: the party finally relaxes, and the monster attacks mid-soak (towels firmly on) — an incident during the team offsite
+  - 2 side,hero: The rival who always arrives first, leaning on a wall with a smirk — another team shipping the same feature first
+  - 2 warrior,side: A talking sword that comments on every swing its wielder takes — a linter with strong opinions
+  - 2 hero: The hero's companions all fight over who gets to sit next to him at dinner (wholesome) — several teams claiming the same engineer
+  - 2 hero,warrior: Stuck at level 1 forever, yet his stats quietly climb past everyone else's — a project at version 0.x forever while features pile up
+  - 2 side: A spirit door into another world appears in the diner once a week — a weekly release window
+  - 2 mage: A young witch suddenly can't fly anymore, and her cat stops talking — a tool that stops working one day for no reason
+  - 2 side: Signing a contract at the spirit bathhouse takes your name away — a contractor working under a service account
+  - 2 nemesis,side: A masked spirit silently offering handfuls of gold — a sponsor offering money for a feature
+  - 2 any: A ramshackle castle wheezing across the hills on chicken legs — a legacy monolith that somehow keeps running
+  - 2 side: Tiny soot sprites scurrying to carry lumps of coal — lots of tiny worker threads
+  - 2 hero,scout: Pointing a finger like a gun and firing a spirit blast — a pointed one-line fix
+  - 2 any: The story that has been on hiatus for years with no new chapter — an abandoned PR still open
+  - 2 hero: The only boy born with zero magic screaming that he'll become the wizard king — a dev without admin rights still shipping
+  - 2 warrior: A wizard-school student with no magic who solves every spell with raw muscle — solving it with a brute-force loop
+  - 2 mage,scout: 'Ten billion percent!', rebuilding civilization from rocks with pure science — reimplementing everything from first principles
+  - 2 any: Hugged by the wrong person, he poofs into a zodiac animal — touching one file triggers a transformation
+  - 2 any: The same summer-vacation episode airing eight times in a row with tiny changes — retriggering the same failing pipeline eight times
+  - 2 warrior,healer: Put every single stat point into defense and become an unkillable fortress — wildly over-engineered defensive code
+  - 2 any: The villainess holds a meeting with an inner council of chibi versions of herself — arguing with yourself over a design decision
+  - 2 hero: The overly cautious hero buys triple armor and overkills the weakest slime: 'Ready perfectly' — writing fifty tests for a one-line change
+  - 2 hero: The shut-in gamer died of shock thinking a truck was hitting him; it was a slow tractor — panicking over a warning that was harmless
+  - 2 side,healer: A dragon moves in as the housekeeper and wrecks everything with good intentions — a helpful bot overdoing the chores
+  - 2 mage: Summoning a legendary hero with a relic as catalyst, and getting a different one — a version pin resolving to the wrong package
+  - 2 mage,hero: Three glowing marks on the hand, each one an absolute order the summoned servant must obey — three force-push tokens per quarter
+  - 2 warrior,side: 'I ask of you, are you my master?' — a new service asking which config owns it
+  - 2 hero: 'This is exactly like the game I played!', the hero runs the whole world off the wiki in his head — a dev who knows the codebase from the docs alone
+  - 2 any: Touching the glowing save crystal before the boss door — committing right before a risky rebase
+  - 2 nemesis: A drunk veteran at the guild picks on the newcomer and gets one-shot — a bot flagging a newcomer's PR and being wrong
+  - 2 scout,mage: The red spinning eye that copies any technique it sees once — copy-pasting a fix from an old thread
+  - 2 scout,mage: A blinding flurry of hand signs before every technique — a chain of keyboard shortcuts
+  - 2 scout: The genius detective crouched barefoot on his chair, stacking sugar cubes — the debugging posture
+  - 2 warrior: A sparkling, shirtless muscleman proudly showing a technique passed down his family for generations — a legacy idiom proudly passed down
+  - 2 warrior: The humanity's-strongest soldier who's obsessed with cleaning — a dev obsessed with lint and formatting
+  - 2 any: The secret in the basement, teased for three seasons — the one mysterious directory nobody dares open
+  - 2 nemesis: Losing a card game banishes your soul to the shadow realm — a process sent to /dev/null
+  - 2 side: The partner monster evolves into a bigger form while its theme song plays — a major upgrade mid-incident
+  - 2 any: The opening theme kicks in mid-fight and everyone knows the hero is about to win — the last test turning green
+  - 2 any: A recap episode that is half clips from earlier episodes — a changelog summarizing changes
+  - 2 any: Episode ends on a freeze frame of the whole party laughing — the team celebrating a merged PR
+  - 2 side: Pure filler episode where nothing advances the plot — a chore PR bumping versions
+  - 2 any: Onlooker gasps: 'I couldn't even see his movements!' — a test suite that finished too fast to see
+  - 2 any: A paper fan smack to the head after a terrible joke — a reviewer swatting down a bad idea
+  - 2 any: Sparkles and flowers fill the background as the pretty boy smiles — freshly refactored code shining
+  - 2 any: A cape billowing dramatically even though they're indoors — a dramatic merge
+  - 2 healer,side: A dish so delicious it glows and the taster sees visions — a reviewer reading beautifully clean code
+  - 2 side: 'I'm simply one hell of a butler', the servant who can do absolutely anything — automation that handles everything
+  - 2 scout,mage: The lazy genius strategist sighing 'what a drag' before solving everything — a senior grumbling but fixing it
+  - 2 warrior,side: The elf and the dwarf in the party who never stop bickering — frontend and backend arguing over the contract
+  - 2 hero: Regressing to his teenage self with all the future knowledge, the hero redoes everything right — reverting to an old commit with hindsight
+  - 2 hero,healer: 'The hero would have done the same', the justification for every kind act decades later — 'the old maintainer would have approved this'
+  - 2 mage: Suppressing her mana for decades so no one ever knows her true power, then releasing it — the quiet dev revealing deep expertise
+  - 2 nemesis,scout: A kid roleplaying a 'mastermind in the shadows' whose made-up conspiracy turns out real — a joke TODO that became the real architecture
+  - 2 mage,nemesis: After a long brooding speech, a whisper: 'I am... atomic.' — one overpowered command after a long buildup
+  - 2 hero: Bullied and dropped into the abyss, he climbs out white-haired, eyepatched and edgy — a dev back from a brutal incident, changed
+  - 2 mage,side: A wise wolf deity haggling over apples on a merchant's cart — negotiating story points
+  - 2 any: Crows caw mockingly overhead during an awkward silence — the silence after 'any questions?'
+  - 3 any: Reincarnated as an egg, waiting to hatch while the world argues about what's inside — a feature flag nobody has turned on yet
+  - 3 warrior: Reincarnated as a crab, only able to scuttle sideways — a migration that can only move laterally
+  - 3 healer: Reincarnated as a hot spring whose waters heal anyone who soaks — a sandbox environment where everything recovers
+  - 3 warrior: Reincarnated as a shield, desperate for a wielder who won't drop it — a safety check everyone keeps disabling
+  - 3 side: Reincarnated as a nameless background mob character in the otome game — a minor file that somehow ends up central
+  - 3 any: Reincarnated as a lone tree on a hill, watching centuries pass — a cron job still running years later
+  - 3 nemesis: Reincarnated as a dragon who just wants a quiet nap on its hoard — a legacy server nobody may touch
+  - 3 side: An 'Online Shopping' skill that summons convenience-store goods into a fantasy world — package install from another world
+  - 3 side: Dragged in by accident alongside the real chosen hero, then dismissed as useless — an extra reviewer auto-added by mistake
+  - 3 hero: Raised by retired legendary grandparents, he thinks everyone casts like that — a dev who thinks everyone writes tests first
+  - 3 any: Respeccing the entire skill tree at the shrine for a fortune — a costly re-architecture
+  - 3 scout: The weakest E-rank hunter who quietly becomes S-rank — a junior's tool becoming the team standard
+  - 3 scout: Using the Appraisal skill on literally everything, including lunch — inspecting every object in the debugger
+  - 3 hero: The cheat skill on the status window reads only '???' — an undocumented flag
+  - 3 scout: The party member whose only good stat is Luck, and it's absurd — a fix that worked by sheer luck
+  - 3 nemesis: The demon lord shows up at the hero's door to surrender before the story starts — the bug fixes itself before review
+  - 3 healer: The palace apothecary who eagerly tastes every suspected poison — QA testing each nightly build
+  - 3 healer: The summoned saint's healing is so strong it cures conditions nobody knew existed — a fix that resolves bugs no one reported
+  - 3 any: Cursing the god who sent him: a salaryman reborn as a tiny, ruthless child officer — a dev cursing the vendor that put them here
+  - 3 any: Chibi heroes from different isekai worlds stuck in one classroom — services from different teams in one monorepo
+  - 3 mage: A once-deadly killing spell becomes the basic textbook spell decades later — a once-novel exploit now in every linter
+  - 3 hero: The hero insists on a statue of himself in every village so his friend won't be alone someday — leaving comments for future maintainers
+  - 3 mage: Magic is just drawing the right glyph in ink, and anyone who learns it could cast — a DSL where one wrong stroke breaks everything
+  - 3 warrior: The trembling warrior who's terrified every time, yet always stands his ground — a junior on their first on-call holding the line
+  - 3 side: The young apprentice acts as the ancient mage's mother, dragging her out of bed — a junior keeping the senior on schedule
+  - 3 healer: The dungeon has an ecosystem: everything eats something, and the party is part of it — services consuming each other's queues
+  - 3 warrior: The haunted suit of armor turns out to be shellfish living inside it — a 'service' that's actually a cron job
+  - 3 side: The kindly undead shopkeeper who always stocks the most useless magic items — a registry full of abandoned libraries
+  - 3 mage: The party is buried in debt after the mage's spell flattened the lord's castle — the cloud bill after the load test
+  - 3 healer: The goddess whose most impressive skill is party tricks — a tool that's great at demos only
+  - 3 any: Harvest season: the cabbages fly away and adventurers must catch them — a data source that literally moves
+  - 3 nemesis: Two kids say one forbidden word together and the floating castle crumbles — the one command that tears down infra
+  - 3 warrior: A towering robot soldier gently carrying a flower across the ruins — a gentle legacy service
+  - 3 any: Three schoolgirls summoned to save a world held up by a single pillar — a single point of failure
+  - 3 scout: Water divination: a leaf floats in a glass to reveal your aura type — a test that classifies a service
+  - 3 mage: Gathering every scattered magic card back into the book — rounding up stray config files
+  - 3 scout: Low-level adventurers who can barely pay for their room at the inn — a starting team with no budget
+  - 3 any: Siblings who settle every dispute in the world by playing games — deciding architecture by rock-paper-scissors
+  - 3 nemesis: The demon king and the hero discuss economics instead of fighting — a refactor scoped as a budget
+  - 3 scout: A traveler who never stays more than three days in any land — a contractor rotating teams
+  - 3 side: Returning names written in a ledger to the spirits who sold them — releasing reserved package names
+  - 3 side: A minor god who'll do any job for five yen, his number scrawled on walls — a bounty for an obscure bug
+  - 3 any: Opening credits showing silhouettes of villains who appear 30 episodes later — TODOs that predict future bugs
+  - 3 any: Next-episode preview with a totally misleading title — a PR title that doesn't match the diff
+  - 3 hero: The goddess rejects the summoned hero for being too plain and dumps him in the wasteland — a PR rejected on style, forced to rewrite
+  - 3 scout: A bird-masked gamer who only plays broken trash games — testing on the worst browser
+  - 3 nemesis: A countdown hourglass in the town square ticking down to the next monster wave — a release countdown
+  - 3 hero: Summoned so many times he's bored by the summoning circle — a dev on their fifth migration
+  - 3 hero: The demon lord is dead and the hero is unemployed, job hunting — after the big migration lands
+  - 3 nemesis,warrior: Arrogant young master: 'You dare? You're courting death!' then he's flattened — someone challenging a senior's code
+  - 3 mage,warrior: Breaking through to the next cultivation realm calls down heavenly tribulation lightning — a major version bump causing a CI storm
+  - 3 scout: Climbing a tower where each floor has its own test and its own ruler — a staged deployment with gates
+  - 3 nemesis: Monster evolution menu offering three cryptic branches to choose from — choosing an upgrade path from a vague changelog
+  - 3 warrior: The overpowered skeleton knight who can never take off his helmet in public — hiding messy internals behind a clean API
+  - 3 mage: Fraud psychic's 'special move' is just throwing salt — a config workaround posing as a fix
+  - 3 mage: 'A believing heart is your magic!', the clumsy witch student — believing CI will pass this time
+  - 3 scout: Stepping on the one obvious trap tile in the dungeon — the config flag everyone trips on
+  - 3 any: Escort quest where the NPC walks slower than the party — a PR blocked on a slow dependency
+  - 3 side: A fetch quest that turns into a chain of twelve fetch quests — one ticket that becomes twelve
+  - 3 any: Arguing for weeks over what to name the adventuring party — naming a new repo
+  - 3 mage,side: Singing a battle song while fighting to power the transformation — pair programming while narrating
+  - 3 warrior: Boar-masked fighter who charges headfirst into walls — hammering a fix without reading the code
+  - 3 healer: Medieval regulars at a modern pub weeping at their first fried chicken — a team discovering a modern build tool
+  - 3 mage: A golem refuses to move because one letter on its forehead was misspelled — a typo in a config key
+  - 3 side: Slime monster tamer who only ever has one weak slime — a dev with one shell script
+  - 3 any: Healing magic that hurts undead allies, so the healer accidentally damages the lich in the party — a fix that breaks a legacy consumer
+  - 3 side: Resting at the inn: the screen fades and everyone is at full health — a weekend off fixing the morale
+  - 3 hero,healer: After the hero's long journey, the party's last trip together to watch a meteor shower — a farewell PR from a departing maintainer
+  - 3 mage: Drinking mana potions back to back mid-battle like energy drinks — a late-night debugging session
+  - 3 any: Stat screen where the hero picks a class and gets 'Villager' — getting the read-only role
+  - 3 any: Party sharing a campfire meal and a quiet moment of thanks — a retro after a long release
+diverseCast:
+  - hero: a dark-skinned desert prince who'd rather duel than rule — Gold-trimmed tunic, curved sword, white hair; brags about his swordplay, dodges paperwork, bickers with the court water mage.
+  - hero: a tiny deaf prince everyone underestimates — Small, crowned, talks with his hands; dodges blows with uncanny grace while his shadowy best friend translates and editorializes.
+  - hero: a girl who chose to be the story's prince — Princely uniform she picked herself, gallant to all; keeps defending the quiet girl she's bound to and gets flustered when thanked.
+  - hero: a commoner girl openly courting her haughty noble rival — Plain academy uniform, beaming; answers every insult from the drill-haired lady with a love confession; the lady keeps blushing.
+  - hero: an inventor princess and the prim lady she adores — Goggles, soot-smudged gown, homemade broom-flyer; drags her proper partner into experiments and swears she'll protect her forever.
+  - hero: a boy king accidentally engaged to a prickly noble — Black royal coat; slapped a noble's cheek, which here is a proposal; his blond fiancé now follows him everywhere, jealous of everyone.
+  - hero: two girls who explore a haunted other world together — Travelling cloaks, mismatched gear, one cursed eye; one awkward, one reckless; every expedition is secretly a date neither will name.
+  - hero: a half-dragon schoolgirl and her devoted princess friend — Small horns and wings under academy robes; she hides her dragon fire, while the princess-mage beside her proudly shows her off.
+  - hero: a princess raised as a prince, with a heart for both — Feathered cap and rapier; duels as the kingdom's prince by day, dances as a mystery lady by night, and means both completely.
+  - hero: a magicless boy with a huge rusty sword — Scruffy, cape askew, anti-magic greatsword; shouts his dream at full volume and solves every problem with push-ups and refusal.
+  - hero: a hero stuck with only a shield — Green cloak, big shield, permanent scowl; can't attack, so he out-thinks, out-haggles and out-cooks every problem, grumbling.
+  - hero: a sheltered red-haired princess learning the bow — Travel cloak over a plain tunic, hair cut short on the road; stubborn, kind, practices archery until her fingers bleed.
+  - hero: a doomed noble girl who befriends every rival — Straw hat over a noble dress, hoe in hand; farms her estate's garden, misreads every romance, and somehow charms everyone.
+  - hero: a frail girl who'll invent printing to get books — Plain dress, hairpin she made herself; coughs, faints, then bulldozes guild masters with schemes for paper, ink and libraries.
+  - mage: an ancient elf mage who measures time in decades — Silver twin tails, plain white robe; collects useless spells, sleeps till noon, and walks straight into every mimic chest.
+  - mage: a small blue-haired demon-race tutor — Pointed hat, sensible robe; strict about lessons, secretly delighted by praise, tired of being mistaken for a child.
+  - mage: a gentle lich who runs a failing magic shop — Pale, purple shop apron, kind smile; stocks only useless or explosive items, faints from hunger, flinches near holy water.
+  - mage: a timid dark-skinned elf druid — Huge staff, green ranger cloak, dark skin; apologizes before every earthquake spell while his bossy twin sister speaks for both.
+  - mage: a high elf mage who mothers the whole guild — Long green hair, sweeping practical robes, jade staff; calm, dry, deadly; scolds the reckless and is quietly proud of them.
+  - mage: a textbook half-elf mage horrified by dungeon food — Braided blonde hair, dusty robe, satchel of notes; knows every monster's anatomy, refuses to eat any, then asks for seconds.
+  - mage: a strict apprentice mage who parents her master — Long purple hair, neat black coat; fires spells with clinical precision, sulks silently, and drags her teacher out of bed.
+  - mage: a sky priestess who won't choose her sex yet — Shrine robes, flight goggles; everyone picks at the sacred spring, but she won't until she's flown enough, and says so proudly.
+  - mage: a violinist sea-mage and her wind-wielding partner — Wave- and wind-themed armour; she plays violin before battle, her short-haired racer girlfriend teases her, they finish each other's spells.
+  - mage: a time mage reliving days to save the girl she loves — Academy mage robes, buckler with a clock face; deadpan, exhausted, always one step ahead, softens only around her pink-haired friend.
+  - mage: a fox-eared earth mage who keeps her hothead fiancé alive — Fox ears and tail, layered robes, calm smile; raises earth walls on cue and sighs every time her fiancé charges in first.
+  - mage: a royal girl whose water magic won't aim — Silver twin tails, stiff noble posture; her spells hit everything but the target, and she insists that was intentional.
+  - mage: a tailor's daughter who learns magic is drawn — Witch's hat too big for her, ink-stained fingers; sketches glyphs in a notebook, overconfident, then floods the workshop.
+  - mage: a water-magic scholar who'd rather study than fight — Seashell headdress, long scholar's robe, armful of books; lectures mid-battle and bickers with the swordsman who mocks magic.
+  - warrior: a dark-skinned elf warrior with a greatsword — Practical plate, silver hair, dark skin; swears loyalty dramatically, eats triple portions, blushes when her king praises her.
+  - warrior: a dark-skinned beastfolk sword master — Cat ears, scarred face, eyepatch, practical leather armour; a sword king who can't do sums and teaches by endless repetition.
+  - warrior: a laid-back red-haired ogre general — Two small horns, dark haori over armour, flame-forged sword; calm, cool, dodges paperwork, panics when his sister cooks.
+  - warrior: a purple-haired ogre bodyguard whose cooking is lethal — Single horn, business-style armour, huge katana; fiercely loyal, cheerfully violent, keeps serving soups that knock people out.
+  - warrior: an old ogre swordmaster with eyes-closed calm — White hair, simple hakama, cane-sword; sips tea mid-duel, trains recruits until they collapse, chuckles at youthful pride.
+  - warrior: a gentle giant orc general who builds roads — Massive armour, soft voice; shields comrades first, builds walls overnight, apologizes to the trees he has to cut.
+  - warrior: dark-skinned warrior-tribe twin sisters — Tan skin, practical wraps and shin guards; one cheerful and reckless with a huge blade, the other polite until her captain is insulted.
+  - warrior: a four-armed ice-blue insect knight — Pale blue chitin, four swords, frosty breath; speaks in stiff, formal half-sentences and weeps ice tears at noble gestures.
+  - warrior: a werewolf brawler with a sharp tongue — Grey wolf ears, metal boots, scar tattoo on the face; insults weaklings, secretly trains them, denies caring about anyone.
+  - warrior: a stoic dwarf warrior who has survived everything — Braided beard, battered horned helm, axe; says almost nothing, takes every hit, and gives surprisingly gentle advice.
+  - warrior: a lion beastman gladiator obsessed with stew — Golden mane, scarred chest plate, chained to nothing now; roars in the arena, then lines up politely for his weekly stew.
+  - warrior: a quiet red-haired girl who kicks through walls — Plain tunic and wraps, red hair; leaps rooftops, eats enormous meals, is deadly serious about saying thank you properly.
+  - warrior: a green-haired spear guardian with a scary reputation — Pale skin, red gem on the brow, simple spear; children fear him, but he adores kids and treats them as warriors in training.
+  - warrior: a fanged half-beast teen who quotes fake proverbs — Short blond hair, forehead scar, wrist guards; turns into a tiger when angry and cites wisdom that doesn't exist.
+  - warrior: a huge alligator spearman who calls everyone turtles — Scaly, tall as a door, spear over his shoulder; proud hunter, terrible at strategy, fiercely protective of his tiny turtles.
+  - warrior: a pink-haired junior agent jealous of her senpai's charges — Church uniform, steel wires; sweet to her senior, bristling at anyone else who gets close to the girl she's devoted to.
+  - warrior: a palace consort with boulder-lifting strength — Elegant court robes, long braid; dresses as he likes, lifts rocks one-handed, teases the heroine, quietly pines for the emperor.
+  - warrior: a stern fencing captain hiding her feelings in a locket — Fencing whites, curls, crisp salute; wins every bout, never admits who's in her locket, and softens around one childhood friend.
+  - warrior: a relic-powered fist fighter devoted to her roommate — Armoured gauntlets, sunny grin; punches giant monsters, always promises to be home for dinner, and her girlfriend holds her to it.
+  - warrior: a duchess knight who wears the men's uniform — Long green hair tied back, tailored officer's coat, sabre; blunt, honest, refuses flattery and finds lies physically painful.
+  - healer: a lizardfolk priest who prays to his ancestors — Scaled, tall, beads and leather; summons dragon-tooth warriors, speaks with gravity, and loses all composure over cheese.
+  - healer: a lazy old priest who is secretly very good — Robes slightly askew, half-empty flask; pretends to be a fraud, quietly heals everyone, and lectures about virtue unconvincingly.
+  - healer: a young priestess on her first adventure — Plain vestments, sounding staff; terrified but determined, writes careful notes after every mistake and keeps everyone alive.
+  - healer: a cat-eared royal healer devoted to his lady knight — Frilly knight's uniform he chose himself, cat ears, sly grin; teases everyone, heals instantly, fusses endlessly over his duchess.
+  - healer: a dwarf cook who heals with balanced meals — Big beard, iron pot for a shield; insists every monster is edible, plans menus mid-fight, and won't let anyone skip breakfast.
+  - healer: a gentle horned shrine maiden with a sharp smile — Pink hair, two small horns, layered miko robes; weaves cloth, casts barriers, and scolds sweetly in a way that terrifies.
+  - healer: a teenage healer who calls himself a beautiful genius — Feathered hat, herb satchel, apron; brews medicine, cooks for the whole party, and complains constantly about doing both.
+  - healer: a soft-spoken cleric who loves bugs — Pale robes, wooden staff, braided hair; heals and purifies calmly, then excitedly shows everyone the beetle she just found.
+  - healer: a vain water goddess who is a better healer than person — Blue hair, divine robes, big cups of drink; resurrects allies effortlessly, then cries when nobody thanks her loudly enough.
+  - healer: a reluctant village priest who hides his gambling — Black cassock, ex-adventurer's build; insists he's a simple priest, heals superbly, and sneaks off to bet on card games.
+  - healer: a soft-hearted spirit healer who trusts the rival he loves — Neat coat, gloves over warding seals; exorcises spirits gently, keeps forgiving the dangerous man he loves, blushes when teased.
+  - healer: a junior healer who pre-casts by planning — Twin tails, priestess robes, clipboard; schedules every heal in advance, gets flustered when the plan changes, adapts anyway.
+  - scout: a bossy dark-skinned elf beast-tamer — Ranger vest and gloves, dark skin, whistle; commands giant beasts, bosses her timid twin brother, sulks when ignored.
+  - scout: a high elf archer who teases the dwarf — Long ears, hunter's leathers, spider-silk bowstring; mocks the dwarf's beard, insists elves are dignified, gets drunk first.
+  - scout: a half-foot lockpicker dad older than he looks — Child-sized, sensible coat, toolkit; dad of three grown daughters, grumbles about safety, hates being treated like a kid.
+  - scout: a cat-eared ninja girl who hates being called cute — Cat ears and tail, eastern ninja garb; eats only what she likes, naps anywhere, and hisses at anyone who pats her head.
+  - scout: a street-thief girl with wind-fast feet — Blonde hair, oversized scarf, boots; steals badges, haggles hard, and outruns knights while yelling insults over her shoulder.
+  - scout: a silent ogre spy who melts into shadows — Blue hair, dark mask and scarf, twin blades; reports in five words, appears behind people mid-sentence, rarely smiles.
+  - scout: a masked archer with dragon-sharp eyes — Fur-trimmed mask, bow, a pet squirrel on his shoulder; shy, barely speaks, sees for miles and gets overwhelmed by kindness.
+  - scout: a tiny halfling porter with a backpack bigger than her — Hooded cape, giant pack, crossbow; counts every coin, pretends to be cold, and is the only one who knows where the exit is.
+  - scout: a quiet traveler who stays three days in each land — Long coat, wide hat, goggles; polite, observant, refuses to get involved, then quietly fixes the one thing that matters.
+  - scout: a church agent who keeps sparing the girl she adores — Priestly coat, hidden dagger; sworn to stop her otherworld charge, she keeps postponing, cooking for her, and blushing.
+  - scout: two girls who leap into dream worlds hand in hand — Mismatched explorer outfits; one bold and chaotic, one shy; their friendship powers their transformation, and it's turning into more.
+  - scout: a short ninja who calls her leader 'my liege' — Dark scarf, short swords, serious face; insists on formality, hates being called small, and is fastest in every scout run.
+  - scout: a giant bird girl who loves pulling the wagon — White feathers, simple dress and boots in human form; sings while running, eats everything, and races any rival carriage.
+  - scout: a freckled ex-assassin turned overworked advisor — Green-trimmed headscarf, sleeve-hidden darts; terrifying in a fight, mostly buried in his king's paperwork and complaints.
+  - nemesis: a demon general who weighs souls on her scales — Small horns, elegant dark gown and coat, golden scales; courteous, smug, and genuinely baffled when anyone resists her.
+  - nemesis: a dark elf swordswoman loyal to the enemy knight — Dark skin, silver hair, black armour; cold to everyone but her commander, duels with spells and blade, never gives ground.
+  - nemesis: a bespectacled demon strategist who overreads his master — Orange suit, tail, round glasses; turns every offhand remark of his lord into a ten-step plan nobody asked for.
+  - nemesis: a six-armed dark-skinned demon king who laughs at everything — Huge, dark skin, six arms, booming laugh; challenges heroes for fun, loses gracefully, and invites them to drink afterwards.
+  - nemesis: two enemy generals, devoted partners — Matching dark uniforms; the elder is grave, the younger flashy; they compete to impress each other more than to defeat the heroes.
+  - nemesis: a smiling cousin who is annoyingly competent — Neat court robes, gentle smile; took the throne, runs it better than anyone expected, and is impossible to stay angry at.
+  - nemesis: a headless knight who keeps losing his head — Black plate armour, head tucked under his arm; demands respect, gets flustered when the head rolls away mid-speech.
+  - nemesis: a court mage who over-protects his dungeon's king — Tiny, old, layered robes, long beard; controls monsters like pets, hoards the castle's food, and treats intruders like pests.
+  - side: a dark-skinned axe fighter who runs the tavern — Shaved head, goatee, apron over chain mail; gives rookies discounts and lectures, grins at every haggle, rarely loses one.
+  - side: a tiny goddess who runs a one-member family — Twin tails, apron over a simple dress; works a part-time food-stall shift, fusses over her one adventurer, jealous of everyone.
+  - side: a wise wolf goddess who loves apples and haggling — Wolf ears and tail, travelling cloak; calls herself wise, sulks theatrically, and spots every merchant's lie instantly.
+  - side: a travelling merchant who calculates everything — Wagon, ledger, sensible coat; can talk prices for hours, gets out-negotiated by his companion, and pretends he planned it.
+  - side: a demon-horned waitress at an otherworld diner — Small horns, tidy apron; delighted by free meals, carries six plates at once, and earnestly misunderstands modern foods.
+  - side: an ancient black dragon who waits tables — Long dark hair, waitress uniform, almost silent; speaks by telepathy, serves perfectly, terrifies diners who recognize her.
+  - side: a dragon maid devoted to her deadpan employer — Horns, tail, maid dress; cooks extravagantly, threatens anyone who frowns at her lady, and calls her 'my love' daily.
+  - side: an overprotective brother and his gentle best friend — One scowls at his sister's suitors; the quiet one eats triple helpings; they share umbrellas, chores and a love both keep calm.
+  - side: a shy noble gardener plotting to wed her best friend — Elegant gown, gardening gloves; grows flowers for her friend, outmaneuvers every male rival, and smiles politely while doing it.
+  - side: a rich girl who sews costumes for the friend she adores — Recording crystal, perfect manners, noble gown; designs a new battle outfit for her friend every day and swoons when she wears it.
+  - side: a merchant who talks with animals — Trader's vest, wagon, nervous grin; hears horses gossip, panics in every fight, and keeps getting dragged into heroics.
+  - side: a show-off lizardman with a spear and an entourage — Green scales, flashy cape, trident spear; poses before every attack, his followers cheer on cue, and it usually backfires.
+  - side: an elderly cat-folk chef who fences — Cat ears, round glasses, apron over a swordsman's coat; serves tea with perfect calm, calls everyone 'young one', parries flawlessly.
+  - side: a shrewd merchant who handles the hero's schemes — Merchant's coat, ledger always open; gruff, practical, sighs at every wild idea and then sells it at a huge profit.
+  - side: a gruff dwarf armorer who works for hire — Short, sturdy, work apron and axe; critiques everyone's weapons, charges by the hour, and secretly loves fixing them.
+  - side: a tiny demon empress who hands out magic eyes — Childlike, horns, purple cloak; declares herself 'empress' at every turn, grants strange powers, and begs for snacks.
+  - scout: a bear-girl who slips past the wall for the girl she loves — Small round bear ears, academy tunic, honey-sweet grin; sneaks past the border wall daily to protect her girl and insists she isn’t hungry.
+  - scout: a gravity-defying spy who swapped lives with a princess — Dark coat, levitation pendant, polite lies; the spy keeps her mission cool, except around the princess she grew up loving.
+  - side: a sharp-tongued high priest who micromanages everyone — Pale robes, long hair, frown; drafts lesson plans, scolds endlessly, and secretly does all the work no one notices.
+leads:
+  - stereotype: Summoned shut-in who resets on death — Japanese teen shut-in in a tracksuit dropped into a fantasy capital; dies, loops back in time, and schemes to save the people he cares about.
+  - stereotype: Lazy adventurer stuck with a useless party — Japanese gamer in a green cape and tunic; uses cheap tricks and a stealing skill to drag his chaotic party through one more paid quest.
+  - stereotype: Reincarnated as a monster who builds a nation — Japanese office worker reborn as a blue blob that copies skills; befriends monsters and settles their disputes as their easygoing ruler.
+  - stereotype: Gamer trapped as his own undead raid boss — Japanese salaryman stuck as his skeletal dread-lord avatar in black robes; bluffs majesty to servants who think every blunder is a master plan.
+  - stereotype: Reborn as a prodigy child mage — Japanese shut-in reborn as a country noble's son; in a robe with a staff, studies magic hard and tries to live this second life properly.
+  - stereotype: Betrayed hero stuck with only a shield — Japanese college otaku summoned as a hero with nothing but a shield; framed by the court, he grinds, trades and protects his small party.
+  - stereotype: Reincarnated as a tiny dungeon spider — Japanese student reborn as a spider at the bottom of a monster dungeon; levels up fight by fight, narrating every panic in a running monologue.
+  - stereotype: Reincarnated as a talking magic sword — Japanese man reborn as an intelligent sword; chosen by a young adventurer, he guides her fights from the scabbard and fusses like a parent.
+  - stereotype: Reborn as a dungeon vending machine — Japanese vending-machine fan reborn as one in a dungeon; can only say stock phrases, yet helps adventurers by choosing what to dispense.
+  - stereotype: Black-coated swordsman trapped in a game — Japanese teen gamer in a long black coat with twin swords, trapped in a deadly virtual world; clears floors solo to free the other players.
+  - stereotype: Strategist in a game world gone real — Bespectacled Japanese grad student in an enchanter's white robe; plans guild politics and turns the old game rules into a working society.
+  - stereotype: Abandoned weakling turned gunslinger — Japanese student summoned with his class and left in an abyss; climbs back white-haired with an eyepatch, revolvers and a cold, practical streak.
+  - stereotype: Earnest rookie dungeon adventurer — White-haired rookie in light armor with a knife; dives the dungeon daily to grow strong enough to stand beside the swordswoman he admires.
+  - stereotype: Overpowered grandson of a legendary sage — Japanese man reborn and raised by a hermit sage; enrolls at a magic academy in a plain robe and casually breaks every record by accident.
+  - stereotype: Wannabe shadow mastermind — Japanese teen reborn as a noble's son; in a black hooded longcoat he plays secret mastermind, never noticing his made-up plots are real.
+  - stereotype: Monster-obsessed dungeon cook — Tall adventurer in a blue tunic and armor; crawls the dungeon to rescue his sister, cooking and eating every monster on the way down.
+  - stereotype: Magicless orphan who wants to be the top mage — Spiky-haired farm orphan in a black hooded robe with an anti-magic sword; outworks everyone in a kingdom where everybody else has magic.
+  - stereotype: Chef whose door opens to a fantasy world — Japanese restaurant owner in a white chef's coat; once a week his door opens onto a fantasy realm and he feeds whoever walks in.
+  - stereotype: Isekai'd teen whose phone still works — Japanese teen reborn by an apologetic god with his smartphone; in a white coat, uses it and boundless magic to politely fix every problem.
+  - stereotype: Summoned hero banished for being plain — Japanese student a goddess calls too ugly and dumps in the wasteland; in a hooded robe, quietly builds a merchant company staffed by monsters.
+  - stereotype: Reincarnated farmer with a divine hoe — Japanese salaryman reborn in the wilds with an all-purpose farm tool; in work clothes, builds a village as elves and dragons move in.
+  - stereotype: Summoned cook with an online grocery skill — Japanese salaryman summoned by mistake; his only skill orders groceries from home, and his cooking wins over a legendary wolf familiar.
+  - gender: Witch who doesn't know she's the strongest — Young witch in a wide hat and cloak who thinks she's mediocre; takes small village jobs and casually flattens monsters along the way.
+  - gender: Ageless elf mage retracing an old journey — Elf mage in a white-and-gold coat; centuries old, retraces her late party's route, collecting odd spells and slowly learning about people.
+  - gender: Apprentice who saw how magic is drawn — Tailor's daughter in an apprentice's pointed hat and cape; learns spells are drawn in ink and tries to undo one she cast by mistake.
+  - gender: Bookworm reborn as a sickly poor girl — Book lover reborn as a frail commoner girl in a world without cheap books; invents paper and printing so she can read again.
+  - gender: Reincarnated villainess dodging her doom — Noble girl who remembers this world is a dating game where she's the villain; in a frilly gown, farms and befriends everyone to dodge bad endings.
+  - gender: Sheltered princess who takes up the bow — Red-haired princess driven from her palace by a coup; in a travel cloak with a bow, gathers legendary warriors and sees her people's hardship.
+  - gender: Ruthless child officer in a magic war — Small girl in a military greatcoat with a rifle; a reborn cynic who wants a safe desk job but keeps winning battles and getting promoted.
+  - gender: Traveling witch who visits a new land each time — Young witch in a black hat and robe on a broom; lands in a strange country each episode, observes its quirks, and leaves a little wiser.
+  - gender: Summoned saint who'd rather brew potions — Office worker summoned as a saint, then overlooked; in a lab coat over a gown, brews too-strong potions and cooks for the knights.
+  - gender: Defense-maxed gamer girl in black armor — Cheerful newcomer to a VR game who put every point into defense; in heavy black armor, absorbs attacks and turns them into absurd powers.
+  - gender: Immortal witch who maxed out by accident — Reborn office worker living as a quiet highland witch; centuries of killing slimes daily made her the strongest, and trouble comes knocking.
+  - gender: Palace herbalist who won't be anyone's prize — Red-haired herbalist in a court apothecary's coat; flees a prince who wants her as a trophy and earns her own place at a neighbouring palace.
+  - gender: Reborn girl hiding her too-strong powers — Girl who asked for average powers and got huge ones; in an adventurer's tunic, keeps trying to look normal on her party's quests.
+  - gender: Executed princess replaying her life carefully — Selfish princess sent back in time after her execution; in ballgowns, scrambles to save the empire and is praised as a genius by mistake.
+  - gender: Clumsy witch student with big dreams — Girl from a non-magic family in a witch academy's hat and uniform; fails spells loudly but never stops chasing her idol's showy magic.
+  - gender: Half-demon swordswoman hunting monsters — Silver-eyed warrior in pale armor with a huge sword; hunts demons village to village while chasing the one that ruined her life.
+  - orientation: Commoner girl openly courting her noble rival — Commoner student at a noble academy in a plain uniform; cheerfully, relentlessly woos the haughty young lady who torments her.
+  - orientation: Inventor princess who falls for her lady-in-waiting — Eccentric princess in a work coat over her dress, building flying brooms; takes in a disgraced noble lady as her aide and falls for her.
+  - orientation: Explorer of an eerie otherworld with her partner — College student in hiking gear crossing into a haunted other world; hunts its monsters for cash beside the woman she's slowly falling for.
+  - orientation: Executioner who can't strike her summoned target — Priestess-executioner in a white habit who hunts summoned heroes; traveling with her latest target, she keeps finding reasons not to strike.
+  - orientation: Necromancer reborn beside the swordsman who loves him — Disgraced flute-playing necromancer back in a stranger's body; in dark robes, solves ghost cases beside a stoic swordsman who loves him.
+  - orientation: Luckless fallen god courted by a demon king — Former crown prince turned scrap-collecting god in white robes; answers small prayers and odd cases, shadowed by the demon king who adores him.
+  - orientation: Girl who wants to be a prince, dueling for a bride — Bold student in a school jacket who dreams of being a prince; wins sword duels for a mysterious bride and resolves to protect her.
+  - race: Dark-skinned seafarer who conquers dungeons — Dark-skinned young sailor in sea-traveler's wraps with a djinn-bound sword; conquers dungeons to found a nation for the displaced.
+  - race: Sunny dark-skinned heir from a desert land — Cheerful dark-skinned heir in gold-trimmed robes at a magic school; throws feasts and trusts too easily, leaving his retainer scrambling.
+  - race: Dark-skinned ronin guarding a gifted child — Weary dark-skinned ronin boatman with a long sword; protects a young girl with strange powers from warlords and sorcerers.
+  - race: Last of a hunted wolf-shifter clan — Wolf-shifter youth in a dark coat with a staff; hunts vampires with a ragtag crew while searching for his scattered people.
+  - race: Lizardfolk warrior defending his marsh — Scaled lizardfolk warrior with a frost-bladed sword; unites rival marsh tribes against an undead army they cannot beat.
+  - race: Dog-eared half-demon scorned by both sides — Silver-haired half-demon with dog ears in a red fire-rat robe; hunts jewel shards with a reluctant team, scorned by humans and demons alike.
+  - race: Reptile-headed amnesiac hunting his curser — Lizard-headed man in work coveralls who forgot his old face; bites sorcerers to find which one cursed him, then shares dumplings.
+  - race: Forest golem raising a lost human child — Mossy golem in a traveling cloak guarding a human child disguised as beastfolk; crosses a world of creatures to find her kin.
+  - race: Living shadow from a persecuted clan — Small living shadow from a hunted clan, wrapped in a borrowed cloak; befriends an outcast prince and steals, scouts and fights for him.
+  - race: Demon king's son training as an exorcist — Hot-headed teen with a hidden tail and blue flames, son of a demon king; trains at an exorcist school to prove he's no monster.
+---
+Draw it as full-colour fantasy anime by default: clean cel shading, painted skies, glowing spells, sweat drops, sparkle eyes and comic reaction faces. Now and then a black-and-white manga page with screentone suits a tense or battle beat.
+
+The party is the heart of it, and its members are often funnier than the hero: let one of them carry the joke while the hero plays it straight. Cast from the personas offered for this comic; ones whose quirks clash make the best pairs.
+
+Places to choose from, and vary: a guild counter with a queue of adventurers, a rowdy tavern at night, a campfire on the road under the stars, a torchlit dungeon or a glowing gate, a witch's atelier full of ink and glass, a magic-academy exam hall, a market-town square, a frontier farming village, a hot-spring inn, a floating library, a flower field, a snowbound mountain pass, the demon lord's throne room, an inn room after the quest.
+
+Battles are comic and bloodless: fireballs that fizzle, a giant spell that flattens a hill, a whole party against one slime. A time loop is a reset to the save point, never a death. Outfits stay practical, with no fan service. Beastfolk are party members, never servants or captives, and fantasy races are never stand-ins for real-world peoples. The summoned hero comes from our world, so anyone can fill that role.

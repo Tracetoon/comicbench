@@ -20,7 +20,9 @@ export interface GenreOption {
   jokeHooks: string[];
   notes?: string;
   /** The five personas this comic casts from, when the genre has a roster (Tracetoon's casting.ts castOffer). */
-  castOffer?: { kind: 'party' | 'side-only'; personas: { id: string; role: string; name: string; details: string; required?: true }[] };
+  castOffer?: { kind: 'party' | 'side-only'; personas: { id: string; role: string; name: string; details: string; required?: true; lead?: true }[] };
+  /** This comic's main character, for a genre without a cast offer (Tracetoon's casting.ts leadPick). */
+  lead?: { id: string; role: string; name: string; details: string; lead?: true };
   /** A diverse archetype this comic must cast, for a genre without a cast offer (Tracetoon's casting.ts diverseHint). */
   requiredCast?: { id: string; role: string; name: string; details: string; required?: true };
   /** Three genre memes this comic may use (Tracetoon's memes.ts memeOffer). */
@@ -115,7 +117,11 @@ Read these packet files (they sit next to this one):
   A genre with a \`castOffer\` comes with five personas picked for this comic.
   If you choose that genre, cast from those five only (crowds and passers-by
   are fine) and list the ids you used in \`personas\`. A \`side-only\` offer
-  means this comic has no party members at all.` : ''}${input.genres.some((g) => g.memeOffer?.length) ? `
+  means this comic has no party members at all.` : ''}${input.genres.some((g) => g.lead || g.castOffer?.personas.some((p) => p.lead)) ? `
+  The persona marked \`lead\` (or a genre's \`lead\`) is this comic's main
+  character if you choose that genre: they drive the episode and appear in
+  most panels. Set \`lead\` to {"persona": its id, "name": their name in
+  \`characters\`}.` : ''}${input.genres.some((g) => g.memeOffer?.length) ? `
   A genre's \`memeOffer\` suggests three memes its veteran fans know. Use one
   when it fits the joke, as an allusion (never name the work), and set
   \`meme\` to its id; leave \`meme\` out when none fits.` : ''}${input.genres.some((g) => g.assignedStyle) ? `

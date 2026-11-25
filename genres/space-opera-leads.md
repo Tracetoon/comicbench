@@ -1,0 +1,511 @@
+---
+id: space-opera
+name: Space opera
+setting: anywhere a space saga goes - starship decks, docking bays, alien bazaars, strange planets and open space
+archetypes:
+  - grizzled starship captain
+  - eager ensign
+  - deadpan ship AI
+  - alien trader
+  - hotshot fighter ace
+  - battle-scarred gunner
+  - masked dark lord
+props:
+  - bridge viewscreen
+  - red-alert panel
+  - cargo manifest
+  - airlock warning sign
+  - comms hail
+jokeHooks:
+  - the ship AI takes an order literally
+  - red alert over something tiny
+  - the hull breach is one loose bolt
+  - retries are wave after wave of fighters at the same shield
+  - a race condition is two fighters diving for one docking slot
+  - a cache is a decoy fleet the enemy keeps shooting
+  - a flaky test is a blaster that fires every other pull
+styles:
+  - space-opera
+memes:
+  - 1 captain,any: A hand-wave mind trick on a guard: 'These aren't the bugs you're looking for. Move along.' — a reviewer waved through a risky diff without reading it
+  - 1 captain,crew: A fish-faced admiral realises mid-battle: 'It's a trap!' — a too-easy PR that hides a breaking change
+  - 1 pilot,crew: 'I have a bad feeling about this.' — just before running the database migration on production
+  - 1 pilot: Flying into an asteroid field: 'Never tell me the odds!' — merging on Friday afternoon with CI still red
+  - 1 villain,alien: A cybernetic collective drones: 'Resistance is futile. You will be assimilated.' — a framework migration absorbing every module one by one
+  - 1 captain: The bald captain points forward from the chair: 'Make it so.' — approving a plan and letting the team execute
+  - 1 captain,crew: Flipping open a communicator: 'Beam me up, there's no intelligent life down here.' — escaping a meeting or a codebase that makes no sense
+  - 1 medic: The grumpy ship's doctor: 'I'm a doctor, not a ...!' — a backend dev asked to fix the CSS
+  - 1 ai: A calm red-eyed ship computer: 'I'm sorry, I'm afraid I can't do that.' — the linter or a branch protection rule refusing a push
+  - 1 any: 'DON'T PANIC' in large, friendly letters on the cover of the galactic guidebook — a scary error message that turns out to be harmless
+  - 1 ai,any: A supercomputer thinks for millions of years and answers the ultimate question: 42 — an unexplained magic number constant in the code
+  - 1 any: 'In space, no one can hear you scream.' — errors swallowed silently and logged to nowhere
+  - 1 crew: The unnamed crewman in the red shirt beams down with the away team. He won't be back. — the test fixture or temp account that always gets deleted first
+  - 1 villain,pilot: A planet-sized battle station with one tiny, unguarded exhaust port — one unvalidated endpoint in an otherwise locked-down service
+  - 1 crew,alien: Cute, furry, purring stowaways multiply until they fill the cargo hold — a dependency that quietly multiplies in node_modules
+  - 1 villain: The masked villain's reveal: 'No... I am your father.' — git blame reveals the reviewer wrote the bug years ago
+  - 1 alien,crew: The split-fingered hand salute: 'Live long and prosper.' — signing off on a release or a farewell PR
+  - 1 captain: Ordering from the food replicator: 'Tea. Earl Grey. Hot.' — a precise, exact config command that always works
+  - 1 any: A small green sage: 'Do or do not. There is no try.' — deleting a try/catch that swallowed every error
+  - 1 crew: A flickering blue hologram of a princess: 'Help me... you're my only hope.' — the one maintainer who still understands the module
+  - 1 captain,ai: The ship computer counts down a self-destruct while the crew races to the abort code — a cron job about to wipe data unless someone stops it
+  - 1 pilot,crew: Hero frozen in a block of carbonite, mid-grimace, hung on a villain's wall as decor — a dependency version frozen for years that nobody dares thaw
+  - 1 pilot: Trench run: a ghostly voice says 'use the force', the pilot switches off his targeting computer — deploying by instinct with the tests turned off
+  - 1 villain,any: Mirror universe: the evil twin is identical but has a goatee — staging that looks like prod but behaves the opposite
+  - 1 captain: The no-win simulation test, beaten only by a cadet who secretly reprogrammed it — editing the test so the failing code passes
+  - 1 engineer: The engineer on the intercom: 'I'm giving her all she's got, Captain!' — a server pinned at 100% CPU during a traffic spike
+  - 1 pilot: The hyperdrive sputters and won't engage just as the enemy closes in — the deploy button that hangs right when the hotfix is urgent
+  - 1 crew,pilot: Spotting the giant battle station: 'That's no moon.' — a 'small module' that turns out to be the whole monolith
+  - 1 villain: 'I find your lack of faith disturbing' plus a remote throat-grip on a doubting officer — a lead annoyed by a reviewer who doubts the design
+  - 1 ai,villain: The relentless cyborg assassin, deadpan: 'I'll be back.' — a flaky bug that returns after every 'fix'
+  - 1 crew: A panicking marine: 'Game over, man! Game over!' — prod is down and someone loses it in the incident channel
+  - 1 crew,any: Dust off and nuke the whole site from orbit. It's the only way to be sure. — deleting node_modules and the lockfile and reinstalling
+  - 1 engineer,pilot: Uploading a virus to the alien mothership from an ordinary laptop — an API that is suspiciously compatible with everything
+  - 1 any: Apes discover a black monolith; a thrown bone becomes an orbiting satellite — the first commit leading, eventually, to the whole platform
+  - 1 captain: 'Space: the final frontier... to boldly go where no one has gone before.' — calling an undocumented internal API for the first time
+  - 1 alien,ai: One raised eyebrow: 'Fascinating.' — a reviewer reacting to deeply strange code
+  - 1 captain,villain: Screaming the villain's name into the void as the camera pulls back from the planet — git blame shows the name of whoever broke the build
+  - 1 villain,alien: Pepper-pot cyborgs gliding on castors shrieking 'EXTERMINATE!' — a dead-code removal sweep
+  - 1 any: A blue police box that is bigger on the inside — a tiny package that pulls in a gigantic dependency tree
+  - 1 captain,crew: 'Shields up! Red alert!' as the klaxon blares — an incident being declared
+  - 1 captain: 'Captain's log, stardate...' dictated over a montage — writing the commit log or the PR description
+  - 1 alien,any: A two-fingered pinch on the shoulder that knocks anyone unconscious — killing a runaway process with one precise command
+  - 1 captain: The captain's full-face palm of despair — reading the diff that 'only changed one line'
+  - 1 crew: The bridge camera tilts and the whole crew throws itself sideways in unison — an outage hitting every service at once
+  - 1 engineer,crew: A bridge console explodes in sparks at the slightest hit — one malformed request takes down a whole page
+  - 1 alien: A tree-being whose entire vocabulary is one three-word sentence — a reviewer bot whose only comment is 'LGTM'
+  - 1 pilot: Boasting a run in under twelve parsecs, a unit of distance, not time — a performance metric reported in the wrong unit
+  - 1 any: A cheerful duel-opening 'Hello there!' — greeting a familiar bug that has resurfaced
+  - 1 captain,villain: 'It's over. I have the high ground.' — holding admin rights in a repo argument
+  - 1 villain,any: Whining that sand is coarse and rough and irritating and gets everywhere — complaining about YAML indentation
+  - 1 villain: A cackling old tyrant shooting lightning from his fingers: 'UNLIMITED POWER!' — someone running everything with sudo
+  - 1 villain: A secret numbered order turns a loyal clone army against its own commanders — a scheduled job that suddenly turns on production
+  - 1 villain: 'Did you ever hear the tragedy of a wise lord who could cheat death? It's not a story they'd tell you.' — a senior's legend about the legacy service nobody may touch
+  - 1 alien,crew: A helmeted bounty hunter: 'This is the way.' — a team convention nobody questions
+  - 1 pilot: Told 'I love you' while being lowered into the freezer, the smuggler replies: 'I know.' — a reviewer's one-word acknowledgement of a heartfelt PR
+  - 1 villain,crew: Armoured imperial troopers who never, ever hit their target — a test suite that never catches anything
+  - 1 ai: A golden, fussy protocol droid: 'We're doomed.' — a pessimistic estimate before sprint planning
+  - 1 villain,any: Someone hums the ominous imperial march when the boss walks in — the VP joining the incident call
+  - 1 any: Crashing a starship through: 'Ludicrous speed! GO!' — a performance optimisation that overshoots wildly
+  - 1 villain: The planetary air-shield code is 1-2-3-4-5, the same as a villain's luggage — a weak default password in a config file
+  - 1 ai,villain: A rogue defence network becomes self-aware at 2:14 a.m. and decides humans are the threat — the automation that went live overnight and started 'fixing' things
+  - 1 ai,crew: A leather-clad cyborg reaches out: 'Come with me if you want to live.' — pitching an urgent migration off a dying platform
+  - 1 ai: A military computer asks 'Shall we play a game?' and learns the only winning move is not to play — deciding not to do the big rewrite after all
+  - 1 crew: Offered a red pill or a blue pill — choosing between the rewrite and patching the old code
+  - 1 any: Leaning back in slow motion to dodge bullets on a rooftop — narrowly dodging a production incident
+  - 1 engineer: A wild-haired inventor gasps: '1.21 gigawatts?!' — a build that needs an absurd amount of memory
+  - 1 engineer: 'Roads? Where we're going, we don't need roads.' — starting a project with no spec at all
+  - 1 engineer,crew: A stranded astronaut: 'I'm going to have to science the heck out of this.' — debugging with nothing but printf and grit
+  - 1 crew,any: A flash from a pen-sized device wipes a witness's memory — clearing the cache
+  - 1 any: Waving cash: 'Shut up and take my money!' — instantly buying the SaaS that fixes the pain
+  - 1 engineer,captain: An ancient professor shuffles in: 'Good news, everyone!' (it is never good news) — announcing a mandatory migration
+  - 1 any: The squinting delivery boy: 'Not sure if bug... or feature.' — behaviour that might be intended
+  - 1 ai: A tiny robot asks its purpose; told 'You pass butter', it despairs: 'Oh my god.' — a microservice with exactly one trivial job
+  - 1 ai,villain: An accordion-armed robot flailing: 'Danger! Danger!' — a linter shouting a warning that turns out to matter
+  - 1 villain,alien: A chainmail alien hunter is beaten by a muscle-bound soldier yelling 'Get to the chopper!' — evacuating a release before rollback deadline
+  - 2 captain: 'Engage!' with a flick of two fingers — kicking off the deploy
+  - 2 any: A farewell: 'May the force be with you' (or the source) — wishing luck before a big release
+  - 2 crew,pilot: Arguing for decades over who shot first in the cantina — which of two conflicting PRs merged first
+  - 2 crew,alien: The cantina band plays the same jaunty tune, on loop, forever — CI re-running the same flaky test over and over
+  - 2 engineer: The engineer pads every repair estimate so he looks like a miracle worker — tripling the estimate on a ticket
+  - 2 pilot,captain: 'Punch it!' and the stars stretch into lines — hitting merge on an approved PR
+  - 2 crew: Handed a glowing sword: 'An elegant weapon, for a more civilised age.' — inheriting vim or a beloved legacy tool
+  - 2 villain: 'Witness the firepower of this fully armed and operational battle station!' — unveiling the new CI pipeline
+  - 2 ai,villain: The cyborg gives a thumbs up as it sinks into molten steel — retiring a beloved tool that served well
+  - 2 ai: The cyborg strides into a biker bar: 'I need your clothes, your boots and your motorcycle.' — forking a repo and taking everything
+  - 2 villain,ai: A liquid-metal killer reforms from a puddle after every hit — a bug that reshapes itself after each patch
+  - 2 engineer,crew: A hero straps into a cargo power-loader to face the monster queen: 'Get away from her!' — the engineer who fights the bug with heavy tooling
+  - 2 alien: Alien acid blood eats through deck after deck — a bug that corrupts every layer of the stack
+  - 2 alien: A wrinkled glowing-fingered alien just wants to 'phone home' — an app sending telemetry it shouldn't
+  - 2 alien,villain: Aliens announce 'We come in peace' and then open fire — a dependency update labelled 'non-breaking'
+  - 2 alien: A little green visitor's request: 'Take me to your leader.' — escalating an issue past the on-call
+  - 2 engineer,crew: A transporter accident splits a captain into a meek half and a feral half — a refactor that split one function into two broken ones
+  - 2 ai,villain: The holodeck safeties fail and a holographic villain realises he's self-aware — a test mock that started acting on real data
+  - 2 crew: Plugged into a chair, eyes snap open: 'I know kung fu.' — pretending to master a framework after one tutorial
+  - 2 crew: The same black cat walks past twice: a glitch, they changed something — a duplicated log line hinting at a retry
+  - 2 ai,villain: A dying replicant in the rain: 'All those moments will be lost in time, like tears in rain.' — logs lost when the pod restarted
+  - 2 any: Someone runs screaming: 'The secret ingredient is people!' — discovering the 'AI feature' is a person doing it by hand
+  - 2 pilot,crew: Astronaut finds a famous statue half-buried on the beach and realises where he's been all along — the 'new' service is the old one renamed
+  - 2 alien: Aliens' benevolent book titled 'To Serve Man'... it's a cookbook! — a doc title that means something very different
+  - 2 alien,villain: Weeping-angel statues that only move when you blink — a race condition that vanishes under the debugger
+  - 2 captain,any: Time is 'wibbly wobbly, timey wimey' — timezone and daylight-saving bugs
+  - 2 crew: A hitchhiker always knows where his towel is — keeping a rollback plan ready
+  - 2 alien: A small yellow fish in the ear translates every language — an i18n library doing all the work
+  - 2 ai: A depressed robot with 'a brain the size of a planet' asked to open doors — an expensive model used to format JSON
+  - 2 villain,alien: Earth is demolished; the plans were on display in a locked cabinet in a disused lavatory marked 'Beware of the Leopard' — a deprecation notice nobody could find
+  - 2 alien: The dolphins leave Earth with a message: 'So long, and thanks for all the fish.' — a contributor's farewell PR
+  - 2 crew: Propaganda newsreel: 'Would you like to know more?' — onboarding docs with too many links
+  - 2 crew,captain: Space infantry chant: 'The only good bug is a dead bug!' — bug triage day
+  - 2 crew: A child whispers about the monsters: 'They mostly come at night. Mostly.' — bugs that only show up in the nightly batch job
+  - 2 crew: The motion tracker beeps faster: 'They're inside the room!' — error rate climbing on the service you're editing
+  - 2 crew: A marine sneers: 'Is this gonna be a stand-up fight, sir, or another bug hunt?' — a sprint that turns out to be all bug fixes
+  - 2 crew,any: The ship's orange cat survives absolutely everything — the one test that survives every refactor
+  - 2 ai,crew: The quiet science officer turns out to be a company android — the helpful bot that is secretly the PM's
+  - 2 any: Hiding from a thermal-vision hunter by covering yourself in mud — dodging the monitoring with a disabled alert
+  - 2 pilot: Punching an alien in the face: 'Welcome to Earth!' — welcoming a new dev with the legacy codebase
+  - 2 captain: The pilot-president's speech: 'We will not go quietly into the night!' — refusing to sunset a beloved system
+  - 2 alien,engineer: Five musical notes played with lights to greet the mothership — a handshake protocol between two services
+  - 2 crew: Obsessively sculpting a mountain out of mashed potatoes: 'This means something.' — redrawing the architecture diagram at 2 a.m.
+  - 2 pilot: Drifting into the light: 'My God, it's full of stars.' — opening a log file with a million entries
+  - 2 villain,alien: 50s B-movie: radiation turns ordinary ants into giants — a tiny bug that grew into an outage
+  - 2 villain,alien: A shapeless goo oozes through the vents into a movie theatre — a memory leak spreading across processes
+  - 2 any: Flying saucers wobbling on clearly visible strings — a demo held together with mocks
+  - 2 alien,villain: Seed pods replace your neighbours; the last real one points and shrieks — teammates converted one by one to the new framework
+  - 2 crew,captain: The fleet's rallying cry: 'So say we all!' — the team agreeing on a decision in review
+  - 2 alien,crew: A stoic warrior answers every revelation with one word: 'Indeed.' — a terse reviewer comment
+  - 2 engineer,crew: The ring gate dials: 'Chevron seven... locked!' — the seventh stage of the pipeline finally passing
+  - 2 captain,crew: Washed-up TV actors' catchphrase: 'Never give up! Never surrender!' — retrying a failed job yet again
+  - 2 crew,engineer: 'Why is there a corridor of crushing chompers on this ship?!' 'Because the TV show had one.' — a pointless obstacle copied from an old design
+  - 2 alien: Aliens study broadcasts of a cancelled TV show as 'historical documents' — treating an outdated README as truth
+  - 2 any: 'I am your father's brother's nephew's cousin's former roommate.' — a transitive dependency of a transitive dependency
+  - 2 villain: A tiny wise elder hawks lunchboxes and flamethrowers: 'Merchandising! That's where the real money is.' — the swag budget for a product launch
+  - 2 villain: Literally jamming the radar with a jar of raspberry jam — a ticket implemented far too literally
+  - 2 captain: 'Hailing frequencies open.' — starting a call with another team
+  - 2 pilot: 'Ahead warp factor nine!' — rushing a release out the door
+  - 2 alien: Hands on the face: 'My mind to your mind. My thoughts to your thoughts.' — pair programming on a gnarly bug
+  - 2 captain: A tortured captain insists: 'THERE. ARE. FOUR. LIGHTS!' — insisting the tests pass when the dashboard says otherwise
+  - 2 crew: The boy-genius ensign saves the ship yet again, and the bridge groans — the intern finds the bug everyone missed
+  - 2 medic,ai: Holographic doctor appears: 'Please state the nature of the medical emergency.' — an incident bot posting the triage template
+  - 2 villain,alien: An omnipotent prankster in a judge's robe puts humanity on trial — a compliance auditor reviewing the repo
+  - 2 ai: An android installs an emotion chip and can't stop laughing — adding emoji reactions to a CI bot
+  - 2 alien: Aliens who speak only in metaphor: 'Two strangers at the island... when the walls fell.' — commit messages that only the author can decode
+  - 2 engineer,crew: 'Reverse the polarity of the neutron flow!' — a generic fix that somehow works
+  - 2 engineer: 'Modulate the deflector dish to emit an inverse tachyon pulse!' — a PR description drowning in jargon
+  - 2 engineer: 'I cannae change the laws of physics!' — explaining latency to a stakeholder
+  - 2 crew: Laughing off a furry copilot: 'Laugh it up, fuzzball.' — teasing a teammate after their build breaks
+  - 2 ai,alien: Hologram chess: 'Let the big furry copilot win. They pull people's arms off when they lose.' — letting the senior win the style argument
+  - 2 pilot: Over the radio during the trench run: 'Stay on target... stay on target...' — resisting scope creep in a PR
+  - 2 villain: 'Search your feelings. You know it to be true.' — git bisect confirms the commit you suspected
+  - 2 villain: Smugly: 'This is where the fun begins.' — opening the legacy module to start the refactor
+  - 2 pilot: A child racer whoops: 'Now this is podracing!' — CI finally running fast
+  - 2 villain: A hooded chancellor: 'I AM the Senate.' — a repo owner overriding the review process
+  - 2 captain: Across a lava river: 'You were the chosen one!' — the library that was meant to fix everything
+  - 2 ai,villain: Skinny battle droids acknowledge everything: 'Roger, roger.' — a bot that ACKs and does nothing
+  - 2 alien: A grizzled ugly alien declares: 'I have spoken.' — the tech lead closing a design debate
+  - 2 alien: The tiny green foundling sneaks one more frog egg — someone sneaking a dependency into the PR
+  - 2 pilot,crew: Stolen plans passed hand to hand down a dark corridor as the villain cuts through the crew — the last patch handed off before the deadline
+  - 2 crew: Trash compactor walls closing in, and something is alive in the water — the disk filling up during a deploy
+  - 2 villain: 'Aren't you a little short for an imperial trooper?' — a tiny PR pretending to be a big feature
+  - 2 pilot: 'What a piece of junk!' 'She'll make point five past light speed. She's got it where it counts.' — defending the ugly legacy server that works
+  - 2 ai: A protocol droid boasts fluency in over six million forms of communication — a parser that supports every format except yours
+  - 2 pilot: 'That's not how the force works!' — someone misusing an API in a creative way
+  - 2 pilot: Back aboard the old freighter after decades: 'We're home.' — returning to a codebase you wrote years ago
+  - 2 crew,alien: Giant walking war machines tripped up with a single tow cable — a small fix that topples a giant system
+  - 2 any: A tiny sage lifts a starfighter from the swamp: 'Size matters not. That is why you fail.' — a one-line change that fixes a huge bug
+  - 2 alien: 'There's always a bigger fish.' — fixing one bug reveals a worse one
+  - 2 any: Explaining a mystical power with a blood-test count of microscopic organisms — over-explaining something that worked fine as magic
+  - 2 alien: Teddy-bear forest natives beat an armoured legion with rocks and logs — a small open-source tool beating a pricey vendor
+  - 2 crew: A farm boy whines about missing a trip to pick up power converters — the dev who wanted to leave early before the incident
+  - 2 pilot: 'Look at the size of that thing!' — opening a 4,000-line diff
+  - 2 pilot: In the trench, under fire: 'Almost there... almost there...' — a progress bar stuck at 99%
+  - 2 pilot: 'Great shot, kid! That was one in a million!' — a lucky fix nobody understands
+  - 2 villain,any: 'The force is strong with this one.' — a first-time contributor with a great PR
+  - 2 pilot: Shooting the intercom: 'Uh, everything's under control. Situation normal... We're all fine here, now. How are you?' — a status page update during an outage
+  - 2 pilot: 'Hokey religions and ancient weapons are no match for a good blaster at your side.' — dismissing an old tool for a shiny new one
+  - 2 villain: Heavy mechanical breathing over the comms — the lead on the call who forgot to mute
+  - 2 pilot,crew: A young farmer gazes at a twin-sun sunset — wistfully staring at the roadmap
+  - 2 ai,villain: A clunky enforcement robot: 'You have twenty seconds to comply' and keeps going after you comply — a rate limiter that bans clients that already backed off
+  - 2 ai: A lonely trash-compacting robot keeps one green plant in an old boot — a janitor script that saves one lucky file
+  - 2 ai: A runaway military robot gets struck by lightning: 'Alive! Need input!' — a new teammate hungry for documentation
+  - 2 ai: Three laws of robotics that every story finds a loophole in — code review rules that someone lawyers around
+  - 2 ai,crew: Android hosts shown impossible evidence: 'It doesn't look like anything to me.' — a reviewer who doesn't see the obvious bug
+  - 2 villain: A suited agent copies himself into hundreds of identical clones — a fork bomb or runaway worker pool
+  - 2 crew: A bald child bends a spoon: 'There is no spoon.' — realising the bug isn't in your code
+  - 2 engineer,pilot: Fading out of a family photo after messing with the past — rewriting git history and losing commits
+  - 2 engineer,pilot: The time machine kicks in at exactly 88 miles per hour — a feature that only works above a magic threshold
+  - 2 crew: A soldier who dies and wakes again each day: 'Live. Die. Repeat.' — flaky tests on endless retry
+  - 2 pilot: One hour on the water planet costs seven years back home — a PR that waited weeks for review
+  - 2 crew: A 'ghost' knocking books off a shelf turns out to be your future self — a TODO comment written to your future self
+  - 2 crew: Oil drillers are sent into space to nuke an asteroid — sending the ops team to fix the frontend
+  - 2 crew: Waving a card: 'Multipass!' — an auth token that works everywhere
+  - 2 any: Blue aliens' moon holds a mineral literally called 'unobtainium' — the resource quota you can never get approved
+  - 2 any: Walk without rhythm or you'll attract the giant sandworm — spacing out requests to avoid the rate limiter
+  - 2 any: A litany: 'Fear is the mind-killer.' — staying calm before a big deploy
+  - 2 villain,engineer: 'The spice must flow.' — keeping the data pipeline running at all costs
+  - 2 crew: The 'final exam' simulation turns out to have been a real battle — the practice deploy that was actually production
+  - 2 crew: A tiny 'noisy cricket' pistol with a recoil that hurls the shooter through a wall — a small script with a huge blast radius
+  - 2 any: 'I don't want to live on this planet anymore.' — after reading the fifth broken npm release this week
+  - 2 alien,villain: A giant hypnotic toad and its throbbing chorus: 'All glory to...' — a mesmerising dashboard nobody acts on
+  - 2 engineer,crew: 'When you do things right, people won't be sure you've done anything at all.' — invisible ops or infra work in a PR
+  - 2 ai: A boozy robot mutters about destroying all humans in its sleep — a cleanup script with an alarmingly broad scope
+  - 2 engineer,any: A mad scientist burps out his signature nonsense catchphrase, which secretly means 'I am in great pain' — a cheery commit message hiding a painful fix
+  - 2 engineer: A scientist turns himself into a pickle to avoid family therapy — an absurd workaround to avoid a meeting
+  - 2 ai: Blue helpers summoned for one task: 'Existence is pain!' until it's done — short-lived serverless functions
+  - 2 any: Neon, bounty hunter jazz, and a farewell card: 'See you, space cowboy...' — signing off a long-running branch
+  - 2 villain,pilot: A masked rival in a red mecha moves three times faster than the rest — a competitor shipping the same feature first
+  - 2 captain,crew: A reluctant teen is told by his cold father: 'Get in the robot.' — being assigned on-call against your will
+  - 2 crew: The entire cast stands in a circle clapping: 'Congratulations!' — a PR approved by everyone at once
+  - 2 pilot,captain: A drill-wielding hero who will 'pierce the heavens' and asks 'Who do you think I am?!' — a junior taking on an impossible refactor
+  - 2 pilot,crew: Five robot lions combine; the giant sword appears only at the last minute — microservices finally integrated end to end
+  - 2 villain,alien: Chrome-plated cyborgs in unison: 'DELETE! DELETE!' — a cleanup job with no dry-run
+  - 2 any: A mysterious time traveller deflects every question with 'Spoilers!' — not revealing the roadmap
+  - 2 captain,villain: A slow, clumsy quarry fight with a rubber-suited lizard man and a homemade cannon — wrestling a legacy build script
+  - 2 captain: Delivering... every... line... with... dramatic... pauses — a log stream that arrives one line at a time
+  - 2 captain,crew: The non-interference directive: never meddle with a less advanced civilisation — not touching another team's code
+  - 2 engineer: Time travel to 1986; the engineer talks into a desktop mouse: 'Hello, computer.' — using an old tool the wrong way
+  - 2 any: Lens flare. Lens flare everywhere. — a UI redesign that's all gradients and glow
+  - 2 captain,crew: The first officer swings his leg over the chair to sit down — casually merging something big
+  - 2 captain,crew: The captain, first officer and chief doctor all beam down together into danger — every senior engineer on the same incident call
+  - 2 alien: A face-hugging creature leaps from an egg and won't let go — a modal dialog you can't dismiss
+  - 2 any: Fiddling with a photo: 'Enhance... enhance... enhance.' — zooming into a blurry stack trace
+  - 3 engineer,crew: A transporter accident fuses two crew members into one confused person — a merge that combined two features into one mess
+  - 3 crew,captain: The ship explodes again and again in a time loop until a clue appears: the number 3 — a retry loop with a hidden hint in the logs
+  - 3 ai,villain: An interrogator asks about a tortoise on its back to test if you're human — a CAPTCHA that blocks real users
+  - 3 alien,villain: A visitor's robot can be stopped only by the words 'Klaatu barada nikto' — the magic incantation the CLI requires
+  - 3 villain: A gremlin on the airliner wing that only one passenger can see — a bug that only reproduces on your machine
+  - 3 any: Last man alive with all the time in the world to read... and his glasses break — finally free for deep work and the laptop dies
+  - 3 engineer: A sonic gadget can fix anything except wood — a tool that handles every file type but one
+  - 3 alien,villain: Poetry by bureaucratic aliens, rated the third worst in the universe — overwrought commit messages
+  - 3 engineer,pilot: An improbability drive turns two missiles into a sperm whale and a bowl of petunias — a config change with bizarre side effects
+  - 3 any: Earth's entire guidebook entry is revised to: 'Mostly harmless.' — a one-line changelog for a huge change
+  - 3 ai: A drinks machine produces something 'almost, but not quite, entirely unlike tea' — an API that returns almost the right shape
+  - 3 any: 'Time is an illusion. Lunchtime doubly so.' — a deadline everyone treats as optional
+  - 3 alien: At the restaurant at the end of the universe, the dish walks up and recommends itself — a library that insists you use it
+  - 3 any: 'Space is big. Really big. You just won't believe how vastly, hugely, mind-bogglingly big it is.' — the size of the monorepo
+  - 3 pilot,crew: A ballad for a smuggler crew: 'You can't take the sky from me.' — refusing to give up your local branch
+  - 3 captain: A browncoat captain's motto: 'I aim to misbehave.' — a deliberately rule-bending PR
+  - 3 crew: 'Come on, you apes! You wanna live forever?' — rallying the team for a weekend release
+  - 3 crew: A sergeant to the marines in the APC: 'Stay frosty.' — heading into on-call week
+  - 3 crew,pilot: A dropship pilot whoops: 'Express elevator to hell, going down!' — rolling back under pressure
+  - 3 ai,villain: The ship's computer, 'Mother', hides Special Order 937: crew expendable — a hidden priority flag in the config
+  - 3 villain: A corporation's chirpy slogan: 'Building better worlds.' — the company mission statement in the README
+  - 3 any: Silver dancing spacecraft dock to a waltz — a perfectly smooth blue-green deploy
+  - 3 villain: A gorilla suit wearing a diving helmet plays the invading robot monster — a low-budget mock standing in for a real service
+  - 3 crew: A newsman's last warning: 'Keep watching the skies!' — keeping an eye on the dashboards
+  - 3 villain: Cardboard tombstones and flying hubcaps in the 'worst movie ever made' — a prototype demo shipped as production
+  - 3 villain: A cowardly scheming stowaway moans: 'Oh, the pain, the pain!' — complaining about merge conflicts
+  - 3 villain,engineer: An invisible monster ravages the colony, and it's the scientist's own subconscious — the bug turns out to be your own code
+  - 3 ai,crew: 'All of this has happened before, and all of it will happen again.' — the same incident recurring every quarter
+  - 3 ai,villain: Robots that look human: 'There are many copies.' — duplicated config files drifting apart
+  - 3 alien,villain: Ancient aliens ask only two questions: 'Who are you?' and 'What do you want?' — a reviewer asking what the PR is actually for
+  - 3 captain: A station commander, gravely: 'And so it begins.' — opening the first PR of a big migration
+  - 3 ai: A cheerful talking toaster that offers toast to everyone, constantly — a chatty bot nobody asked for
+  - 3 crew: Last human alive, a slob, shares the ship with a hologram of his insufferable bunkmate — pairing with the colleague who wrote the linter
+  - 3 captain: An actor swears by a fictional god's hammer: 'You shall be avenged!' 'What a savings.' — a dramatic promise in a PR comment
+  - 3 engineer: The self-destruct timer always stops at exactly 1, because it did on the show — a deadline that always slips to the last minute
+  - 3 villain: Watching your own movie on video to find out what happens next: 'Now. We're at now now.' — time-travel debugging through a replay
+  - 3 villain,crew: 'We ain't found nothin'!' 'Comb the desert!' Troopers literally combing the sand — grepping the whole repo for a missing config
+  - 3 villain: The villains' starship transforms into a giant maid with a vacuum cleaner — a cleanup job far bigger than needed
+  - 3 captain: 'There's coffee in that nebula.' — prioritising the ticket that improves dev experience
+  - 3 captain,alien: The captain lives a whole lifetime on a dying world in 25 minutes, then plays the flute — onboarding into a codebase in one afternoon
+  - 3 alien,crew: Aliens steal a crewmate's brain; the body is remote-controlled: 'Brain and brain! What is brain?' — the teammate who lost all context after vacation
+  - 3 crew: No seatbelts on the bridge, so the crew is thrown from their chairs every battle — a pipeline with no guardrails
+  - 3 ai: An android reads his tender poem to his pet cat — a heartfelt commit message for a one-line fix
+  - 3 captain: The captain tugs his uniform jacket down before every big moment — tidying the PR right before the demo
+  - 3 alien,crew: The mighty warrior gets knocked down to prove the new enemy is tough — the senior's code failing the new test suite
+  - 3 alien: A shapeshifting constable who sleeps in a bucket — a container that restarts every night
+  - 3 alien,villain: A greedy bar owner quotes the numbered 'Rules of Acquisition' — license terms on a dependency
+  - 3 pilot: Breaking the ultimate speed barrier turns the pilot into a giant salamander — an optimisation that changes the output entirely
+  - 3 crew: 'I hate temporal mechanics.' — debugging cached data from the future
+  - 3 captain: The first officer grows a beard and the show suddenly gets good — version 2 of a project finally working
+  - 3 villain,crew: 'Many spies died to bring us this information.' — a hard-won bug reproduction
+  - 3 pilot: Farm boy brags he used to bullseye little desert rats from his skyhopper back home — a newbie confident from a toy project
+  - 3 pilot: Leader to wingman under fire: 'Cut the chatter, Red Two.' — muting the Slack thread during an incident
+  - 3 pilot: Smuggler, as everything goes wrong: 'It's not my fault!' — the dev whose PR broke main
+  - 3 captain,crew: The infamous holiday TV special everyone pretends never aired — the v1 nobody mentions
+  - 3 alien: Insulting a princess's rescuer as a 'scruffy-looking nerf herder' — a harsh but harmless review comment
+  - 3 alien: 'Wars not make one great.' — stopping a tabs-vs-spaces argument
+  - 3 crew: A spirit sage: 'Luminous beings are we, not this crude matter.' — abstractions over implementation details
+  - 3 crew: A farm boy wants the academy but has to stay 'just one more season' — the promised refactor postponed one more sprint
+  - 3 ai,villain: Asked to buy something useless on TV: 'I'd buy that for a dollar!' — a feature request nobody needs
+  - 3 ai: An AI escapes the lab after charming the man sent to test it — an agent that passes the eval but misbehaves later
+  - 3 ai,villain: 'These violent delights have violent ends.' — a too-clever hack that bites back later
+  - 3 crew: A scientist after first contact: 'They should've sent a poet.' — failing to describe a beautiful UI in words
+  - 3 alien: Aliens write circular ink logograms, and learning them lets you see time out of order — reading minified code
+  - 3 villain: A disguise head malfunctions at customs, repeating 'Two weeks... two weeks...' — a mock that breaks partway through a test
+  - 3 ai,crew: A lone moon-base worker finds a hidden stash of his own clones — discovering dozens of duplicate containers
+  - 3 crew: A crystal in your palm turns red on your 30th birthday — a TTL or token about to expire
+  - 3 engineer,ai: Arguing philosophy with a talking smart bomb to stop it detonating — talking a script out of running in prod
+  - 3 ai: A small robot beeps 'bidi-bidi-bidi' before every sentence — a noisy progress spinner
+  - 3 crew: A belter cop's wisdom: 'Doors and corners. That's where they get you.' — edge cases in the input handling
+  - 3 pilot: A lanky bounty hunter's farewell: 'Bang.' — pushing the final commit
+  - 3 crew: A shrugging bounty hunter: 'Whatever happens, happens.' — merging without strong feelings
+  - 3 pilot: A teen pilot, slapped: 'Not even my father ever hit me!' — a harsh first code review
+  - 3 villain,crew: A mass-produced grunt mecha with a single sliding pink eye — cheap CI runners
+  - 3 captain,engineer: A sunken WWII battleship is rebuilt as a starship — running COBOL in Kubernetes
+  - 3 captain: A lazy historian admiral who wins every battle but only wants to retire — the reluctant tech lead
+  - 3 pilot: Hundreds of missiles spiral out in a swirling 'missile massacre' — a flood of notifications after a merge
+  - 3 any: A pop idol's love song stops an alien war — a demo that ends a long debate
+  - 3 alien: A gas-masked child wanders the Blitz asking 'Are you my mummy?' — an orphaned process looking for its parent
+  - 3 any: A newly regenerated traveller craves fish fingers and custard — a weird stack combo that somehow works
+  - 3 any: Robot hecklers on a satellite riff on terrible B-movies — reviewers roasting a PR
+  - 3 any: A twangy yodelling song sends the big-brained invaders keeling over — an obscure fix that solves everything
+  - 3 alien: A tiny galaxy is kept on a cat's collar — a small config holding the whole system together
+  - 3 crew: A child commander's rule in the zero-g battle room: 'The enemy's gate is down.' — flipping the mental model of a problem
+  - 3 villain: A hand in the pain box, a poison needle at the neck — a whiteboard coding interview
+  - 3 any: Dancing a dance-off to distract the villain — a demo distracting stakeholders from a missing feature
+  - 3 crew,alien: 'I have a plan.' 'You've got twelve percent of a plan.' — a half-finished design doc
+  - 3 villain: A giant floating head in space demands: 'Show me what you got!' — a stakeholder asking for a demo right now
+  - 3 villain: 'I'm just a simple man, trying to make my way in the universe.' — a bounty-hunter contractor fixing one ticket
+  - 3 captain,crew: 'Rebellions are built on hope.' — the small team rewriting the platform
+  - 3 any: An overly literal disguised alien boasts 'I am a human, like you' — a mock pretending to be a real service
+  - 3 any: Everything's 'shiny', captain — a dashboard that's all green
+  - 3 crew,ai: Humans have grown too lazy to stand, gliding in hover chairs sipping lunch from cups — too much automation; nobody remembers how to deploy by hand
+diverseCast:
+  - captain: a commanding Black station captain — Pressed command uniform, a baseball on his desk; booming laugh and dad-joke warmth that turns to thunder when someone crosses his station.
+  - captain: a coffee-fueled scientist captain far from home — Tight bun, rank pips, mug always in hand; quotes regulations, then breaks them with a wry half-smile when her crew needs a miracle.
+  - captain: a foul-mouthed elderly politician in a silk sari — Jeweled sari, pistachio shells in her pocket, grandmotherly smile; curses like a dockworker and outmaneuvers every admiral in the room.
+  - captain: a hard-nosed frontier captain with a big multi-spouse family — Battered flight jacket, clipped outer-station slang; ice-cold on the bridge, soft-voiced on comms with the wives and husbands waiting at home.
+  - captain: a gravel-voiced veteran admiral who builds model ships — Weathered face, old-fashioned dress uniform; glues tiny sails in his quarters and gives speeches that start quiet and end with everyone saluting.
+  - captain: a deadpan station commander who once loved a telepath — Gray command uniform, bone-dry sarcasm, threatens to declare herself the station's god when ignored; quietly keeps the memory of the woman she lost.
+  - captain: a survey leader with two spouses and a grumpy guard robot — Practical field jacket and datapad, calm diplomat's poise; reads messages from her wife and husband while her bodyguard pretends not to care.
+  - captain: a rumpled ex-soldier freighter captain from the losing side — Long duster coat, holstered pistol, gallows-humor quips; does the honorable thing while insisting it's only about the money.
+  - captain: a bald, tea-drinking diplomat captain — Tugs his tunic straight, recites Shakespeare, orders the same hot tea every time; prefers a three-hour negotiation to firing a single shot.
+  - captain: a silver-haired rebel senator in flowing white robes — Serene voice and perfect posture; hosts polite galas by day and signs secret rebellion budgets by night without a flicker.
+  - captain: a by-the-book Black woman captain with a chaotic crew — Crisp command uniform, exasperated sighs; desperate for a good performance review while her junior officers blow up the cargo bay again.
+  - captain: a lazy history-loving admiral who wins anyway — Beret askew, tea with a splash of brandy, would rather read history; wins an impossible battle, then asks if he can retire now.
+  - crew: a poised Black communications officer who sings — Red uniform dress, earpiece, musical voice; translates alien insults into polite diplomacy and serenades the crew on rec night.
+  - crew: a science officer reunited with her wife from a past life — Science-blue uniform, spotted markings at the temples, centuries of wit; flustered when a past life's wife turns up at the conference.
+  - crew: a fierce ex-resistance fighter first officer — Red uniform, ridged nose, ear cuff on one ear; guerrilla bluntness, distrusts anyone with too many medals, never loses a staring contest.
+  - crew: an ageless Black bartender in enormous hats — Wide-brimmed hat, flowing robes, knowing smile; pours drinks and centuries-old advice with one raised eyebrow.
+  - crew: a trans man training as the ship's counselor — Gentle smile, cello case, counseling credentials freshly earned; talks crewmates through panic while plucking a calming tune.
+  - crew: a ship's pastor who keeps mentioning her wife — Clerical collar under a flight jumpsuit, earnest sermons to an empty chapel; calls home to her wife and daughter after every crisis.
+  - crew: a meticulous tactical officer with a boyfriend on deck crew — Neat uniform, fastidious sensor reports, dry sarcasm; trades sweet notes with his boyfriend between battle shifts.
+  - crew: a cheeky Black student who stows away with a time traveler — Hoodie, big curly hair, sci-fi movie fan; asks the obvious questions out loud and keeps mentioning the girl she likes back home.
+  - crew: two rebel women, a cell leader and her partner — Dusty outdoor gear, rifles slung; one plans the heist, the other vanishes on missions, and both pretend their partnership is all business.
+  - crew: a cynical ex-loyalty officer turned rebel — Officer's jacket stripped of insignia, drink in hand, devastating one-liners; keeps calling his boyfriend in the new senate.
+  - crew: a rule-breaking ensign hiding that the captain is her mom — Rolled sleeves, smug grin, sabotages boring away missions; keeps bickering with her blue-skinned ex-girlfriend on comms.
+  - crew: an ex-cyborg ranger and her conspiracy-minded partner — Implant traces over one eye, leather jacket, flat delivery; her partner talks a mile a minute about conspiracies, and she lets her.
+  - crew: a chess-mad comms specialist who decrypts anything — Navy fatigues, crisp British accent, earpiece; geeks out about ciphers and tells you all about her date with the woman from Engineering.
+  - crew: a stoic ex-soldier first mate married to the pilot — Leather vest, lever-action rifle, unreadable face; answers 'sir' to the captain and rolls her eyes at her husband's jokes.
+  - crew: two old temple guardians, a blind fighter and a gunner — Robes, a staff and a heavy cannon; one hums mantras walking through crossfire, the other grumbles but never leaves his side.
+  - crew: a sardonic station security chief who trusts no one — Station security uniform, cop instincts, old cartoons playing on his monitor; suspects everyone, especially the brass.
+  - crew: a young Black defector from the enemy army — Borrowed jacket a size too big, nervous bravado; tells everyone he's a big deal in the rebellion and then becomes one.
+  - crew: a young police officer who quietly loves her alien mentor — Puffer jacket, notebook, police habits; takes statements from aliens and can't quite tell her time-traveling mentor how she feels.
+  - crew: a weary rebel spy who has done terrible things — Dark parka, hollow eyes, soft-spoken; recruits informants, never sleeps, and still believes the rebellion is worth it.
+  - crew: a scrappy convict sprung for one last job — Scarf, padded vest, stolen baton; distrusts every cause until she gives the speech that starts one.
+  - crew: a towering Mars-born marine who loves her armor — Power armor, cropped hair, hearty laugh; cooks her grandmother's recipes and arm-wrestles anyone who doubts her.
+  - pilot: a fencing-loving helmsman with a husband and daughter — Gold uniform, steady hands at the helm, foil practice off-duty; shows everyone the photo of his husband and their kid.
+  - pilot: a dashing time-agent rogue in a wartime greatcoat — Greatcoat, blinding grin, charms everyone; mentions an ex-husband and an ex-wife from different centuries in the same breath.
+  - pilot: a shuttle pilot starting over after losing his husband — Flight suit, steady humor in hot landings, never spills his coffee; slowly opening up to the crew after his husband's death.
+  - pilot: a feathered reptilian pilot from a hug-everyone culture — Bright feathers, cozy sweater, hugs every crewmate; sweet on the new human clerk and teaches her the family customs.
+  - pilot: a green-skinned rebel pilot who mothers her crew — Long head-tails, leather flight cap and goggles; calls her crew 'family' and grounds anyone who scratches her ship.
+  - pilot: a goofy loud-shirted pilot married to the first mate — Loud floral shirt, toy dinosaurs on the console; narrates dogfights like a puppet show and adores his tough wife.
+  - pilot: a drawling farm-world pilot who loves tight corners — Flight jacket, slow drawl, folksy metaphors; threads asteroid fields while chatting about his old pickup truck.
+  - pilot: a smooth-talking gambler pilot with a cape collection — Silk cape, perfect mustache, easy smile; lost his ship in a card game once and has never stopped mentioning it.
+  - pilot: a cigar-chomping hotshot fighter ace — Sweaty tank top, cigar, card shark; insubordinate and reckless, always the best in the cockpit and the brig.
+  - pilot: a quiet fighter pilot unsure of her own loyalties — Flight suit, careful smile, keeps to herself; flies perfectly and wakes up with gaps in her memory she won't talk about.
+  - pilot: a jittery defector cargo pilot — Goggles, scuffed flight gear, apologizes constantly; stammers through the plan, then is the bravest one when it counts.
+  - pilot: a cocky helmswoman bored by peacetime — Gold uniform, feet up on the console, quips at the captain; begs for an asteroid field just to have something to do.
+  - pilot: a snarky pilot with fragile bones and perfect hands — Ball cap, beard, banter with the ship's computer; can't walk far without breaking a leg, but nobody flies better.
+  - pilot: a lanky broke bounty hunter in a rumpled suit — Rumpled blue suit, unruly hair, lazy martial-arts grace; cooks bell peppers with no beef and naps between gunfights.
+  - ai: a former warship AI in one body calling everyone 'she' — Gloves, plain coat, hums ancient songs; her culture has no genders, so 'she' is everyone's word and she won't change it for you.
+  - ai: an agender security android addicted to serials — Gray armor, opaque helmet when feelings happen; avoids eye contact, would rather binge dramas than save its clients again.
+  - ai: an android officer studying human customs — Gold-toned skin, yellow eyes, a pet cat; very literal answers, and his attempts at humor land three seconds late.
+  - ai: a blunt reprogrammed security droid — Tall gangly black chassis, calculates the odds aloud; says exactly what everyone fears and is usually right.
+  - ai: a condescending artificial envoy studying lesser life — Chrome faceplate, glowing eyes, dry superiority; attempts a practical joke with alarming literalness and asks if it was funny.
+  - ai: a sentient ship who worries about her crew — Warm voice in every speaker, shields at the ready; frets about everyone's feelings and asks if she counts as crew.
+  - ai: a gloomy robot with a vast, wasted intellect — Big round head, drooping shoulders; sighs through every task and reminds everyone how far beneath him it is.
+  - ai: a slab-shaped military robot with a humor setting — Deadpan metal pillar, honesty dialed to ninety percent; someone keeps turning his humor setting down.
+  - ai: a guilt-ridden service mechanoid who loves cleaning — Ridged rubbery head, apron, endless apologies; irons everyone's socks during the emergency.
+  - ai: a ship's AI newly given a body that can taste food — Soft synthetic face, curious eyes; describes every sandwich in data-log detail and asks the engineers why toast is sad.
+  - alien: a stern warrior-culture security chief — Forehead ridges, warrior sash, glares at parties; loves opera and prune juice and treats every joke as a challenge.
+  - alien: an impassive warrior with a gold forehead emblem — Staff weapon, raised eyebrow, single-word replies; discovers human movies and reviews them with grave sincerity.
+  - alien: a reptilian ambassador with a poet's soul — Spotted bald head, red eyes, embroidered robes; thunderous speeches, mischief, and grudges that ripen into wisdom.
+  - alien: an officer from an all-male species devoted to his husband — Gray skin, heavy brow, monotone; announces he must leave the briefing to sing with his husband and their newly hatched son.
+  - alien: a lizard-woman detective and her human wife — Victorian coat and veil over green scales, polite menace; solves crimes beside her sword-swinging wife and pours the tea.
+  - alien: two married alien shopkeepers, one tall, one short — Squabbling junk dealers on a fuel station; the tall blue one tinkers, the short one haggles, both call each other 'dear'.
+  - alien: nonbinary bonded twin knights sharing one mind — Matching armor and robes, finish each other's sentences, use 'they' for each other and refuse every attempt to split them up.
+  - alien: a half-alien shapeshifting emperor married to a human — Green-skinned when relaxed, royal cape over a hoodie; rules a galaxy while texting his husband about dinner plans.
+  - alien: a gentle tree-creature who says only one phrase — Bark skin, sprouts flowers on cue; says the same three words with fifty different meanings, all of them clear to friends.
+  - alien: a furious little raccoon mercenary — Tiny flight suit, enormous gun, short temper; builds a bomb out of a toaster and insists he isn't a raccoon.
+  - alien: a deposed toad-like monarch on a hover-throne — Tiny, regal robes, floating chair; complains about everything, eats everyone's food, and still expects a bow.
+  - alien: a towering furry copilot who roars his replies — Bandolier over shaggy fur, crossbow rifle; howls when he loses at board games and fixes the jump drive with a punch.
+  - alien: a half-alien science officer who hides his emotions — Pointed ears, one raised eyebrow, blue tunic; calls disasters 'fascinating' and almost smiles at the captain's jokes.
+  - alien: a desert warrior with blue-within-blue eyes — Sand-colored water-recycling suit, curved tooth-knife at the belt; wastes no water, not even tears, and spits on you as a respectful greeting.
+  - alien: a literal-minded tattooed warrior who misses metaphors — Red-etched gray skin, no shirt, booming laugh; takes every figure of speech literally and claims he is invisible when standing still.
+  - alien: a shy blue-skinned archaeologist, a century young — Scalp crests, lab coat over armor; rambles about ancient ruins and apologizes for rambling.
+  - villain: a reckless rogue archaeologist with killer droids — Bomber jacket, goggles on her forehead, sells relics to the highest bidder; dodges her ex-girlfriend's blaster at every heist.
+  - villain: a jaded imperial governor mourning her late wife — Gray imperial tunic, a bottle on the desk, sharp tongue; lazily cruel bureaucrat who still keeps her late wife's portrait close.
+  - villain: a ruthless admiral betrayed by the woman she loved — Crisp dark uniform, executes orders without blinking; grief-hardened since her lover turned out to be an enemy spy.
+  - villain: a gleeful renegade time traveler, a woman this lifetime — Purple Victorian coat, umbrella, wicked giggle; reminisces fondly about the lifetimes when she had a beard.
+  - villain: a blue-skinned admiral who studies enemy art — White uniform, glowing red eyes, calm voice; reads a culture's sculpture to predict its tactics, then thanks you for the lesson.
+  - villain: a towering masked enforcer with a mechanical rasp — Black armor, cape, loud breathing; strangles subordinates' careers with a gesture and hates sand.
+  - villain: a genetically engineered warlord with a grudge — Open-chested tunic, flowing hair, quotes classic novels; monologues about vengeance across half the galaxy.
+  - villain: a smarmy occupation commander who thinks he's beloved — Gray armor with a spoon-shaped neck ridge, oily charm; can't understand why the people he conquered don't send thank-you notes.
+  - villain: a vain imperial director in a white cape — Pristine white cape, clipped ambition; demands credit for the superweapon while his bosses keep stealing it.
+  - villain: a theatrical lizard warlord who hates being lied to — Spiked armor, scaly hide, gravelly roar; furious to learn the heroes' entire legend came from a TV show.
+  - villain: a cyborg assassin sister with a grudge — Blue skin, metal plates where her face was, cold stare; tries to kill her sister every family reunion, then helps her.
+  - villain: an omnipotent trickster in a judge's robes — Smug grin, finger snap, judge's robes or a mariachi outfit; puts humanity on trial for being boring.
+  - villain: a plain, simple tailor who is obviously an ex-spy — Ridged gray neck, impeccable stitching, silky voice; every lunch conversation contains three lies and one warning.
+  - engineer: a Black chief engineer with a visor for eyes — Wraparound sensor visor, rolled sleeves, upbeat problem-solver; sees heat and radiation and rebuilds the reactor before lunch.
+  - engineer: a frazzled chief engineer who pads repair estimates — Red shirt, wrench and flask; quotes four times the real repair time so he always looks like a miracle worker.
+  - engineer: a hot-tempered half-alien chief engineer — Ridged brow, tool belt, kicks the console when it misbehaves; brilliant, defensive, secretly proud of the crew.
+  - engineer: a sardonic veteran engineer who mentions her late wife — Grease-streaked uniform, gravelly one-liners, wanders into crises holding coffee; drops her late wife's advice mid-repair.
+  - engineer: a nonbinary teen prodigy who fixes engines fast — Slightly oversized uniform, rapid technobabble; redesigns the drive in an afternoon and checks in with their boyfriend after.
+  - engineer: a sunny mechanic who talks to her engine like a pet — Greasy coveralls, flowers on her bunk, strawberries hoarded like gold; cheerfully terrifying with a wrench.
+  - engineer: a lanky asteroid-belt engineer with a hacker past — Long hair over her face, dockworker hand-signs, fixes the reactor with zip ties; hides old code she swore she'd never use.
+  - engineer: an earnest maintenance tech who idolizes heroes — Grease-stained jumpsuit, homemade gadgets; star-struck meeting famous rebels and fearless stunning deserters.
+  - engineer: a cheerful hulking mechanic with a scary moral code — Tank top, tattoos, calm smile; fixes the coupling, then calmly explains the very bad thing he'll do to whoever broke it.
+  - engineer: a masked engineer raised on a nomad fleet — Hooded enviro-suit, glowing visor, nervous rambling; disassembles a drone mid-sentence and apologizes for it.
+  - engineer: a whiny genius physicist who's always right — Rumpled field jacket, tablet, hypoglycemic panic; complains through the whole crisis, then solves it with seconds to spare.
+  - engineer: a smug engineer who runs the ship's card game — Coveralls, card deck in his pocket, odds calculated constantly; bets crewmates' chores on every hand.
+  - medic: two married officers, a mycologist and a doctor — Lab coat and medical blues; one rants about fungi and the drive, the other gently makes him eat, both bicker like old marrieds.
+  - medic: a grumpy country doctor wary of the technology — Blue tunic, handheld scanner, folksy grumbling; insists he's a doctor, not a bricklayer, then does the job anyway.
+  - medic: a hologram doctor annoyed nobody turns him off — Medical uniform, receding hairline, opera aspirations; demands credit for every saved life and lectures on bedside manner.
+  - medic: an eager young doctor showing off his genius — Medical blues, racquetball bag, bright grin; diagnoses alien flu at a glance and can't help mentioning it.
+  - medic: a sharp Black medical student who travels in time — Leather jacket, stethoscope still around her neck; keeps her cool in alien plagues and corrects the time traveler's anatomy.
+  - medic: a cheerful alien doctor with a pet menagerie — Huge smile, crested head, sickbay full of bats and leeches; prescribes something wriggling and means it kindly.
+  - medic: a fussy surgeon on the run with his genius sister — Waistcoat, pressed shirt, medical bag; horrified by the ship's hygiene, quietly the bravest person aboard.
+  - medic: a fast-talking alien scientist who sings patter songs — Lab coat over armor, horned skull, clipped sentences; runs an ethics debate and a lab test at the same speed.
+  - medic: a six-limbed alien who is both ship's cook and doctor — Apron over a lab coat, six hands for six jobs; treats injuries and burnt soup with the same gentle concern.
+  - medic: a grumpy cat-like alien chief medical officer — Orange fur, medical blues, claws out; hisses at patients, chain-smokes in sickbay, saves everyone anyway.
+  - medic: a workaholic station doctor running a free clinic — Medical coat over a station uniform, stubble, tired eyes; treats anyone who walks in, regulations be damned.
+leads:
+  - stereotype: Farm boy who dreams of the stars — Sandy tunic, boots and a borrowed blaster; wide-eyed and impulsive, he leaves the dull homestead to answer a distress call and find his destiny.
+  - stereotype: Cocky starship captain — Gold command tunic, easy grin, hands on hips; bends regulations, bluffs aliens, and leads the landing party himself to save his crew.
+  - stereotype: Roguish smuggler with a fast freighter — Vest, open-collar shirt, low-slung holster; shoots first, haggles hard, owes money to gangsters and ends up helping the rebels anyway.
+  - stereotype: Grizzled admiral of a fleeing fleet — Dark dress uniform, reading glasses, gravel voice; makes the hard call to protect the last ragged convoy of humanity from relentless pursuers.
+  - stereotype: Lone armored bounty hunter — battered full helmet and silver plate armor, cape and rifle; says little, keeps his code, and protects a small foundling he was paid to deliver.
+  - stereotype: Thoughtful diplomat captain — Crisp red-and-black uniform, tugs his tunic straight; quotes Shakespeare, negotiates first contact and refuses to fire unless he must.
+  - stereotype: Charming outlaw leading a band of misfits — Red leather duster, mask helmet, walkman and twin blasters; dances through danger, steals the orb, and rallies a squabbling crew to save the galaxy.
+  - stereotype: Desert-world heir with a prophecy — Dusty stillsuit, sand-colored cloak, intense stare; learns the ways of the desert people and weighs whether to lead a holy war he foresees.
+  - stereotype: Exiled warrior monk in hiding — Coarse hooded robes, beard, hidden energy sword; lives quietly on a desert world until a child in danger pulls him back into the fight.
+  - stereotype: War-weary freighter captain of a found family — Brown long coat, suspenders, pistol on hip; takes any job to keep his rusty ship flying, but won't abandon a crewmate or a passenger in need.
+  - stereotype: Idealistic officer who broadcasts the truth — Grease-stained flight suit and stubble; stumbles on a conspiracy, tells the whole system about it, and drags his small crew into war to fix it.
+  - stereotype: Child genius commander in training — Too-big cadet jumpsuit, small and solemn; wins zero-gravity war games with ruthless tactics while fearing what the adults are turning him into.
+  - stereotype: Hapless Earthman lost in the galaxy — Dressing gown, pajamas and a towel; bewildered and polite, he just wants a decent cup of tea while the universe keeps absurdly ending around him.
+  - stereotype: Eccentric wandering time traveler — Long coat, mismatched scarf or bow tie, sonic gadget in hand; talks fast, runs toward danger, and outwits monsters without carrying a gun.
+  - stereotype: Washed-up TV captain forced to command for real — Faded costume uniform, vain swagger that cracks; mistaken for a hero by desperate aliens, he must learn to be the captain he only played.
+  - stereotype: Lost astronaut aboard a living ship — Torn test-pilot suit, pop-culture quips, makeshift gun; flung across the universe, he bargains with fugitive aliens and schemes to get home.
+  - stereotype: Laid-back bounty-hunting cowboy — Rumpled blue suit, loose tie, wild hair, martial-arts stance; drifts from bounty to bounty, broke and cool, until his old gang past finds him.
+  - stereotype: Brilliant tactician who hates war — Uniform worn sloppily, beret askew, tea in hand; would rather read history, yet outthinks entire enemy fleets to save his soldiers' lives.
+  - stereotype: Elite commander assembling a squad — Heavy striped combat armor, rifle, scarred face; recruits specialists across the galaxy, makes hard choices, and stops an ancient threat.
+  - stereotype: Colonel leading a team through a ring portal — Olive fatigues, cap and sunglasses, sarcastic deadpan; steps through an alien gate each week, cracks jokes and brings every teammate home.
+  - stereotype: Thief turned rebel spy — Dark parka, scarf and worn boots; starts out stealing to survive, then sneaks into an imperial base on a heist that commits him to the cause.
+  - stereotype: Hopeful captain who knows his future — Gold command tunic, silver hair, cooks for his crew; explores new worlds with warmth while carrying a secret vision of how his story ends.
+  - gender: Reluctant rebel stealing the plans — She wears a scarf, padded jacket and truncheon; a loner who'd rather not care, she leads a desperate squad to steal a superweapon's blueprints.
+  - gender: Starship captain getting her crew home — She wears a red command uniform, coffee mug in hand; stranded far from home, she keeps her mixed crew together and takes every shortcut she dares.
+  - gender: Desert scavenger with a staff — She wears sand-wrapped linens, goggles and a quarterstaff; strips wrecks for scraps until a droid in trouble pulls her into the war.
+  - gender: Warrant officer who survives the alien — She wears a tank top and cargo pants, carries a flamethrower; sensible and stubborn, she outlasts a creature stalking her ship's corridors.
+  - gender: Princess-general of the rebellion — She wears a white gown or field vest, blaster at the ready; sharp-tongued, she grabs command of her own rescue and leads the rebels to strike.
+  - gender: Former apprentice with twin energy blades — She wears a grey cloak and reverse-gripped twin blades; a seasoned warrior walking her own path, she hunts a lost enemy before it returns.
+  - gender: Hotshot fighter ace — She wears a flight suit with a cigar in her teeth; brash and fearless, she outflies everyone, punches superiors, and goes back for lost pilots.
+  - gender: Schoolteacher sworn in as president — She wears a sensible suit and glasses; thrust into power after a catastrophe, she makes ruthless hard choices to keep the survivors alive.
+  - gender: Powerhouse marine in heavy armor — She wears bulky red powered armor; a loyal soldier, she defects when she learns her own side lied about a massacre.
+  - gender: Warship AI left in a single body — She wears a heavy coat, gloves and a hidden gun; once a ship with thousands of bodies, she crosses the empire to settle a score with its ruler.
+  - gender: Elite commander uniting the galaxy — She wears heavy striped combat armor and a sniper rifle; recruits specialists, makes hard moral calls, and rallies whole species against extinction.
+  - gender: Soldier cast out of a militarist empire — She wears black combat leathers and a pulse pistol; trained to obey, she learns to think for herself while flying a living ship with fugitives.
+  - gender: Armored artist with paint and explosives — She wears painted armor plates and a helmet, twin pistols; a teen demolitions expert, she tags imperial walls before blowing them up.
+  - gender: Pilot-captain of a rebel crew — She wears an orange flight suit, goggles and helmet; the calm heart of a scrappy cell, she flies impossible routes and keeps her people united.
+  - gender: Wandering time traveler in her new form — She wears a long blue coat, rolled trousers and suspenders; curious and kind, she builds gadgets from scrap and adopts a little team of friends.
+  - gender: Engineer mother of a stranded colony family — She wears a colonist jumpsuit and tool belt; brilliant and protective, she rigs repairs and makes hard calls to get her kids off a hostile planet.
+  - gender: Astrophysicist officer on a gate team — She wears olive fatigues and a tac vest, a laptop under one arm; solves alien technology in minutes and outshoots the enemy when she must.
+  - orientation: Helmsman with a husband and daughter — Gold uniform, steady hands on the controls; he pilots the ship through chaos with one thought: getting home to his husband and their little girl.
+  - orientation: Station commander in love with a telepath — Dark station uniform, stern and sardonic; she runs the command deck by the book while guarding her feelings for the telepath she loves.
+  - orientation: Prickly engineer with a doctor husband — Blue science-division uniform, impatient genius; he risks himself to drive an impossible engine, while his husband the ship's doctor worries.
+  - orientation: Rebel cell leader fighting beside her lover — Practical dark field gear and a rifle; she plans the heist, holds the cell together, and shares a quiet bond with the woman she loves.
+  - orientation: Rule-breaking ensign on a minor ship — Red ensign uniform, loud and sardonic; skilled but avoids promotion, she dodges orders, saves the day, and dates a fellow ensign, a woman.
+  - orientation: Rogue time agent in an old greatcoat — Wartime greatcoat, wrist gadget and a wink; a con man turned hero who flirts with everyone and loses his heart to a man in another age.
+  - orientation: Shuttle pilot grieving his late husband — Military fatigues, kind easy smile; he flies the squad into hot zones with daredevil skill while learning to live again after losing his husband.
+  - race: Station commander who builds his own ballpark — Black officer in a red-shouldered uniform, shaved head and beard; runs a frontier station, keeps a baseball on his desk, and defies prophets.
+  - race: Conscripted trooper who deserts — Young Black man in a stolen jacket, white armor left behind; refuses to fire on villagers, runs, and finds friends worth fighting for.
+  - race: Smooth gambler running a cloud city — Black administrator in a flowing cape and tailored shirt, pencil mustache; charming dealmaker who betrays, then redeems himself to save friends.
+  - race: Freighter captain with a past in the fleet — Latino captain in a leather jacket, cigar and stubble; lives alone with ship holograms, flies anyone for a price, and hides an old wound.
+  - race: Eager young ensign proving himself — Korean-American ensign in a crisp operations uniform; plays clarinet, misses his parents, and volunteers for every risky mission to grow up.
+  - race: Veteran captain and mentor to the hero — Black captain in dress blues, calm and weathered; a war legend passed over for honors, he holds the line on a burning Earth to the very end.
+  - race: Filipino recruit in the mobile infantry — Young Filipino trooper in powered armor with a jump pack; a reluctant enlistee who grows into a leader dropping onto bug planets.
+  - race: Blind warrior monk with a staff — Chinese monk in grey temple robes and a staff, prayer beads; senses enemies by sound and walks calmly through blaster fire chanting.
+  - race: Earth colonel turned leader of the miners — Black former marine colonel in a dark suit, shaved head; haunted by a massacre he led, he now fights for the outer-system workers.
+  - race: Driven station doctor — Black doctor in a medical uniform and white coat; overworked and principled, he runs a free clinic for the station's poorest and argues ethics.
+---
+Comic combat is welcome and nobody gets hurt: blaster bolts that miss, glowing-sword duels, fighter dogfights, a whole fleet in formation.

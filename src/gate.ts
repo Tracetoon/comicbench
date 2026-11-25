@@ -1,13 +1,21 @@
 /**
  * One gate for every model call in the process. A campaign runs comics,
- * checklists and arenas at once; the gate caps how many Codex calls run
- * together (slots), lets comic work (the critical path) go before judging,
- * shrinks the cap while Codex is rate-limiting and recovers it afterwards.
- * Outside a campaign the gate is unlimited, so single commands behave as before.
+ * checklists and arenas at once; the gate caps how many run together.
+ *
+ * Three lanes:
+ * - `draw`: image rendering. It is mostly waiting on the image service, so it
+ *   has its own cap and never takes a text slot.
+ * - `comic`: a comic's text calls (author, scoring), the critical path.
+ * - `judge`: checklists and arena pairs.
+ * Text calls share `slots`; comic work goes first but always leaves
+ * `judgeSlots` free while judging is waiting, so judging keeps pace with
+ * drawing. While Codex rate-limits, text slots shrink by a third and recover
+ * after ten quiet minutes. Outside a campaign the gate is unlimited.
  */
 import { AsyncLocalStorage } from 'node:async_hooks';
 
-export type Lane = 'comic' | 'judge';
+export type Lane = 'comic' | 'judge' | 'draw';
+type TextLane = 'comic' | 'judge';
 const lane = new AsyncLocalStorage<Lane>();
 
 /** Runs fn with every model call inside it on the given lane. */
@@ -20,25 +28,34 @@ export const RATE_LIMIT = /\b(rate[ -]?limit(ed)?|usage limit|too many requests|
 export interface GateStats {
   calls: Record<Lane, number>;
   ms: Record<Lane, number>;
+  /** Time calls spent waiting for a slot, per lane. */
+  waitMs: Record<Lane, number>;
   rateLimits: number;
   backoffMs: number;
-  /** The lowest the slot count fell while rate-limited. */
+  /** The lowest the text slot count fell while rate-limited. */
   minSlots: number;
 }
+
+const zero = (): Record<Lane, number> => ({ comic: 0, judge: 0, draw: 0 });
 
 class Gate {
   private base = Infinity;
   private limit = Infinity;
-  private active = 0;
+  private reserve = 0;
+  private drawLimit = Infinity;
+  private active: Record<Lane, number> = zero();
   private lastLimit = 0;
-  private queues: Record<Lane, (() => void)[]> = { comic: [], judge: [] };
-  stats: GateStats = { calls: { comic: 0, judge: 0 }, ms: { comic: 0, judge: 0 }, rateLimits: 0, backoffMs: 0, minSlots: Infinity };
+  private queues: Record<Lane, (() => void)[]> = { comic: [], judge: [], draw: [] };
+  stats: GateStats = { calls: zero(), ms: zero(), waitMs: zero(), rateLimits: 0, backoffMs: 0, minSlots: Infinity };
   /** How long without a rate limit before the slots recover. */
   recoverMs = 10 * 60_000;
 
-  setSlots(n: number) {
+  /** Text slots, the share kept free for judging, and the separate rendering cap (0 means unlimited). */
+  setSlots(n: number, opts: { judge?: number; draw?: number } = {}) {
     this.base = this.limit = n > 0 ? n : Infinity;
-    this.stats = { calls: { comic: 0, judge: 0 }, ms: { comic: 0, judge: 0 }, rateLimits: 0, backoffMs: 0, minSlots: this.limit };
+    this.reserve = Math.max(0, Math.min(opts.judge ?? 0, Number.isFinite(this.base) ? this.base - 1 : 0));
+    this.drawLimit = opts.draw && opts.draw > 0 ? opts.draw : Infinity;
+    this.stats = { calls: zero(), ms: zero(), waitMs: zero(), rateLimits: 0, backoffMs: 0, minSlots: this.limit };
     this.pump();
   }
 
@@ -46,17 +63,39 @@ class Gate {
     return this.limit;
   }
 
+  get judgeSlots() {
+    return this.reserve;
+  }
+
+  get drawSlots() {
+    return this.drawLimit;
+  }
+
+  /** Text calls running. */
   get running() {
-    return this.active;
+    return this.active.comic + this.active.judge;
+  }
+
+  get drawing() {
+    return this.active.draw;
   }
 
   private pump() {
     if (this.limit < this.base && Date.now() - this.lastLimit > this.recoverMs) this.limit = this.base;
-    while (this.active < this.limit) {
-      const next = this.queues.comic.shift() ?? this.queues.judge.shift();
+    while (this.active.draw < this.drawLimit && this.queues.draw.length) {
+      this.active.draw++;
+      this.queues.draw.shift()!();
+    }
+    for (;;) {
+      const text = this.running;
+      if (text >= this.limit) return;
+      // Comic work first, but never into the slots kept for judging while judging waits.
+      const reserveFree = Math.min(this.reserve, Math.max(0, this.limit - 1));
+      const comicRoom = this.queues.judge.length ? text < this.limit - reserveFree : true;
+      const next: TextLane | undefined = this.queues.comic.length && comicRoom ? 'comic' : this.queues.judge.length ? 'judge' : undefined;
       if (!next) return;
-      this.active++;
-      next();
+      this.active[next]++;
+      this.queues[next].shift()!();
     }
   }
 
@@ -67,12 +106,12 @@ class Gate {
     });
   }
 
-  release() {
-    this.active--;
+  release(l: Lane) {
+    this.active[l]--;
     this.pump();
   }
 
-  /** Codex is rate-limiting: run a third fewer calls for a while. */
+  /** Codex is rate-limiting: run a third fewer text calls for a while. */
   limited() {
     this.stats.rateLimits++;
     this.lastLimit = Date.now();
@@ -80,23 +119,25 @@ class Gate {
     this.stats.minSlots = Math.min(this.stats.minSlots, this.limit);
   }
 
-  record(l: Lane, ms: number) {
+  record(l: Lane, ms: number, waitMs: number) {
     this.stats.calls[l]++;
     this.stats.ms[l] += ms;
+    this.stats.waitMs[l] += waitMs;
   }
 }
 
 export const gate = new Gate();
 
-/** Holds one slot on the current lane while fn runs. */
+/** Holds one slot on the current lane (or the one given) while fn runs. */
 export async function withSlot<T>(fn: () => Promise<T>, l: Lane = currentLane()): Promise<T> {
+  const asked = performance.now();
   await gate.acquire(l);
   const started = performance.now();
   try {
     return await fn();
   } finally {
-    gate.record(l, performance.now() - started);
-    gate.release();
+    gate.record(l, performance.now() - started, started - asked);
+    gate.release(l);
   }
 }
 

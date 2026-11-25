@@ -208,6 +208,8 @@ export function arenaComics(round: string): ArenaComic[] {
       const art = join(root, c, n, 'art');
       const page = existsSync(art) ? readdirSync(art).find((f) => /^page\.(png|jpe?g|webp)$/.test(f)) : undefined;
       if (!page) continue;
+      // A comic the misread review gated is never ranked.
+      if (readJson(join(art, 'misread.json'))?.concern === true) continue;
       const blind = readJson(join(root, c, n, 'judge', 'blind.json'));
       const judgment = readJson(join(round, 'judgments', c, `${n}.json`));
       const respect = typeof judgment?.gates?.respect === 'boolean' && blind?.respect?.pass === judgment.gates.respect && typeof blind.respect.reason === 'string' && blind.respect.reason.trim()
@@ -235,16 +237,19 @@ export async function judgePair(o: { dir: string; a: ArenaComic; b: ArenaComic; 
     prompt: o.prompt,
     images: [o.a.image, o.b.image].map((path) => sha256(readFileSync(path))),
   }));
-  for (const order of ['ab', 'ba'] as const) {
-    const file = join(o.dir, `${order}-${cacheKey.slice(0, 16)}.json`);
-    out[order] = readJson(file);
-    if (out[order]) continue;
-    const [first, second] = order === 'ab' ? [o.a, o.b] : [o.b, o.a];
-    const r = await codexExec({ prompt: o.prompt, cwd: o.dir, images: [first.image, second.image], schema: ARENA_SCHEMA, logDir: join(o.dir, order), model: o.model, timeoutMs: 20 * 60_000 });
-    if (!r.ok) throw new Error(`${order}: ${r.error}`);
-    out[order] = r.json;
-    writeFileSync(file, JSON.stringify(r.json, null, 2) + '\n');
-  }
+  // The two orders are independent judgments: run them at the same time.
+  await Promise.all(
+    (['ab', 'ba'] as const).map(async (order) => {
+      const file = join(o.dir, `${order}-${cacheKey.slice(0, 16)}.json`);
+      out[order] = readJson(file);
+      if (out[order]) return;
+      const [first, second] = order === 'ab' ? [o.a, o.b] : [o.b, o.a];
+      const r = await codexExec({ prompt: o.prompt, cwd: o.dir, images: [first.image, second.image], schema: ARENA_SCHEMA, logDir: join(o.dir, order), model: o.model, timeoutMs: 20 * 60_000 });
+      if (!r.ok) throw new Error(`${order}: ${r.error}`);
+      out[order] = r.json;
+      writeFileSync(file, JSON.stringify(r.json, null, 2) + '\n');
+    }),
+  );
   return out;
 }
 
@@ -346,15 +351,17 @@ async function arenaImpl(o: ArenaOpts) {
     const dir = join(out, 'pairs', c, `${a.id.split('#')[1]}-vs-${b.id.split('#')[1]}`);
     mkdirSync(dir, { recursive: true });
     try {
-      const j = await judgePair({ dir, a, b, prompt, model });
+      // The second judge runs alongside the first.
+      const twice = second.has(`${a.id}|${b.id}`);
+      const dir2 = join(dir, 'judge-2');
+      if (twice) mkdirSync(dir2, { recursive: true });
+      const [j, j2] = await Promise.all([
+        judgePair({ dir, a, b, prompt, model }),
+        twice ? judgePair({ dir: dir2, a, b, prompt, model: o.model2 }) : Promise.resolve(undefined),
+      ]);
       const r = pairResult(c, a, b, j.ab, j.ba);
       results.push(r);
-      if (second.has(`${a.id}|${b.id}`)) {
-        const dir2 = join(dir, 'judge-2');
-        mkdirSync(dir2, { recursive: true });
-        const j2 = await judgePair({ dir: dir2, a, b, prompt, model: o.model2 });
-        secondResults.push({ primary: r, second: { ...pairResult(c, a, b, j2.ab, j2.ba), judge: o.model2 } });
-      }
+      if (j2) secondResults.push({ primary: r, second: { ...pairResult(c, a, b, j2.ab, j2.ba), judge: o.model2 } });
       const result = r.respect!.overall;
       console.log(`${c} ${a.id.split('#')[1]} vs ${b.id.split('#')[1]}: overall ${result === -1 ? nameB : result === 1 ? nameA : result === 0 ? 'tie' : r.respect!.status}`);
     } catch (e) {

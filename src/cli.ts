@@ -64,6 +64,8 @@ export function writePacket(
     castOffer?: GenreOption['castOffer'];
     /** A required diverse archetype, for a genre without a cast offer. */
     requiredCast?: GenreOption['requiredCast'];
+    /** The whole option as the Tracetoon under test builds it (round 11 on); overrides the fields above. */
+    option?: Partial<GenreOption>;
     /** Memes offered and the assigned style, when the Tracetoon under test has them. */
     memeOffer?: GenreOption['memeOffer'];
     assignedStyle?: string;
@@ -83,6 +85,7 @@ export function writePacket(
         ...(opts.memeOffer?.length ? { memeOffer: opts.memeOffer } : {}),
         ...(opts.assignedStyle ? { assignedStyle: opts.assignedStyle } : {}),
         ...(opts.requiredCast ? { requiredCast: opts.requiredCast } : {}),
+        ...(opts.option ?? {}),
       },
     ],
     ...(opts.recentComics ? { recentComics: opts.recentComics } : {}),
@@ -348,16 +351,21 @@ if (import.meta.main) {
       console.log(`  Nemesis on page: ${coverage(s.castRoles.nemesisOnPage)}; party member lands the punchline: ${coverage(s.castRoles.partyPunchline)}`);
       if (s.memes.offered || s.memes.onPage.observed) console.log(`  Memes: ${s.memes.offered} offered, ${s.memes.scripted} scripted (${s.memes.outsideOffer} outside the offer, ${s.memes.repeats} repeats), ${coverage(s.memes.onPage)} on the page`);
       console.log(`  Backgrounds by panel focus: ${coverage(s.backgroundFocus)}`);
+      const L = s.leads;
+      console.log(`  Main character: ${coverage(L.mainCharacter)} with a clear lead; assigned lead is the protagonist ${coverage(L.leadMatches)}; lead in at least half the panels ${L.leadPanelShare.atLeastHalf}/${L.leadPanelShare.comics}; axes ${Object.entries(L.axes).map(([k, v]) => `${k} ${v}`).join(', ') || 'n/a'}`);
+      if (s.misread.reviewed) console.log(`  Misread review: ${s.misread.reviewed} reviewed, ${s.misread.redrawn} redrawn (${s.misread.redraws} redraws), ${s.misread.gated} gated`);
       console.log(`  Genre cast: ${coverage(s.genreCast.offGenre)} comics with an off-genre character, ${coverage(s.genreCast.stylingTells)} with a styling tell; required archetype on the page ${coverage(s.genreCast.requiredOnPage)} of ${s.genreCast.required}`);
       for (const c of s.genreCast.offGenreCharacters.slice(0, 12)) console.log(`    off-genre: ${c}`);
       if (s.cast) console.log(`  Cast offers: ${s.cast.withPersonas}/${s.cast.comics} scripts list personas, ${s.cast.distinctUsed} distinct used, largest ${pct(s.cast.topShare ?? NaN)}, ${s.cast.outsideOffer} outside the offer; side-only ${s.cast.sideOnlyKept}/${s.cast.sideOnly} kept to side characters`);
     } else if (cmd === 'campaign') {
       const specFile = positional[0];
-      if (!specFile) throw new Error('usage: comicbench campaign <spec.json> [--slots 12] [--canary 4] [--keep-awake off]');
+      if (!specFile) throw new Error('usage: comicbench campaign <spec.json> [--slots 24] [--judge-slots 12] [--draw-slots 24] [--canary 3] [--keep-awake off]');
       const { runCampaign } = await import('./campaign.ts');
       const r = await runCampaign({
         spec: JSON.parse(readFileSync(resolve(specFile), 'utf8')),
         ...(flags.get('slots')?.[0] ? { slots: Number(flags.get('slots')![0]) } : {}),
+        ...(flags.get('judge-slots')?.[0] ? { judgeSlots: Number(flags.get('judge-slots')![0]) } : {}),
+        ...(flags.get('draw-slots')?.[0] ? { drawSlots: Number(flags.get('draw-slots')![0]) } : {}),
         ...(flags.get('canary')?.[0] ? { canary: Number(flags.get('canary')![0]) } : {}),
         ...(flags.get('keep-awake')?.[0] === 'off' ? { keepAwake: false } : {}),
       });

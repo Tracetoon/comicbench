@@ -40,9 +40,38 @@ test('the gate never runs more than its slots, and comic work goes before judgin
   await Promise.all([...first, ...queued]);
   expect(peak).toBe(2);
   expect(order.slice(2, 4).sort()).toEqual(['c0', 'c1']);
-  expect(gate.stats.calls).toEqual({ comic: 2, judge: 4 });
+  expect(gate.stats.calls).toEqual({ comic: 2, judge: 4, draw: 0 });
   // The lane travels with async work.
   expect(await inLane('comic', async () => (await import('../src/gate.ts')).currentLane())).toBe('comic');
+  gate.setSlots(0);
+});
+
+test('renders never take a text slot, and judging keeps its reserved slots while comic work queues', async () => {
+  gate.setSlots(4, { judge: 2, draw: 3 });
+  const hold: (() => void)[] = [];
+  const blocker = () => new Promise<void>((r) => hold.push(r));
+  // Three renders run alongside text work without using its slots.
+  const draws = [0, 1, 2].map(() => withSlot(blocker, 'draw'));
+  await new Promise((r) => setTimeout(r, 5));
+  expect(gate.drawing).toBe(3);
+  expect(gate.running).toBe(0);
+  // Comic work fills what judging doesn't need, but two slots stay free while judging waits.
+  const comics = [0, 1, 2, 3].map(() => withSlot(blocker, 'comic'));
+  await new Promise((r) => setTimeout(r, 5));
+  expect(gate.running).toBe(4);
+  const judges = [0, 1].map(() => withSlot(blocker, 'judge'));
+  hold.splice(0).forEach((r) => r());
+  await new Promise((r) => setTimeout(r, 5));
+  // After releases, the waiting judge work gets in ahead of further comic work.
+  const more = [0, 1].map(() => withSlot(blocker, 'comic'));
+  await new Promise((r) => setTimeout(r, 5));
+  expect(gate.running).toBeLessThanOrEqual(4);
+  for (let i = 0; i < 10 && hold.length; i++) {
+    hold.splice(0).forEach((r) => r());
+    await new Promise((r) => setTimeout(r, 5));
+  }
+  await Promise.all([...draws, ...comics, ...judges, ...more]);
+  expect(gate.stats.calls).toEqual({ comic: 6, judge: 2, draw: 3 });
   gate.setSlots(0);
 });
 

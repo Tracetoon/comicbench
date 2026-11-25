@@ -19,6 +19,8 @@ import { comparableRounds } from './manifest.ts';
 import { clusteredBootstrapCI, mean } from './stats.ts';
 
 export const ARENA_VERSION = 3;
+/** Each arena call's limit before its one retry (round 13 on). */
+export const ARENA_TIMEOUT_MS = 10 * 60_000;
 
 export const ARENA_CRITERIA = [
   { id: 'funnier', question: 'Which comic is funnier to a software developer who is also a veteran genre fan: a better joke, better timing, a punchline that lands harder? A genre meme or famous-scene allusion that fits the PR is a strength, not a stale joke.' },
@@ -244,7 +246,11 @@ export async function judgePair(o: { dir: string; a: ArenaComic; b: ArenaComic; 
       out[order] = readJson(file);
       if (out[order]) return;
       const [first, second] = order === 'ab' ? [o.a, o.b] : [o.b, o.a];
-      const r = await codexExec({ prompt: o.prompt, cwd: o.dir, images: [first.image, second.image], schema: ARENA_SCHEMA, logDir: join(o.dir, order), model: o.model, timeoutMs: 20 * 60_000 });
+      // A hung call is cut at 10 minutes and tried once more (round 12 lost 40 minutes to
+      // six 20-minute timeouts); a rate limit is left to the gate's backoff.
+      const call = () => codexExec({ prompt: o.prompt, cwd: o.dir, images: [first.image, second.image], schema: ARENA_SCHEMA, logDir: join(o.dir, order), model: o.model, timeoutMs: ARENA_TIMEOUT_MS });
+      let r = await call();
+      if (!r.ok && !r.limited) r = await call();
       if (!r.ok) throw new Error(`${order}: ${r.error}`);
       out[order] = r.json;
       writeFileSync(file, JSON.stringify(r.json, null, 2) + '\n');

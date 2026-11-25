@@ -461,11 +461,41 @@ export function castSummary(items: { offer?: CastOfferLike; script?: any }[]) {
   };
 }
 
+/** An isekai scene offered to a comic (Tracetoon's isekai/memeMatch.ts IsekaiSceneOffer). */
+export interface SceneLike {
+  id: string;
+  family: string;
+  tier: number;
+  withLead: boolean;
+}
+
 /** Memes: offered, scripted (the script's \`meme\`), seen on the page, and repeats within the round. */
-export function memeSummary(items: { checklist: Checklist; script?: any; offers?: string[] }[]) {
+export function memeSummary(items: { checklist: Checklist; script?: any; offers?: string[]; scenes?: SceneLike[] }[]) {
   const scripted = items.map((i) => (typeof i.script?.meme === 'string' && i.script.meme ? i.script.meme : undefined));
   const used = scripted.filter((m): m is string => !!m);
+  // Isekai scene offers (round 13 on): which scene each comic was built on.
+  const withScenes = items.filter((i) => i.scenes?.length);
+  const chosen = items.flatMap((i, k) => {
+    const s = i.scenes?.find((x) => x.id === scripted[k]);
+    return s ? [s] : [];
+  });
+  const tiers = (list: SceneLike[]) => Object.fromEntries([1, 2, 3].map((t) => [t, list.filter((s) => s.tier === t).length]));
   return {
+    ...(withScenes.length
+      ? {
+          scenes: {
+            offered: withScenes.length,
+            offerHasLeadScene: withScenes.filter((i) => i.scenes!.some((s) => s.withLead)).length,
+            used: chosen.length,
+            usedWithLead: chosen.filter((s) => s.withLead).length,
+            distinct: new Set(chosen.map((s) => s.id)).size,
+            families: new Set(chosen.map((s) => s.family)).size,
+            familyCounts: Object.fromEntries([...new Set(chosen.map((s) => s.family))].map((f) => [f, chosen.filter((s) => s.family === f).length])),
+            tiersOffered: tiers(withScenes.flatMap((i) => i.scenes!)),
+            tiersUsed: tiers(chosen),
+          },
+        }
+      : {}),
     offered: items.filter((i) => i.offers?.length).length,
     scripted: used.length,
     outsideOffer: items.filter((i, k) => scripted[k] && i.offers && !i.offers.includes(scripted[k]!)).length,
@@ -475,7 +505,7 @@ export function memeSummary(items: { checklist: Checklist; script?: any; offers?
   };
 }
 
-export function summarize(items: { id: string; checklist: Checklist; script?: any; offer?: CastOfferLike; offers?: string[]; required?: string; addon?: Addon; misread?: { reviews: unknown[]; redraws: number; concern: boolean }; leadAxis?: string; preset?: string; lint?: string[] }[], order: string[] = items.map(({ id }) => id)) {
+export function summarize(items: { id: string; checklist: Checklist; script?: any; offer?: CastOfferLike; offers?: string[]; scenes?: SceneLike[]; required?: string; addon?: Addon; misread?: { reviews: unknown[]; redraws: number; concern: boolean }; leadAxis?: string; preset?: string; lint?: string[] }[], order: string[] = items.map(({ id }) => id)) {
   const n = items.length;
   const share = (f: (c: Checklist) => boolean) => (n ? items.filter((i) => f(i.checklist)).length / n : NaN);
   const dist = (key: 'setting' | 'punchline') => {
@@ -706,15 +736,16 @@ async function checklistImpl(o: { round: string; model?: string; jobs?: number; 
     const script = existsSync(join(j.dir, 'packet', 'comic.json')) ? JSON.parse(readFileSync(join(j.dir, 'packet', 'comic.json'), 'utf8')) : undefined;
     const context = existsSync(join(j.dir, 'packet', 'context.json')) ? JSON.parse(readFileSync(join(j.dir, 'packet', 'context.json'), 'utf8')) : undefined;
     const offer = context?.genreOptions?.[0]?.castOffer as CastOfferLike | undefined;
-    const offers = (context?.genreOptions?.[0]?.memeOffer as { id: string }[] | undefined)?.map((m) => m.id);
     const option = context?.genreOptions?.[0];
+    const scenes = option?.sceneOffer as SceneLike[] | undefined;
+    const offers = ((option?.memeOffer ?? scenes) as { id: string }[] | undefined)?.map((m) => m.id);
     const addon = readJson(join(j.dir, 'checklist-addon.json'))?.addon as Addon | undefined;
     const misread = readJson(join(j.dir, 'art', 'misread.json')) as { reviews: unknown[]; redraws: number; concern: boolean } | undefined;
     const leadAxis = (option?.lead ?? option?.castOffer?.personas?.find((p: { lead?: boolean }) => p.lead))?.role as string | undefined;
     const isekai = option?.isekaiCast as { preset: { id: string }; lead: { archetype: string } } | undefined;
     const lint = readJson(join(j.dir, 'art', 'prompt-lint.json')) as string[] | undefined;
     const required = (option?.requiredCast ?? option?.castOffer?.personas?.find((p: { required?: boolean }) => p.required))?.id as string | undefined;
-    return [{ id: j.id, checklist: JSON.parse(readFileSync(f, 'utf8')) as Checklist, script, ...(offer ? { offer } : {}), ...(offers ? { offers } : {}), ...(required ? { required } : {}), ...(addon ? { addon } : {}), ...(misread ? { misread } : {}), ...(leadAxis ? { leadAxis } : {}), ...(isekai ? { preset: isekai.preset.id } : {}), ...(lint ? { lint } : {}) }];
+    return [{ id: j.id, checklist: JSON.parse(readFileSync(f, 'utf8')) as Checklist, script, ...(offer ? { offer } : {}), ...(offers ? { offers } : {}), ...(scenes ? { scenes } : {}), ...(required ? { required } : {}), ...(addon ? { addon } : {}), ...(misread ? { misread } : {}), ...(leadAxis ? { leadAxis } : {}), ...(isekai ? { preset: isekai.preset.id } : {}), ...(lint ? { lint } : {}) }];
   });
   const summary = { checklistVersion: CHECKLIST_VERSION, rubricVersion: RUBRIC_VERSION, model, round: basename(o.round), planned: order.length, ...summarize(items, order), errors };
   writeFileSync(join(o.round, 'checklist.json'), JSON.stringify(summary, null, 2) + '\n');

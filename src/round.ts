@@ -161,12 +161,14 @@ export async function tracetoonModules(root: string) {
   // required archetype, memes, assigned style), so the bench can't drift from production.
   const optionFor =
     casting?.leadPick && genreFile
-      ? (genrePath: string, seed: string, recentMemes: string[], recentLeads: string[], recentPresets: string[] = []): Partial<GenreOption> => {
+      ? (genrePath: string, seed: string, recentMemes: string[], recentLeads: string[], recentPresets: string[] = [], description = ''): Partial<GenreOption> => {
           const g = genreFile.parseGenreFile(readFileSync(genrePath, 'utf8')).genre;
           if (!g) return {};
-          const opt = genres.genreOptions([], { pinned: g.id, catalog: [g], seed, recentMemes, recentLeads, recentPresets })[0] ?? {};
-          const { castOffer, memeOffer, assignedStyle, requiredCast, lead, archetypes, isekaiCast } = opt as GenreOption;
-          return { ...(castOffer ? { castOffer, archetypes } : {}), ...(memeOffer ? { memeOffer } : {}), ...(assignedStyle ? { assignedStyle } : {}), ...(requiredCast ? { requiredCast } : {}), ...(lead ? { lead } : {}), ...(isekaiCast ? { isekaiCast } : {}) };
+          let opt = genres.genreOptions([], { pinned: g.id, catalog: [g], seed, recentMemes, recentLeads, recentPresets })[0] ?? {};
+          // Round 13 on: an isekai cast's scenes are matched to the PR, as at production's packet step.
+          if (genres.withSceneOffers) opt = genres.withSceneOffers([opt], { description }, recentMemes)[0] ?? opt;
+          const { castOffer, memeOffer, assignedStyle, requiredCast, lead, archetypes, isekaiCast, sceneOffer } = opt as GenreOption;
+          return { ...(castOffer ? { castOffer, archetypes } : {}), ...(memeOffer ? { memeOffer } : {}), ...(assignedStyle ? { assignedStyle } : {}), ...(requiredCast ? { requiredCast } : {}), ...(lead ? { lead } : {}), ...(isekaiCast ? { isekaiCast } : {}), ...(sceneOffer ? { sceneOffer } : {}) };
         }
       : undefined;
   // The misread review (round 11 on): what a finished image could look like at a glance.
@@ -314,6 +316,7 @@ async function oneComic(c: Case, sample: number, o: RoundOpts, tt: Tt, genreText
               seen.flatMap((r) => (typeof r.summary.meme === 'string' ? [r.summary.meme] : [])),
               seen.flatMap((r) => (typeof r.summary.lead === 'string' ? [r.summary.lead] : [])),
               seen.flatMap((r) => (typeof r.summary.castPreset === 'string' ? [r.summary.castPreset] : [])),
+              readFileSync(join(c.dir, 'description.md'), 'utf8'),
             ),
           };
         const cast = tt.castOffer?.(o.genre, seed);

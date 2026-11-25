@@ -37,6 +37,8 @@ export interface CodexResult {
   model?: string;
   /** The sandbox Codex reported it actually used (it can differ from the one asked for). */
   sandbox?: string;
+  /** A failed call's own stderr says it was rate-limited. */
+  limited?: boolean;
 }
 
 /** The codex command; COMICBENCH_CODEX_BIN overrides it (a .ts stand-in runs under Bun, for tests). */

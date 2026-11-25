@@ -151,6 +151,8 @@ function armData(round: string, out: string) {
         arm,
         case: cid,
         sample: Number(n),
+        imagePrompt: existsSync(join(dir, 'art', 'prompt.txt')) ? readFileSync(join(dir, 'art', 'prompt.txt'), 'utf8').slice(0, 20000) : null,
+        misread: existsSync(join(dir, 'art', 'misread.json')) ? JSON.parse(readFileSync(join(dir, 'art', 'misread.json'), 'utf8')) : null,
         status,
         total: judgment ? comicScore(judgment) : null,
         gates: judgment?.gates ?? null,
@@ -611,6 +613,10 @@ dialog::backdrop { background: rgba(20,19,15,.7) }
       '<div class="crit">' + crit + '</div>' +
       (gateReasons ? '<details open><summary>Gate reasons</summary><ul class="tight">' + gateReasons + '</ul></details>' : '') +
       phone + author +
+      (x.imagePrompt ? '<details><summary>Image prompt (exactly what the image model was sent)</summary><pre>' + esc(x.imagePrompt) + '</pre></details>' : '') +
+      (x.misread ? '<details><summary>Misread review (' + (x.misread.concern ? 'concern' : 'clear') + ', ' + x.misread.redraws + ' redraw' + (x.misread.redraws === 1 ? '' : 's') + ')</summary><ul class="tight">' +
+        (x.misread.reviews || []).flatMap((r, i) => (r.items || []).map((it) => '<li><b>Review ' + (i + 1) + ', panel ' + esc(it.panel) + ' (' + esc(it.likelihood || 'likely') + '):</b> ' + esc(it.what) + ' could read as ' + esc(it.couldReadAs) + '</li>')).join('') +
+        ((x.misread.reviews || []).every((r) => !(r.items || []).length) ? '<li>Nothing could be misread.</li>' : '') + '</ul></details>' : '') +
       '<div class="notes"><label for="note-' + esc(x.key) + '"><b>Your note</b> <span class="legend">what the judges got wrong, or what the comic needs</span></label><textarea id="note-' + esc(x.key) + '" data-note="' + esc(x.key) + '">' + esc(n.text || '') + '</textarea></div>' +
       '</article>';
   }

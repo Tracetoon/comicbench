@@ -1,0 +1,19 @@
+{
+  "name": "r12",
+  "cases": "cases-local",
+  "split": "dev",
+  "samples": 2,
+  "arms": [
+    { "name": "r12-anime", "label": "Anime fantasy cast from the isekai archetype guide (106 archetypes, 12 presets, fresh cast per comic) + one definitive image prompt + misread review", "genre": "genres/anime-isekai.md", "skill": ".comicbench-cache/skills/r12", "tracetoon": ".comicbench-cache/tracetoon-r12", "jobs": 12 }
+  ],
+  "references": [
+    { "round": "results/r11-anime", "label": "Anime fantasy + leads + misread review (round 11)" }
+  ],
+  "arenas": [["r11-anime", "r12-anime"]],
+  "secondJudge": { "model": "gpt-6.2-astra", "share": 0.3 },
+  "canary": 3,
+  "slots": 24,
+  "judgeSlots": 12,
+  "drawSlots": 24,
+  "reviewTracetoon": ".comicbench-cache/tracetoon-bench"
+}

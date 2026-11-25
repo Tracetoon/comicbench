@@ -353,6 +353,8 @@ if (import.meta.main) {
       console.log(`  Backgrounds by panel focus: ${coverage(s.backgroundFocus)}`);
       const L = s.leads;
       console.log(`  Main character: ${coverage(L.mainCharacter)} with a clear lead; assigned lead is the protagonist ${coverage(L.leadMatches)}; lead in at least half the panels ${L.leadPanelShare.atLeastHalf}/${L.leadPanelShare.comics}; axes ${Object.entries(L.axes).map(([k, v]) => `${k} ${v}`).join(', ') || 'n/a'}`);
+      if (s.isekai) console.log(`  Isekai cast: ${s.isekai.comics} comics; archetype reads ${s.isekai.archetypeRead.observed}/${s.isekai.archetypeRead.assessed} on-page characters; cast distinct ${coverage(s.isekai.castDistinct)}; place on page ${coverage(s.isekai.placeOnPage)}; ${s.isekai.distinctArchetypes} distinct archetypes over ${s.isekai.onPage} on the page; presets ${Object.entries(s.isekai.presets).map(([k, v]) => `${k} ${v}`).join(', ')}`);
+      if (s.promptLint.comics) console.log(`  Prompt lint: ${s.promptLint.withHits}/${s.promptLint.comics} prompts with an open choice${s.promptLint.hits.length ? `: ${s.promptLint.hits.slice(0, 3).join(' | ')}` : ''}`);
       if (s.misread.reviewed) console.log(`  Misread review: ${s.misread.reviewed} reviewed, ${s.misread.redrawn} redrawn (${s.misread.redraws} redraws), ${s.misread.gated} gated`);
       console.log(`  Genre cast: ${coverage(s.genreCast.offGenre)} comics with an off-genre character, ${coverage(s.genreCast.stylingTells)} with a styling tell; required archetype on the page ${coverage(s.genreCast.requiredOnPage)} of ${s.genreCast.required}`);
       for (const c of s.genreCast.offGenreCharacters.slice(0, 12)) console.log(`    off-genre: ${c}`);

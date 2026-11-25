@@ -1,0 +1,442 @@
+{
+  "method": "Seeded rule audit plus independent cast-shape fixtures. Catalog-level abilities and declared relationships are checked; no audience recognition, visual readability, source popularity, or narrative quality is measured.",
+  "seeds_per_preset": 100,
+  "preset_count": 12,
+  "requested_total": 1200,
+  "unique_archetype_rosters_total": 965,
+  "roster_definition": "Sorted narrative-role and archetype-ID combinations; different seeds, ordering, or world contacts alone do not make a new roster.",
+  "presets": {
+    "standard_adventure": {
+      "requested": 100,
+      "generated": 100,
+      "unique_archetype_rosters": 100,
+      "hard_invalid": 0,
+      "policy_invalid": 0,
+      "generation_failures": []
+    },
+    "disaster_comedy": {
+      "requested": 100,
+      "generated": 100,
+      "unique_archetype_rosters": 97,
+      "hard_invalid": 0,
+      "policy_invalid": 0,
+      "generation_failures": []
+    },
+    "harem_adventure": {
+      "requested": 100,
+      "generated": 100,
+      "unique_archetype_rosters": 100,
+      "hard_invalid": 0,
+      "policy_invalid": 0,
+      "generation_failures": []
+    },
+    "survival": {
+      "requested": 100,
+      "generated": 100,
+      "unique_archetype_rosters": 93,
+      "hard_invalid": 0,
+      "policy_invalid": 0,
+      "generation_failures": []
+    },
+    "cozy_familiars": {
+      "requested": 100,
+      "generated": 100,
+      "unique_archetype_rosters": 59,
+      "hard_invalid": 0,
+      "policy_invalid": 0,
+      "generation_failures": []
+    },
+    "object_duo": {
+      "requested": 100,
+      "generated": 100,
+      "unique_archetype_rosters": 16,
+      "hard_invalid": 0,
+      "policy_invalid": 0,
+      "generation_failures": []
+    },
+    "court_otome": {
+      "requested": 100,
+      "generated": 100,
+      "unique_archetype_rosters": 98,
+      "hard_invalid": 0,
+      "policy_invalid": 0,
+      "generation_failures": []
+    },
+    "monster_court": {
+      "requested": 100,
+      "generated": 100,
+      "unique_archetype_rosters": 100,
+      "hard_invalid": 0,
+      "policy_invalid": 0,
+      "generation_failures": []
+    },
+    "professional": {
+      "requested": 100,
+      "generated": 100,
+      "unique_archetype_rosters": 98,
+      "hard_invalid": 0,
+      "policy_invalid": 0,
+      "generation_failures": []
+    },
+    "military": {
+      "requested": 100,
+      "generated": 100,
+      "unique_archetype_rosters": 9,
+      "hard_invalid": 0,
+      "policy_invalid": 0,
+      "generation_failures": []
+    },
+    "cozy_household": {
+      "requested": 100,
+      "generated": 100,
+      "unique_archetype_rosters": 98,
+      "hard_invalid": 0,
+      "policy_invalid": 0,
+      "generation_failures": []
+    },
+    "guild_ensemble": {
+      "requested": 100,
+      "generated": 100,
+      "unique_archetype_rosters": 97,
+      "hard_invalid": 0,
+      "policy_invalid": 0,
+      "generation_failures": []
+    }
+  },
+  "fixture_checks": [
+    {
+      "name": "Recognizable dysfunctional quartet",
+      "passed": true,
+      "expected_valid": true,
+      "observed_valid": true,
+      "expected_rule": null,
+      "observed_rules": []
+    },
+    {
+      "name": "Shield and offensive partner",
+      "passed": true,
+      "expected_valid": true,
+      "observed_valid": true,
+      "expected_rule": null,
+      "observed_rules": []
+    },
+    {
+      "name": "Weapon guardian and willing child wielder",
+      "passed": true,
+      "expected_valid": true,
+      "observed_valid": true,
+      "expected_rule": null,
+      "observed_rules": []
+    },
+    {
+      "name": "Vending machine and strong carrier",
+      "passed": true,
+      "expected_valid": true,
+      "observed_valid": true,
+      "expected_rule": null,
+      "observed_rules": []
+    },
+    {
+      "name": "Cook with large and small familiars",
+      "passed": true,
+      "expected_valid": true,
+      "observed_valid": true,
+      "expected_rule": null,
+      "observed_rules": []
+    },
+    {
+      "name": "Solo spider opening",
+      "passed": true,
+      "expected_valid": true,
+      "observed_valid": true,
+      "expected_rule": null,
+      "observed_rules": []
+    },
+    {
+      "name": "Two unbundled protagonists",
+      "passed": true,
+      "expected_valid": false,
+      "observed_valid": false,
+      "expected_rule": "main_count",
+      "observed_rules": [
+        "main_count",
+        "novelty_budget"
+      ]
+    },
+    {
+      "name": "Two elf profiles without exception",
+      "passed": true,
+      "expected_valid": false,
+      "observed_valid": false,
+      "expected_rule": "elf_cap",
+      "observed_rules": [
+        "repeated_signature",
+        "elf_cap"
+      ]
+    },
+    {
+      "name": "Repeated identical elf profile",
+      "passed": true,
+      "expected_valid": false,
+      "observed_valid": false,
+      "expected_rule": "repeated_archetype",
+      "observed_rules": [
+        "repeated_archetype",
+        "repeated_signature",
+        "elf_cap"
+      ]
+    },
+    {
+      "name": "Immobile machine without transport",
+      "passed": true,
+      "expected_valid": false,
+      "observed_valid": false,
+      "expected_rule": "mobility",
+      "observed_rules": [
+        "mobility"
+      ]
+    },
+    {
+      "name": "Shield with no attacking companion",
+      "passed": true,
+      "expected_valid": false,
+      "observed_valid": false,
+      "expected_rule": "attack_dependency",
+      "observed_rules": [
+        "attack_dependency"
+      ]
+    },
+    {
+      "name": "Romance assigned to a child",
+      "passed": true,
+      "expected_valid": false,
+      "observed_valid": false,
+      "expected_rule": "romance_age",
+      "observed_rules": [
+        "romance_age",
+        "romance_catalog"
+      ]
+    },
+    {
+      "name": "Romance assigned to a familiar",
+      "passed": true,
+      "expected_valid": false,
+      "observed_valid": false,
+      "expected_rule": "romance_relationship",
+      "observed_rules": [
+        "romance_relationship",
+        "romance_catalog"
+      ]
+    },
+    {
+      "name": "Unrelated added time mechanism",
+      "passed": true,
+      "expected_valid": false,
+      "observed_valid": false,
+      "expected_rule": "novelty_budget",
+      "observed_rules": [
+        "novelty_budget"
+      ]
+    },
+    {
+      "name": "Documented two-elf travel exception",
+      "passed": true,
+      "expected_valid": true,
+      "observed_valid": true,
+      "expected_rule": null,
+      "observed_rules": []
+    },
+    {
+      "name": "Fixed-location vending service",
+      "passed": true,
+      "expected_valid": true,
+      "observed_valid": true,
+      "expected_rule": null,
+      "observed_rules": []
+    },
+    {
+      "name": "Weapon with no willing wielder",
+      "passed": true,
+      "expected_valid": false,
+      "observed_valid": false,
+      "expected_rule": "wielder",
+      "observed_rules": [
+        "wielder"
+      ]
+    },
+    {
+      "name": "Explicitly bundled co-leads with shared premise",
+      "passed": true,
+      "expected_valid": true,
+      "observed_valid": true,
+      "expected_rule": null,
+      "observed_rules": []
+    }
+  ],
+  "source_reference_shape_checks": [
+    {
+      "series": "KonoSuba",
+      "scope": "traveling_party",
+      "source_characters": [
+        "Kazuma",
+        "Aqua",
+        "Megumin",
+        "Darkness"
+      ],
+      "source_url": "https://konosuba.com/3rd/character/",
+      "passed": true,
+      "accepted_exceptions": [],
+      "failures": [],
+      "interpretation": "Coarse role, dependency, age-safeguard, and scope regression only. The proxy cards do not assert the sources exact personality, appearance, age, or full abilities."
+    },
+    {
+      "series": "Handyman Saitou",
+      "scope": "dungeon_party",
+      "source_characters": [
+        "Saitou",
+        "Raelza",
+        "Morlock",
+        "Lafanpan"
+      ],
+      "source_url": "https://www.aniplus-asia.com/show/handyman-saitou-in-another-world/",
+      "passed": true,
+      "accepted_exceptions": [],
+      "failures": [],
+      "interpretation": "Coarse role, dependency, age-safeguard, and scope regression only. The proxy cards do not assert the sources exact personality, appearance, age, or full abilities."
+    },
+    {
+      "series": "So Im a Spider So What",
+      "scope": "solo_opening",
+      "source_characters": [
+        "I commonly called Kumoko"
+      ],
+      "source_url": "https://kumo-anime.com/character.html",
+      "passed": true,
+      "accepted_exceptions": [],
+      "failures": [],
+      "interpretation": "Coarse role, dependency, age-safeguard, and scope regression only. The proxy cards do not assert the sources exact personality, appearance, age, or full abilities."
+    },
+    {
+      "series": "Reincarnated as a Sword",
+      "scope": "linked_duo",
+      "source_characters": [
+        "Teacher",
+        "Fran",
+        "Urushi"
+      ],
+      "source_url": "https://tenken-anime.com/",
+      "passed": true,
+      "accepted_exceptions": [],
+      "failures": [],
+      "interpretation": "Coarse role, dependency, age-safeguard, and scope regression only. The proxy cards do not assert the sources exact personality, appearance, age, or full abilities."
+    },
+    {
+      "series": "Reborn as a Vending Machine",
+      "scope": "linked_duo",
+      "source_characters": [
+        "Boxxo",
+        "Lammis"
+      ],
+      "source_url": "https://jihanki-anime.com/",
+      "passed": true,
+      "accepted_exceptions": [],
+      "failures": [],
+      "interpretation": "Coarse role, dependency, age-safeguard, and scope regression only. The proxy cards do not assert the sources exact personality, appearance, age, or full abilities."
+    },
+    {
+      "series": "Campfire Cooking",
+      "scope": "familiar_travel",
+      "source_characters": [
+        "Mukohda",
+        "Fel",
+        "Sui"
+      ],
+      "source_url": "https://tondemoskill-anime.com/character/",
+      "passed": true,
+      "accepted_exceptions": [],
+      "failures": [],
+      "interpretation": "Coarse role, dependency, age-safeguard, and scope regression only. The proxy cards do not assert the sources exact personality, appearance, age, or full abilities."
+    },
+    {
+      "series": "In the Land of Leadale",
+      "scope": "family_network",
+      "source_characters": [
+        "Cayna",
+        "Skargo",
+        "Mai-Mai",
+        "Kartatz",
+        "Kee"
+      ],
+      "source_url": "https://leadale.net/character.html",
+      "passed": true,
+      "accepted_exceptions": [],
+      "failures": [],
+      "interpretation": "Coarse role, dependency, age-safeguard, and scope regression only. The proxy cards do not assert the sources exact personality, appearance, age, or full abilities."
+    },
+    {
+      "series": "My Next Life as a Villainess",
+      "scope": "court_circle",
+      "source_characters": [
+        "Catarina",
+        "Geordo",
+        "Alan",
+        "Sophia",
+        "Maria"
+      ],
+      "source_url": "https://hamehura-anime.com/1st/character/",
+      "passed": true,
+      "accepted_exceptions": [
+        {
+          "rule": "repeated_archetype",
+          "message": "The same archetype appears more than once; describe the intended twin, rival, or cohort distinction.",
+          "accepted_exception": "Geordo and Alan are explicitly linked twins with different temperaments and activities."
+        },
+        {
+          "rule": "repeated_signature",
+          "message": "Repeated dramatic families need an intentional contrast: court_suitor.",
+          "accepted_exception": "The court ensemble intentionally contains twin princes with distinct social dynamics."
+        }
+      ],
+      "failures": [],
+      "interpretation": "Coarse role, dependency, age-safeguard, and scope regression only. The proxy cards do not assert the sources exact personality, appearance, age, or full abilities."
+    },
+    {
+      "series": "Overlord",
+      "scope": "organization",
+      "source_characters": [
+        "Ainz",
+        "Albedo",
+        "Demiurge",
+        "Cocytus",
+        "Sebas",
+        "Aura",
+        "Mare"
+      ],
+      "source_url": "https://overlord-anime.com/_season2/character/",
+      "passed": true,
+      "accepted_exceptions": [],
+      "failures": [],
+      "interpretation": "Coarse role, dependency, age-safeguard, and scope regression only. The proxy cards do not assert the sources exact personality, appearance, age, or full abilities."
+    },
+    {
+      "series": "The Saga of Tanya the Evil",
+      "scope": "military_unit",
+      "source_characters": [
+        "Tanya",
+        "Visha"
+      ],
+      "source_url": "https://youjo-senki.jp/th/",
+      "passed": true,
+      "accepted_exceptions": [],
+      "failures": [],
+      "interpretation": "Coarse role, dependency, age-safeguard, and scope regression only. The proxy cards do not assert the sources exact personality, appearance, age, or full abilities."
+    }
+  ],
+  "all_checks_passed": true,
+  "limitations": [
+    "Broad functions do not establish a complete spell or healing system; the sustain plan remains an explicit design responsibility.",
+    "Editorial caps can be deliberately overridden with a meaningful justification.",
+    "Sampling from authored preset pools demonstrates available variety, not the statistical distribution of anime casts.",
+    "The seed-zero examples are candidates for qualitative review, not proof that every generated cast is entertaining."
+  ]
+}

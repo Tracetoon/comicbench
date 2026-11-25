@@ -1,0 +1,1767 @@
+{
+  "note": "One seeded original candidate per preset; review the cast creatively before comic production.",
+  "casts": [
+    {
+      "preset": "standard_adventure",
+      "seed": 0,
+      "scope": "traveling_party",
+      "members": [
+        {
+          "archetype_id": "M06",
+          "narrative_role": "main",
+          "title": "The reincarnated child magic prodigy",
+          "present_age_group": "child",
+          "romance_enabled": false,
+          "relationship_to_main": "self",
+          "species": "human",
+          "mechanism_tags": [
+            "reincarnation"
+          ],
+          "contribution": "A person with memories of an earlier life starts over as a child and learns magic far earlier than anyone expects.",
+          "functions": [
+            "damage",
+            "utility"
+          ],
+          "character_id": "character_1"
+        },
+        {
+          "archetype_id": "P02",
+          "narrative_role": "party",
+          "title": "Sheltered and ditzy elf princess",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "companion",
+          "species": "elf",
+          "mechanism_tags": [],
+          "contribution": "Royal forest elegance paired with cheerful impracticality and a talent she misunderstands.",
+          "functions": [
+            "damage",
+            "social"
+          ],
+          "character_id": "character_2"
+        },
+        {
+          "archetype_id": "P21",
+          "narrative_role": "party",
+          "title": "Noble knight with one humiliating weakness",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "companion",
+          "species": "human",
+          "mechanism_tags": [],
+          "contribution": "A splendid armored protector whose impressive strengths coexist with one immediately exploitable flaw.",
+          "functions": [
+            "frontline"
+          ],
+          "character_id": "character_3"
+        },
+        {
+          "archetype_id": "P41",
+          "narrative_role": "party",
+          "title": "Earnest Japanese style samurai swordswoman",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "companion",
+          "species": "human",
+          "mechanism_tags": [],
+          "contribution": "A courteous traveling sword specialist brings disciplined practice and conspicuous regional customs into a mixed fantasy party.",
+          "functions": [
+            "frontline",
+            "damage"
+          ],
+          "character_id": "character_4"
+        },
+        {
+          "archetype_id": "P10",
+          "narrative_role": "party",
+          "title": "Stoic scaled spear guardian",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "companion",
+          "species": "lizardfolk",
+          "mechanism_tags": [],
+          "contribution": "The reptilian-looking professional who quietly keeps an unruly mixed-species group alive.",
+          "functions": [
+            "frontline",
+            "damage",
+            "utility"
+          ],
+          "character_id": "character_5"
+        }
+      ],
+      "overrides": {},
+      "sustain_plan": "Potions, rest, and access to a town healer; retreat remains possible.",
+      "generation_note": "Original cast sketch from archetype recipes; not a canonical series roster. Romance remains off until explicit adult relationships are designed.",
+      "world_contacts": [
+        {
+          "archetype_id": "N07",
+          "narrative_role": "world",
+          "title": "Gruff dwarf blacksmith",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "local_contact",
+          "species": "dwarf",
+          "mechanism_tags": [],
+          "contribution": "Demanding craft specialist judges heroes by how they treat equipment rather than by noble titles.",
+          "functions": [
+            "utility",
+            "support"
+          ]
+        },
+        {
+          "archetype_id": "N19",
+          "narrative_role": "world",
+          "title": "Town guard captain",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "local_contact",
+          "species": "human",
+          "mechanism_tags": [],
+          "contribution": "Responsible officer must protect normal residents while managing adventurers whose powers exceed the town's entire defense.",
+          "functions": [
+            "social",
+            "support"
+          ]
+        }
+      ],
+      "editorial_review_notes": [
+        "Choose individual names, voices, goals, and relationships before using this sketch in a comic.",
+        "Several members can stand in front: separate protection, pursuit, reach, and intimidation instead of giving them the same fight beat.",
+        "The young lead needs explicit friend, mentor, guardian, or colleague relationships; adult romance is not inferred from nearby companions."
+      ],
+      "validation": {
+        "mechanically_valid": true,
+        "passes_selected_editorial_policies": true,
+        "hard_errors": [],
+        "policy_failures": [],
+        "warnings": [],
+        "recognized_by_audience": "not_measured",
+        "coverage": {
+          "broad_functions": [
+            "damage",
+            "frontline",
+            "social",
+            "utility"
+          ],
+          "missing_functions": [],
+          "elf_count": 1,
+          "familiar_focal_units": 0,
+          "premise_mechanisms": [
+            "reincarnation"
+          ]
+        }
+      },
+      "sampling_attempts": 1
+    },
+    {
+      "preset": "disaster_comedy",
+      "seed": 0,
+      "scope": "traveling_party",
+      "members": [
+        {
+          "archetype_id": "M09",
+          "narrative_role": "main",
+          "title": "The obsessively cautious overpowered hero",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "self",
+          "species": "human",
+          "mechanism_tags": [
+            "divine_summoning"
+          ],
+          "contribution": "A hero with overwhelming potential refuses to act until every possible risk has been anticipated, rehearsed, insured against, and preferably eliminated.",
+          "functions": [
+            "damage",
+            "frontline",
+            "utility"
+          ],
+          "character_id": "character_1"
+        },
+        {
+          "archetype_id": "P02",
+          "narrative_role": "party",
+          "title": "Sheltered and ditzy elf princess",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "companion",
+          "species": "elf",
+          "mechanism_tags": [],
+          "contribution": "Royal forest elegance paired with cheerful impracticality and a talent she misunderstands.",
+          "functions": [
+            "damage",
+            "social"
+          ],
+          "character_id": "character_2"
+        },
+        {
+          "archetype_id": "P19",
+          "narrative_role": "party",
+          "title": "Deadpan superior maid",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "companion",
+          "species": "human",
+          "mechanism_tags": [],
+          "contribution": "Perfect service accompanied by a perfectly timed insult.",
+          "functions": [
+            "utility",
+            "social"
+          ],
+          "character_id": "character_3"
+        },
+        {
+          "archetype_id": "P33",
+          "narrative_role": "party",
+          "title": "Tiny practical fairy healer",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "colleague",
+          "species": "fairy",
+          "mechanism_tags": [],
+          "contribution": "A miniature support professional who takes payment, promises, and survival seriously.",
+          "functions": [
+            "support",
+            "utility"
+          ],
+          "character_id": "character_4"
+        },
+        {
+          "archetype_id": "P32",
+          "narrative_role": "party",
+          "title": "Unreliable elderly archmage",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "companion",
+          "species": "human",
+          "mechanism_tags": [],
+          "contribution": "Extraordinary magic depends on a companion remembering where he put his notes.",
+          "functions": [
+            "damage",
+            "control"
+          ],
+          "character_id": "character_5"
+        }
+      ],
+      "overrides": {},
+      "sustain_plan": "A real healer, potion stock, or a guaranteed recovery point; failures should create comedy without erasing consequences.",
+      "generation_note": "Original cast sketch from archetype recipes; not a canonical series roster. Romance remains off until explicit adult relationships are designed.",
+      "world_contacts": [
+        {
+          "archetype_id": "N07",
+          "narrative_role": "world",
+          "title": "Gruff dwarf blacksmith",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "local_contact",
+          "species": "dwarf",
+          "mechanism_tags": [],
+          "contribution": "Demanding craft specialist judges heroes by how they treat equipment rather than by noble titles.",
+          "functions": [
+            "utility",
+            "support"
+          ]
+        },
+        {
+          "archetype_id": "N05",
+          "narrative_role": "world",
+          "title": "Practical innkeeper",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "local_contact",
+          "species": "human",
+          "mechanism_tags": [],
+          "contribution": "Everyday host gives the adventuring cast a home base, meal schedule, and inconveniently sensible expectations.",
+          "functions": [
+            "support",
+            "social"
+          ]
+        }
+      ],
+      "editorial_review_notes": [
+        "Choose individual names, voices, goals, and relationships before using this sketch in a comic."
+      ],
+      "validation": {
+        "mechanically_valid": true,
+        "passes_selected_editorial_policies": true,
+        "hard_errors": [],
+        "policy_failures": [],
+        "warnings": [],
+        "recognized_by_audience": "not_measured",
+        "coverage": {
+          "broad_functions": [
+            "control",
+            "damage",
+            "frontline",
+            "social",
+            "support",
+            "utility"
+          ],
+          "missing_functions": [],
+          "elf_count": 1,
+          "familiar_focal_units": 0,
+          "premise_mechanisms": [
+            "divine_summoning"
+          ]
+        }
+      },
+      "sampling_attempts": 1
+    },
+    {
+      "preset": "harem_adventure",
+      "seed": 0,
+      "scope": "traveling_party",
+      "members": [
+        {
+          "archetype_id": "M05",
+          "narrative_role": "main",
+          "title": "The betrayed gun crafting survivor",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "self",
+          "species": "human",
+          "mechanism_tags": [
+            "modern_firearms"
+          ],
+          "contribution": "A discarded weakling survives an extreme ordeal and returns as a heavily armed, abrasive problem-solver who wants control over his future.",
+          "functions": [
+            "damage",
+            "utility"
+          ],
+          "character_id": "character_1"
+        },
+        {
+          "archetype_id": "P02",
+          "narrative_role": "party",
+          "title": "Sheltered and ditzy elf princess",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "companion",
+          "species": "elf",
+          "mechanism_tags": [],
+          "contribution": "Royal forest elegance paired with cheerful impracticality and a talent she misunderstands.",
+          "functions": [
+            "damage",
+            "social"
+          ],
+          "character_id": "character_2"
+        },
+        {
+          "archetype_id": "P10",
+          "narrative_role": "party",
+          "title": "Stoic scaled spear guardian",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "companion",
+          "species": "lizardfolk",
+          "mechanism_tags": [],
+          "contribution": "The reptilian-looking professional who quietly keeps an unruly mixed-species group alive.",
+          "functions": [
+            "frontline",
+            "damage",
+            "utility"
+          ],
+          "character_id": "character_3"
+        },
+        {
+          "archetype_id": "P23",
+          "narrative_role": "party",
+          "title": "Kind princess and diplomatic anchor",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "companion",
+          "species": "human",
+          "mechanism_tags": [],
+          "contribution": "The royal ally who turns a wandering protagonist into someone with obligations.",
+          "functions": [
+            "social",
+            "support"
+          ],
+          "character_id": "character_4"
+        },
+        {
+          "archetype_id": "P22",
+          "narrative_role": "party",
+          "title": "Hot-blooded sword prodigy",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "companion",
+          "species": "human",
+          "mechanism_tags": [],
+          "contribution": "A blunt, energetic fighter whose physical confidence exceeds social finesse.",
+          "functions": [
+            "damage",
+            "frontline"
+          ],
+          "character_id": "character_5"
+        }
+      ],
+      "overrides": {},
+      "sustain_plan": "Potions, rest, and access to a town healer; retreat remains possible.",
+      "generation_note": "Original cast sketch from archetype recipes; not a canonical series roster. Romance remains off until explicit adult relationships are designed.",
+      "world_contacts": [
+        {
+          "archetype_id": "N16",
+          "narrative_role": "world",
+          "title": "Eccentric sage instructor",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "local_contact",
+          "species": "human",
+          "mechanism_tags": [],
+          "contribution": "Acclaimed expert teaches extraordinary skills while remaining comically absorbed in one narrow personal interest or habit.",
+          "functions": [
+            "support",
+            "utility"
+          ]
+        },
+        {
+          "archetype_id": "N19",
+          "narrative_role": "world",
+          "title": "Town guard captain",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "local_contact",
+          "species": "human",
+          "mechanism_tags": [],
+          "contribution": "Responsible officer must protect normal residents while managing adventurers whose powers exceed the town's entire defense.",
+          "functions": [
+            "social",
+            "support"
+          ]
+        }
+      ],
+      "editorial_review_notes": [
+        "Choose individual names, voices, goals, and relationships before using this sketch in a comic.",
+        "Several court-linked figures need distinct status, obligations, and reasons to travel together.",
+        "This is an adult romance candidate pool. Select explicit consenting adult romantic bonds; the sketch currently enables none."
+      ],
+      "validation": {
+        "mechanically_valid": true,
+        "passes_selected_editorial_policies": true,
+        "hard_errors": [],
+        "policy_failures": [],
+        "warnings": [],
+        "recognized_by_audience": "not_measured",
+        "coverage": {
+          "broad_functions": [
+            "damage",
+            "frontline",
+            "social",
+            "support",
+            "utility"
+          ],
+          "missing_functions": [],
+          "elf_count": 1,
+          "familiar_focal_units": 0,
+          "premise_mechanisms": [
+            "modern_firearms"
+          ]
+        }
+      },
+      "sampling_attempts": 1
+    },
+    {
+      "preset": "survival",
+      "seed": 0,
+      "scope": "traveling_party",
+      "members": [
+        {
+          "archetype_id": "M26",
+          "narrative_role": "main",
+          "title": "Vulnerable young outcast tamer",
+          "present_age_group": "child",
+          "romance_enabled": false,
+          "relationship_to_main": "self",
+          "species": "human",
+          "mechanism_tags": [
+            "taming"
+          ],
+          "contribution": "A rejected child survives through observation, kindness and a bond with an underestimated creature.",
+          "functions": [
+            "utility",
+            "support"
+          ],
+          "character_id": "character_1"
+        },
+        {
+          "archetype_id": "P05",
+          "narrative_role": "party",
+          "title": "Quiet cat or panther companion",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "companion",
+          "species": "catfolk",
+          "mechanism_tags": [],
+          "contribution": "Compact feline silhouette, guarded emotions, and a fiercely specific skill set.",
+          "functions": [
+            "damage",
+            "utility"
+          ],
+          "character_id": "character_2"
+        },
+        {
+          "archetype_id": "P22",
+          "narrative_role": "party",
+          "title": "Hot-blooded sword prodigy",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "companion",
+          "species": "human",
+          "mechanism_tags": [],
+          "contribution": "A blunt, energetic fighter whose physical confidence exceeds social finesse.",
+          "functions": [
+            "damage",
+            "frontline"
+          ],
+          "character_id": "character_3"
+        },
+        {
+          "archetype_id": "P33",
+          "narrative_role": "party",
+          "title": "Tiny practical fairy healer",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "colleague",
+          "species": "fairy",
+          "mechanism_tags": [],
+          "contribution": "A miniature support professional who takes payment, promises, and survival seriously.",
+          "functions": [
+            "support",
+            "utility"
+          ],
+          "character_id": "character_4"
+        }
+      ],
+      "overrides": {},
+      "sustain_plan": "Limited supplies, retreat routes, and an identified safe refuge. Companions may be recurring allies rather than present in every isolated chapter.",
+      "generation_note": "Original cast sketch from archetype recipes; not a canonical series roster. Romance remains off until explicit adult relationships are designed.",
+      "phase_note": "An expedition after recruitment, or a longitudinal ally network; a spider-like solo opening can precede this cast.",
+      "world_contacts": [
+        {
+          "archetype_id": "N19",
+          "narrative_role": "world",
+          "title": "Town guard captain",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "local_contact",
+          "species": "human",
+          "mechanism_tags": [],
+          "contribution": "Responsible officer must protect normal residents while managing adventurers whose powers exceed the town's entire defense.",
+          "functions": [
+            "social",
+            "support"
+          ]
+        },
+        {
+          "archetype_id": "N22",
+          "narrative_role": "world",
+          "title": "Grateful farmer or craftsperson",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "local_contact",
+          "species": "human",
+          "mechanism_tags": [],
+          "contribution": "Ordinary skilled resident makes the effects of the hero's inventions, protection, or generosity visible in daily life.",
+          "functions": [
+            "support",
+            "utility"
+          ]
+        }
+      ],
+      "editorial_review_notes": [
+        "Choose individual names, voices, goals, and relationships before using this sketch in a comic.",
+        "The young lead needs explicit friend, mentor, guardian, or colleague relationships; adult romance is not inferred from nearby companions."
+      ],
+      "validation": {
+        "mechanically_valid": true,
+        "passes_selected_editorial_policies": true,
+        "hard_errors": [],
+        "policy_failures": [],
+        "warnings": [],
+        "recognized_by_audience": "not_measured",
+        "coverage": {
+          "broad_functions": [
+            "damage",
+            "frontline",
+            "support",
+            "utility"
+          ],
+          "missing_functions": [],
+          "elf_count": 0,
+          "familiar_focal_units": 0,
+          "premise_mechanisms": [
+            "taming"
+          ]
+        }
+      },
+      "sampling_attempts": 1
+    },
+    {
+      "preset": "cozy_familiars",
+      "seed": 0,
+      "scope": "familiar_travel",
+      "members": [
+        {
+          "archetype_id": "M16",
+          "narrative_role": "main",
+          "title": "Gentle slime tamer caretaker",
+          "present_age_group": "child",
+          "romance_enabled": false,
+          "relationship_to_main": "self",
+          "species": "human",
+          "mechanism_tags": [
+            "taming"
+          ],
+          "contribution": "A considerate reincarnated worker builds a peaceful livelihood around small creatures everyone else overlooks.",
+          "functions": [
+            "support",
+            "utility",
+            "social"
+          ],
+          "character_id": "character_1"
+        },
+        {
+          "archetype_id": "P36",
+          "narrative_role": "party",
+          "title": "Adorable utility slime",
+          "present_age_group": "nonhuman",
+          "romance_enabled": false,
+          "relationship_to_main": "familiar",
+          "species": "slime",
+          "mechanism_tags": [],
+          "contribution": "A small blob supplies affection, cleanup, and a suspicious number of useful functions.",
+          "functions": [
+            "support",
+            "utility"
+          ],
+          "character_id": "character_2"
+        },
+        {
+          "archetype_id": "P10",
+          "narrative_role": "party",
+          "title": "Stoic scaled spear guardian",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "companion",
+          "species": "lizardfolk",
+          "mechanism_tags": [],
+          "contribution": "The reptilian-looking professional who quietly keeps an unruly mixed-species group alive.",
+          "functions": [
+            "frontline",
+            "damage",
+            "utility"
+          ],
+          "character_id": "character_3"
+        },
+        {
+          "archetype_id": "P35",
+          "narrative_role": "party",
+          "title": "Bird mount with a child form",
+          "present_age_group": "child",
+          "romance_enabled": false,
+          "relationship_to_main": "familiar",
+          "species": "bird_shifter",
+          "mechanism_tags": [],
+          "contribution": "A loud, hungry, affectionate companion alternates between transport and a small speaking form.",
+          "functions": [
+            "utility",
+            "damage"
+          ],
+          "character_id": "character_4"
+        }
+      ],
+      "overrides": {},
+      "sustain_plan": "Meals, rest, familiar protection, and trusted local help; combat can be avoided.",
+      "generation_note": "Original cast sketch from archetype recipes; not a canonical series roster. Romance remains off until explicit adult relationships are designed.",
+      "world_contacts": [
+        {
+          "archetype_id": "N28",
+          "narrative_role": "world",
+          "title": "Indulgent goddess demanding offerings",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "local_contact",
+          "species": "deity",
+          "mechanism_tags": [],
+          "contribution": "Divine patron makes heavenly authority unexpectedly dependent on access to the hero's ordinary earthly consumer treats.",
+          "functions": [
+            "support",
+            "social"
+          ]
+        },
+        {
+          "archetype_id": "N07",
+          "narrative_role": "world",
+          "title": "Gruff dwarf blacksmith",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "local_contact",
+          "species": "dwarf",
+          "mechanism_tags": [],
+          "contribution": "Demanding craft specialist judges heroes by how they treat equipment rather than by noble titles.",
+          "functions": [
+            "utility",
+            "support"
+          ]
+        }
+      ],
+      "editorial_review_notes": [
+        "Choose individual names, voices, goals, and relationships before using this sketch in a comic.",
+        "The young lead needs explicit friend, mentor, guardian, or colleague relationships; adult romance is not inferred from nearby companions."
+      ],
+      "validation": {
+        "mechanically_valid": true,
+        "passes_selected_editorial_policies": true,
+        "hard_errors": [],
+        "policy_failures": [],
+        "warnings": [],
+        "recognized_by_audience": "not_measured",
+        "coverage": {
+          "broad_functions": [
+            "damage",
+            "frontline",
+            "social",
+            "support",
+            "utility"
+          ],
+          "missing_functions": [],
+          "elf_count": 0,
+          "familiar_focal_units": 2,
+          "premise_mechanisms": [
+            "taming"
+          ]
+        }
+      },
+      "sampling_attempts": 1
+    },
+    {
+      "preset": "object_duo",
+      "seed": 0,
+      "scope": "linked_duo",
+      "members": [
+        {
+          "archetype_id": "M14",
+          "narrative_role": "main",
+          "title": "The reincarnated vending machine",
+          "present_age_group": "nonhuman",
+          "romance_enabled": false,
+          "relationship_to_main": "self",
+          "species": "sentient_machine",
+          "mechanism_tags": [
+            "modern_object"
+          ],
+          "contribution": "A modern commercial object becomes an adventuring protagonist by making its rigid product system useful in a world that has never seen it.",
+          "functions": [
+            "utility",
+            "support"
+          ],
+          "character_id": "character_1"
+        },
+        {
+          "archetype_id": "P40",
+          "narrative_role": "party",
+          "title": "Strong and sociable carrier partner",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "companion",
+          "species": "human",
+          "mechanism_tags": [],
+          "contribution": "A practical local supplies movement, conversation, and emotional access for an unconventional lead.",
+          "functions": [
+            "frontline",
+            "utility",
+            "social"
+          ],
+          "character_id": "character_2"
+        },
+        {
+          "archetype_id": "P05",
+          "narrative_role": "party",
+          "title": "Quiet cat or panther companion",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "companion",
+          "species": "catfolk",
+          "mechanism_tags": [],
+          "contribution": "Compact feline silhouette, guarded emotions, and a fiercely specific skill set.",
+          "functions": [
+            "damage",
+            "utility"
+          ],
+          "character_id": "character_3"
+        }
+      ],
+      "overrides": {},
+      "sustain_plan": "The wielder or carrier has practical supplies and a return route; the object has a defined repair, energy, or recharge rule.",
+      "generation_note": "Original cast sketch from archetype recipes; not a canonical series roster. Romance remains off until explicit adult relationships are designed.",
+      "world_contacts": [
+        {
+          "archetype_id": "N09",
+          "narrative_role": "world",
+          "title": "Shrewd traveling merchant",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "local_contact",
+          "species": "human",
+          "mechanism_tags": [],
+          "contribution": "Practical intermediary recognizes profitable absurdity before warriors, nobles, or scholars understand what the hero discovered.",
+          "functions": [
+            "social",
+            "utility"
+          ]
+        },
+        {
+          "archetype_id": "N30",
+          "narrative_role": "world",
+          "title": "Jobbing bureaucrat or accountant",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "local_contact",
+          "species": "human",
+          "mechanism_tags": [],
+          "contribution": "Uncelebrated administrator turns heroic victories into budgets, permits, supply lists, and documents that someone must actually complete.",
+          "functions": [
+            "utility",
+            "support",
+            "social"
+          ]
+        }
+      ],
+      "editorial_review_notes": [
+        "Choose individual names, voices, goals, and relationships before using this sketch in a comic."
+      ],
+      "validation": {
+        "mechanically_valid": true,
+        "passes_selected_editorial_policies": true,
+        "hard_errors": [],
+        "policy_failures": [],
+        "warnings": [],
+        "recognized_by_audience": "not_measured",
+        "coverage": {
+          "broad_functions": [
+            "damage",
+            "frontline",
+            "social",
+            "support",
+            "utility"
+          ],
+          "missing_functions": [],
+          "elf_count": 0,
+          "familiar_focal_units": 0,
+          "premise_mechanisms": [
+            "modern_object"
+          ]
+        }
+      },
+      "sampling_attempts": 1
+    },
+    {
+      "preset": "court_otome",
+      "seed": 0,
+      "scope": "court_circle",
+      "members": [
+        {
+          "archetype_id": "M23",
+          "narrative_role": "main",
+          "title": "The pragmatic kingdom administrator",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "self",
+          "species": "human",
+          "mechanism_tags": [
+            "modern_knowledge"
+          ],
+          "contribution": "A summoned outsider applies administrative reasoning to a troubled kingdom and discovers that good policy requires capable people, legitimacy, and compromise.",
+          "functions": [
+            "social",
+            "utility",
+            "support"
+          ],
+          "character_id": "character_1"
+        },
+        {
+          "archetype_id": "P04",
+          "narrative_role": "party",
+          "title": "Devoted dark elf bodyguard",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "companion",
+          "species": "dark_elf",
+          "mechanism_tags": [],
+          "contribution": "A dignified forest warrior whose discipline collapses around a chosen person, food, or homeland.",
+          "functions": [
+            "frontline",
+            "damage"
+          ],
+          "character_id": "character_2"
+        },
+        {
+          "archetype_id": "P21",
+          "narrative_role": "party",
+          "title": "Noble knight with one humiliating weakness",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "companion",
+          "species": "human",
+          "mechanism_tags": [],
+          "contribution": "A splendid armored protector whose impressive strengths coexist with one immediately exploitable flaw.",
+          "functions": [
+            "frontline"
+          ],
+          "character_id": "character_3"
+        },
+        {
+          "archetype_id": "P28",
+          "narrative_role": "party",
+          "title": "Hypercompetent sinister officer",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "companion",
+          "species": "demon",
+          "mechanism_tags": [],
+          "contribution": "The advisor who turns the hero's vague remark into an alarming multi-stage operation.",
+          "functions": [
+            "control",
+            "social",
+            "utility"
+          ],
+          "character_id": "character_4"
+        },
+        {
+          "archetype_id": "P25",
+          "narrative_role": "party",
+          "title": "Childhood friend and emotional equal",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "companion",
+          "species": "human",
+          "mechanism_tags": [],
+          "contribution": "The person who remembers the hero before the heroic reputation became inconvenient.",
+          "functions": [
+            "support",
+            "social"
+          ],
+          "character_id": "character_5"
+        }
+      ],
+      "overrides": {},
+      "sustain_plan": "Institutional protection, money, reputation, and access to medical care matter more than a dungeon-role checklist.",
+      "generation_note": "Original cast sketch from archetype recipes; not a canonical series roster. Romance remains off until explicit adult relationships are designed.",
+      "world_contacts": [
+        {
+          "archetype_id": "N16",
+          "narrative_role": "world",
+          "title": "Eccentric sage instructor",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "local_contact",
+          "species": "human",
+          "mechanism_tags": [],
+          "contribution": "Acclaimed expert teaches extraordinary skills while remaining comically absorbed in one narrow personal interest or habit.",
+          "functions": [
+            "support",
+            "utility"
+          ]
+        },
+        {
+          "archetype_id": "N30",
+          "narrative_role": "world",
+          "title": "Jobbing bureaucrat or accountant",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "local_contact",
+          "species": "human",
+          "mechanism_tags": [],
+          "contribution": "Uncelebrated administrator turns heroic victories into budgets, permits, supply lists, and documents that someone must actually complete.",
+          "functions": [
+            "utility",
+            "support",
+            "social"
+          ]
+        }
+      ],
+      "editorial_review_notes": [
+        "Choose individual names, voices, goals, and relationships before using this sketch in a comic."
+      ],
+      "validation": {
+        "mechanically_valid": true,
+        "passes_selected_editorial_policies": true,
+        "hard_errors": [],
+        "policy_failures": [],
+        "warnings": [],
+        "recognized_by_audience": "not_measured",
+        "coverage": {
+          "broad_functions": [
+            "control",
+            "damage",
+            "frontline",
+            "social",
+            "support",
+            "utility"
+          ],
+          "missing_functions": [],
+          "elf_count": 1,
+          "familiar_focal_units": 0,
+          "premise_mechanisms": [
+            "modern_knowledge"
+          ]
+        }
+      },
+      "sampling_attempts": 1
+    },
+    {
+      "preset": "monster_court",
+      "seed": 0,
+      "scope": "organization",
+      "members": [
+        {
+          "archetype_id": "M11",
+          "narrative_role": "main",
+          "title": "The undead overlord with ordinary worries",
+          "present_age_group": "nonhuman",
+          "romance_enabled": false,
+          "relationship_to_main": "self",
+          "species": "undead",
+          "mechanism_tags": [
+            "game_npc_world"
+          ],
+          "contribution": "A player becomes the terrifying ruler represented by an inhuman avatar and must maintain authority over followers who assume limitless wisdom.",
+          "functions": [
+            "control",
+            "damage",
+            "social"
+          ],
+          "character_id": "character_1"
+        },
+        {
+          "archetype_id": "P28",
+          "narrative_role": "party",
+          "title": "Hypercompetent sinister officer",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "companion",
+          "species": "demon",
+          "mechanism_tags": [],
+          "contribution": "The advisor who turns the hero's vague remark into an alarming multi-stage operation.",
+          "functions": [
+            "control",
+            "social",
+            "utility"
+          ],
+          "character_id": "character_2"
+        },
+        {
+          "archetype_id": "P04",
+          "narrative_role": "party",
+          "title": "Devoted dark elf bodyguard",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "companion",
+          "species": "dark_elf",
+          "mechanism_tags": [],
+          "contribution": "A dignified forest warrior whose discipline collapses around a chosen person, food, or homeland.",
+          "functions": [
+            "frontline",
+            "damage"
+          ],
+          "character_id": "character_3"
+        },
+        {
+          "archetype_id": "P13",
+          "narrative_role": "party",
+          "title": "Gothic immortal vampire",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "companion",
+          "species": "vampire",
+          "mechanism_tags": [],
+          "contribution": "Stillness, lace, and an impossible age signal danger beneath a delicate appearance.",
+          "functions": [
+            "damage",
+            "support"
+          ],
+          "character_id": "character_4"
+        },
+        {
+          "archetype_id": "P26",
+          "narrative_role": "party",
+          "title": "Overdevoted inhuman consort",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "companion",
+          "species": "demon",
+          "mechanism_tags": [],
+          "contribution": "A grand, frighteningly capable admirer whose public dignity barely contains private obsession.",
+          "functions": [
+            "frontline",
+            "social"
+          ],
+          "character_id": "character_5"
+        }
+      ],
+      "overrides": {},
+      "sustain_plan": "A settlement or court supplies logistics; identify which officer handles each essential service.",
+      "generation_note": "Original cast sketch from archetype recipes; not a canonical series roster. Romance remains off until explicit adult relationships are designed.",
+      "world_contacts": [
+        {
+          "archetype_id": "N26",
+          "narrative_role": "world",
+          "title": "Misunderstood monster chief",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "local_contact",
+          "species": "monster",
+          "mechanism_tags": [],
+          "contribution": "Feared nonhuman leader turns out to be negotiating food, security, and peaceful survival for their community.",
+          "functions": [
+            "social",
+            "support"
+          ]
+        },
+        {
+          "archetype_id": "N25",
+          "narrative_role": "world",
+          "title": "Flamboyant demon general",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "local_contact",
+          "species": "demon",
+          "mechanism_tags": [],
+          "contribution": "Memorable lieutenant turns a major encounter into personal theater through one obsessive theme and unmistakable silhouette.",
+          "functions": [
+            "social",
+            "support"
+          ]
+        }
+      ],
+      "editorial_review_notes": [
+        "Choose individual names, voices, goals, and relationships before using this sketch in a comic."
+      ],
+      "validation": {
+        "mechanically_valid": true,
+        "passes_selected_editorial_policies": true,
+        "hard_errors": [],
+        "policy_failures": [],
+        "warnings": [],
+        "recognized_by_audience": "not_measured",
+        "coverage": {
+          "broad_functions": [
+            "control",
+            "damage",
+            "frontline",
+            "social",
+            "support",
+            "utility"
+          ],
+          "missing_functions": [],
+          "elf_count": 1,
+          "familiar_focal_units": 0,
+          "premise_mechanisms": [
+            "game_npc_world"
+          ]
+        }
+      },
+      "sampling_attempts": 1
+    },
+    {
+      "preset": "professional",
+      "seed": 0,
+      "scope": "workplace",
+      "members": [
+        {
+          "archetype_id": "M30",
+          "narrative_role": "main",
+          "title": "Ordinary handyman specialist",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "self",
+          "species": "human",
+          "mechanism_tags": [
+            "ordinary_skill"
+          ],
+          "contribution": "A modest worker becomes essential because powerful adventurers still need locks opened and equipment repaired.",
+          "functions": [
+            "utility"
+          ],
+          "character_id": "character_1"
+        },
+        {
+          "archetype_id": "P16",
+          "narrative_role": "party",
+          "title": "Earnest priestess or support mage",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "companion",
+          "species": "human",
+          "mechanism_tags": [],
+          "contribution": "The gentle support specialist who notices pain, logistics, and feelings the hero overlooks.",
+          "functions": [
+            "support",
+            "social"
+          ],
+          "character_id": "character_2"
+        },
+        {
+          "archetype_id": "P29",
+          "narrative_role": "party",
+          "title": "Sociable male warrior friend",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "companion",
+          "species": "human",
+          "mechanism_tags": [],
+          "contribution": "The dependable friend who provides physical backup and treats the hero like an ordinary person.",
+          "functions": [
+            "frontline",
+            "social"
+          ],
+          "character_id": "character_3"
+        },
+        {
+          "archetype_id": "P33",
+          "narrative_role": "party",
+          "title": "Tiny practical fairy healer",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "colleague",
+          "species": "fairy",
+          "mechanism_tags": [],
+          "contribution": "A miniature support professional who takes payment, promises, and survival seriously.",
+          "functions": [
+            "support",
+            "utility"
+          ],
+          "character_id": "character_4"
+        },
+        {
+          "archetype_id": "P32",
+          "narrative_role": "party",
+          "title": "Unreliable elderly archmage",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "companion",
+          "species": "human",
+          "mechanism_tags": [],
+          "contribution": "Extraordinary magic depends on a companion remembering where he put his notes.",
+          "functions": [
+            "damage",
+            "control"
+          ],
+          "character_id": "character_5"
+        }
+      ],
+      "overrides": {},
+      "sustain_plan": "A production chain, paying customers, access, and protection. A healer is optional when the story is not a combat expedition.",
+      "generation_note": "Original cast sketch from archetype recipes; not a canonical series roster. Romance remains off until explicit adult relationships are designed.",
+      "world_contacts": [
+        {
+          "archetype_id": "N15",
+          "narrative_role": "world",
+          "title": "Earnest healer nun",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "local_contact",
+          "species": "human",
+          "mechanism_tags": [],
+          "contribution": "Patient community caregiver makes the world's casualties and ordinary needs visible beyond the protagonists' victory celebrations.",
+          "functions": [
+            "support",
+            "social"
+          ]
+        },
+        {
+          "archetype_id": "N09",
+          "narrative_role": "world",
+          "title": "Shrewd traveling merchant",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "local_contact",
+          "species": "human",
+          "mechanism_tags": [],
+          "contribution": "Practical intermediary recognizes profitable absurdity before warriors, nobles, or scholars understand what the hero discovered.",
+          "functions": [
+            "social",
+            "utility"
+          ]
+        }
+      ],
+      "editorial_review_notes": [
+        "Choose individual names, voices, goals, and relationships before using this sketch in a comic.",
+        "Two healing-oriented templates overlap: distinguish emergency treatment, purification, supplies, payment, or personal goals."
+      ],
+      "validation": {
+        "mechanically_valid": true,
+        "passes_selected_editorial_policies": true,
+        "hard_errors": [],
+        "policy_failures": [],
+        "warnings": [],
+        "recognized_by_audience": "not_measured",
+        "coverage": {
+          "broad_functions": [
+            "control",
+            "damage",
+            "frontline",
+            "social",
+            "support",
+            "utility"
+          ],
+          "missing_functions": [],
+          "elf_count": 0,
+          "familiar_focal_units": 0,
+          "premise_mechanisms": [
+            "ordinary_skill"
+          ]
+        }
+      },
+      "sampling_attempts": 1
+    },
+    {
+      "preset": "military",
+      "seed": 0,
+      "scope": "military_unit",
+      "members": [
+        {
+          "archetype_id": "M24",
+          "narrative_role": "main",
+          "title": "The reincarnated military prodigy",
+          "present_age_group": "child",
+          "romance_enabled": false,
+          "relationship_to_main": "self",
+          "species": "human",
+          "mechanism_tags": [
+            "industrial_military"
+          ],
+          "contribution": "An adult bureaucratic mentality inhabits an unlikely young soldier and repeatedly earns dangerous promotions while trying to secure a comfortable assignment.",
+          "functions": [
+            "damage",
+            "control",
+            "social"
+          ],
+          "character_id": "character_1"
+        },
+        {
+          "archetype_id": "P28",
+          "narrative_role": "party",
+          "title": "Hypercompetent sinister officer",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "colleague",
+          "species": "human",
+          "mechanism_tags": [],
+          "contribution": "The advisor who turns the hero's vague remark into an alarming multi-stage operation.",
+          "functions": [
+            "control",
+            "social",
+            "utility"
+          ],
+          "chosen_variant": "Original military-setting version of the role; uniform and equipment follow this worlds military premise.",
+          "character_id": "character_2"
+        },
+        {
+          "archetype_id": "P21",
+          "narrative_role": "party",
+          "title": "Noble knight with one humiliating weakness",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "colleague",
+          "species": "human",
+          "mechanism_tags": [],
+          "contribution": "A splendid armored protector whose impressive strengths coexist with one immediately exploitable flaw.",
+          "functions": [
+            "frontline"
+          ],
+          "chosen_variant": "Original military-setting version of the role; uniform and equipment follow this worlds military premise.",
+          "character_id": "character_3"
+        },
+        {
+          "archetype_id": "P29",
+          "narrative_role": "party",
+          "title": "Sociable male warrior friend",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "colleague",
+          "species": "human",
+          "mechanism_tags": [],
+          "contribution": "The dependable friend who provides physical backup and treats the hero like an ordinary person.",
+          "functions": [
+            "frontline",
+            "social"
+          ],
+          "chosen_variant": "Original military-setting version of the role; uniform and equipment follow this worlds military premise.",
+          "character_id": "character_4"
+        }
+      ],
+      "overrides": {},
+      "sustain_plan": "A field medic, supply corps, command authority, and clear resupply or retreat procedures exist off the active page.",
+      "generation_note": "Original cast sketch from archetype recipes; not a canonical series roster. Romance remains off until explicit adult relationships are designed.",
+      "phase_note": "Supporting templates use original native military variants, not transplanted canonical source characters.",
+      "world_contacts": [
+        {
+          "archetype_id": "N30",
+          "narrative_role": "world",
+          "title": "Jobbing bureaucrat or accountant",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "local_contact",
+          "species": "human",
+          "mechanism_tags": [],
+          "contribution": "Uncelebrated administrator turns heroic victories into budgets, permits, supply lists, and documents that someone must actually complete.",
+          "functions": [
+            "utility",
+            "support",
+            "social"
+          ]
+        },
+        {
+          "archetype_id": "N19",
+          "narrative_role": "world",
+          "title": "Town guard captain",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "local_contact",
+          "species": "human",
+          "mechanism_tags": [],
+          "contribution": "Responsible officer must protect normal residents while managing adventurers whose powers exceed the town's entire defense.",
+          "functions": [
+            "social",
+            "support"
+          ]
+        }
+      ],
+      "editorial_review_notes": [
+        "Choose individual names, voices, goals, and relationships before using this sketch in a comic.",
+        "The young lead needs explicit friend, mentor, guardian, or colleague relationships; adult romance is not inferred from nearby companions."
+      ],
+      "validation": {
+        "mechanically_valid": true,
+        "passes_selected_editorial_policies": true,
+        "hard_errors": [],
+        "policy_failures": [],
+        "warnings": [],
+        "recognized_by_audience": "not_measured",
+        "coverage": {
+          "broad_functions": [
+            "control",
+            "damage",
+            "frontline",
+            "social",
+            "utility"
+          ],
+          "missing_functions": [],
+          "elf_count": 0,
+          "familiar_focal_units": 0,
+          "premise_mechanisms": [
+            "industrial_military"
+          ]
+        }
+      },
+      "sampling_attempts": 1
+    },
+    {
+      "preset": "cozy_household",
+      "seed": 0,
+      "scope": "household",
+      "members": [
+        {
+          "archetype_id": "M22",
+          "narrative_role": "main",
+          "title": "Costume armored gamer girl",
+          "present_age_group": "teen",
+          "romance_enabled": false,
+          "relationship_to_main": "self",
+          "species": "human",
+          "mechanism_tags": [
+            "costume_cheat"
+          ],
+          "contribution": "A competent gamer receives unbeatable equipment whose ridiculous appearance is impossible to hide.",
+          "functions": [
+            "frontline",
+            "damage",
+            "utility"
+          ],
+          "character_id": "character_1"
+        },
+        {
+          "archetype_id": "P05",
+          "narrative_role": "party",
+          "title": "Quiet cat or panther companion",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "companion",
+          "species": "catfolk",
+          "mechanism_tags": [],
+          "contribution": "Compact feline silhouette, guarded emotions, and a fiercely specific skill set.",
+          "functions": [
+            "damage",
+            "utility"
+          ],
+          "character_id": "character_2"
+        },
+        {
+          "archetype_id": "P24",
+          "narrative_role": "party",
+          "title": "Merchant-minded noble partner",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "companion",
+          "species": "human",
+          "mechanism_tags": [],
+          "contribution": "A polished social ally who sees the business model behind every miracle.",
+          "functions": [
+            "social",
+            "utility"
+          ],
+          "character_id": "character_3"
+        },
+        {
+          "archetype_id": "P35",
+          "narrative_role": "party",
+          "title": "Bird mount with a child form",
+          "present_age_group": "child",
+          "romance_enabled": false,
+          "relationship_to_main": "familiar",
+          "species": "bird_shifter",
+          "mechanism_tags": [],
+          "contribution": "A loud, hungry, affectionate companion alternates between transport and a small speaking form.",
+          "functions": [
+            "utility",
+            "damage"
+          ],
+          "character_id": "character_4"
+        },
+        {
+          "archetype_id": "P33",
+          "narrative_role": "party",
+          "title": "Tiny practical fairy healer",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "colleague",
+          "species": "fairy",
+          "mechanism_tags": [],
+          "contribution": "A miniature support professional who takes payment, promises, and survival seriously.",
+          "functions": [
+            "support",
+            "utility"
+          ],
+          "character_id": "character_5"
+        }
+      ],
+      "overrides": {},
+      "sustain_plan": "Home, local tradespeople, shared chores, and mutual care; danger is episodic, not the default measure of usefulness.",
+      "generation_note": "Original cast sketch from archetype recipes; not a canonical series roster. Romance remains off until explicit adult relationships are designed.",
+      "world_contacts": [
+        {
+          "archetype_id": "N20",
+          "narrative_role": "world",
+          "title": "Desperate village elder",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "local_contact",
+          "species": "human",
+          "mechanism_tags": [],
+          "contribution": "Community representative turns a distant monster problem into specific households, limited resources, and a request for help.",
+          "functions": [
+            "social",
+            "support"
+          ]
+        },
+        {
+          "archetype_id": "N22",
+          "narrative_role": "world",
+          "title": "Grateful farmer or craftsperson",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "local_contact",
+          "species": "human",
+          "mechanism_tags": [],
+          "contribution": "Ordinary skilled resident makes the effects of the hero's inventions, protection, or generosity visible in daily life.",
+          "functions": [
+            "support",
+            "utility"
+          ]
+        }
+      ],
+      "editorial_review_notes": [
+        "Choose individual names, voices, goals, and relationships before using this sketch in a comic.",
+        "The young lead needs explicit friend, mentor, guardian, or colleague relationships; adult romance is not inferred from nearby companions."
+      ],
+      "validation": {
+        "mechanically_valid": true,
+        "passes_selected_editorial_policies": true,
+        "hard_errors": [],
+        "policy_failures": [],
+        "warnings": [],
+        "recognized_by_audience": "not_measured",
+        "coverage": {
+          "broad_functions": [
+            "damage",
+            "frontline",
+            "social",
+            "support",
+            "utility"
+          ],
+          "missing_functions": [],
+          "elf_count": 0,
+          "familiar_focal_units": 1,
+          "premise_mechanisms": [
+            "costume_cheat"
+          ]
+        }
+      },
+      "sampling_attempts": 1
+    },
+    {
+      "preset": "guild_ensemble",
+      "seed": 0,
+      "scope": "guild",
+      "members": [
+        {
+          "archetype_id": "M08",
+          "narrative_role": "main",
+          "title": "The theatrical secret mastermind",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "self",
+          "species": "human",
+          "mechanism_tags": [
+            "secret_identity"
+          ],
+          "contribution": "An overwhelmingly capable fantasist pretends to be ordinary while staging dramatic secret interventions that other people interpret far more seriously.",
+          "functions": [
+            "damage",
+            "control"
+          ],
+          "character_id": "character_1"
+        },
+        {
+          "archetype_id": "P01",
+          "narrative_role": "party",
+          "title": "Proud elf precision fighter",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "companion",
+          "species": "elf",
+          "mechanism_tags": [],
+          "contribution": "The long-eared specialist who treats good aim, good manners, and elven superiority as the same subject.",
+          "functions": [
+            "damage",
+            "utility"
+          ],
+          "character_id": "character_2"
+        },
+        {
+          "archetype_id": "P24",
+          "narrative_role": "party",
+          "title": "Merchant-minded noble partner",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "companion",
+          "species": "human",
+          "mechanism_tags": [],
+          "contribution": "A polished social ally who sees the business model behind every miracle.",
+          "functions": [
+            "social",
+            "utility"
+          ],
+          "character_id": "character_3"
+        },
+        {
+          "archetype_id": "P30",
+          "narrative_role": "party",
+          "title": "Intimidating honorable veteran",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "companion",
+          "species": "humanoid_monster",
+          "mechanism_tags": [],
+          "contribution": "A scarred or monstrous-looking guardian whose principles are simpler and kinder than his reputation.",
+          "functions": [
+            "frontline",
+            "damage",
+            "utility"
+          ],
+          "character_id": "character_4"
+        },
+        {
+          "archetype_id": "P29",
+          "narrative_role": "party",
+          "title": "Sociable male warrior friend",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "companion",
+          "species": "human",
+          "mechanism_tags": [],
+          "contribution": "The dependable friend who provides physical backup and treats the hero like an ordinary person.",
+          "functions": [
+            "frontline",
+            "social"
+          ],
+          "character_id": "character_5"
+        }
+      ],
+      "overrides": {},
+      "sustain_plan": "Shared guild resources, healers or recovery rules, craft specialists, and a clear command structure.",
+      "generation_note": "Original cast sketch from archetype recipes; not a canonical series roster. Romance remains off until explicit adult relationships are designed.",
+      "world_contacts": [
+        {
+          "archetype_id": "N19",
+          "narrative_role": "world",
+          "title": "Town guard captain",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "local_contact",
+          "species": "human",
+          "mechanism_tags": [],
+          "contribution": "Responsible officer must protect normal residents while managing adventurers whose powers exceed the town's entire defense.",
+          "functions": [
+            "social",
+            "support"
+          ]
+        },
+        {
+          "archetype_id": "N30",
+          "narrative_role": "world",
+          "title": "Jobbing bureaucrat or accountant",
+          "present_age_group": "adult",
+          "romance_enabled": false,
+          "relationship_to_main": "local_contact",
+          "species": "human",
+          "mechanism_tags": [],
+          "contribution": "Uncelebrated administrator turns heroic victories into budgets, permits, supply lists, and documents that someone must actually complete.",
+          "functions": [
+            "utility",
+            "support",
+            "social"
+          ]
+        }
+      ],
+      "editorial_review_notes": [
+        "Choose individual names, voices, goals, and relationships before using this sketch in a comic."
+      ],
+      "validation": {
+        "mechanically_valid": true,
+        "passes_selected_editorial_policies": true,
+        "hard_errors": [],
+        "policy_failures": [],
+        "warnings": [],
+        "recognized_by_audience": "not_measured",
+        "coverage": {
+          "broad_functions": [
+            "control",
+            "damage",
+            "frontline",
+            "social",
+            "utility"
+          ],
+          "missing_functions": [],
+          "elf_count": 1,
+          "familiar_focal_units": 0,
+          "premise_mechanisms": [
+            "secret_identity"
+          ]
+        }
+      },
+      "sampling_attempts": 1
+    }
+  ]
+}

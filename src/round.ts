@@ -434,7 +434,7 @@ async function oneComic(c: Case, sample: number, o: RoundOpts, tt: Tt, genreText
   let page = existsSync(art) ? readdirSync(art).find((f) => /^page\.(png|jpeg|jpg|webp)$/.test(f)) : undefined;
   if (!page) {
     try {
-      await withSlot(() => tt.draw(script, art, { provider: 'codex' }), 'draw');
+      await withSlot(() => drawWithin(tt.draw(script, art, { provider: 'codex' })), 'draw');
     } catch (e) {
       return state({ status: 'error', stage: 'draw', error: (e as Error).message.slice(0, 500) });
     }
@@ -460,7 +460,7 @@ async function oneComic(c: Case, sample: number, o: RoundOpts, tt: Tt, genreText
       script.avoid = [...(script.avoid ?? []), ...tt.misread.avoidFrom(r.json)].slice(-8);
       writeFileSync(join(packet, 'comic.json'), JSON.stringify(script, null, 2) + '\n');
       try {
-        await withSlot(() => tt.draw(script, art, { provider: 'codex' }), 'draw');
+        await withSlot(() => drawWithin(tt.draw(script, art, { provider: 'codex' })), 'draw');
       } catch (e) {
         return state({ status: 'error', stage: 'draw', error: (e as Error).message.slice(0, 500) });
       }
@@ -492,6 +492,20 @@ async function oneComic(c: Case, sample: number, o: RoundOpts, tt: Tt, genreText
   Object.assign(scores, j.scores);
   writeJudgment({ phoneMissing: j.phoneMissing, phoneDiagnosticError: j.phoneDiagnosticError });
   return state({ status: Object.values(gates).every(Boolean) ? 'judged' : 'gated' });
+}
+
+/** Longest one render may take before it counts as a draw error (a hung image service, an exhausted quota). */
+export const DRAW_TIMEOUT_MS = Number(process.env.COMICBENCH_DRAW_TIMEOUT_MS ?? 15 * 60_000);
+
+/** A render that never returns must not hold up the run: it fails after DRAW_TIMEOUT_MS. */
+function drawWithin<T>(p: Promise<T>, ms = DRAW_TIMEOUT_MS): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  return Promise.race([
+    p,
+    new Promise<never>((_, reject) => {
+      timer = setTimeout(() => reject(new Error(`no image after ${Math.round(ms / 60_000)} minutes (hung render or exhausted image quota)`)), ms);
+    }),
+  ]).finally(() => clearTimeout(timer));
 }
 
 export interface JudgeInput {

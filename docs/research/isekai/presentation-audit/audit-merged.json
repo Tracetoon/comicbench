@@ -1,0 +1,952 @@
+{
+ "M10": {
+  "base": "dual",
+  "presentation": "Both forms are common on screen. Creature form: a small pale-blue translucent water-drop or dome-shaped slime with a simple drawn face and no limbs. Human form: a slender, androgynous child-to-teen human with very long light-blue hair, gold eyes and no non-human traits, wearing a long blue coat with a fur-trimmed scarf (later a long black coat over grey trousers) and boots, sometimes a katana.",
+  "notOnPage": [
+   "slime with arms, legs or a humanoid torso",
+   "green, purple or opaque slime",
+   "monster features (horns, fangs, claws) on the human form",
+   "pointed elf ears",
+   "clearly adult or muscular human form",
+   "civic badge or sash as a fixed trait"
+  ],
+  "recipeProblems": [
+   "'compact magical creature' is too vague; the slime is specifically a pale-blue translucent drop",
+   "'civic badge' unsupported (no badge in either official design)",
+   "'without erasing the monster identity' is misleading: the human form has no monster traits at all; the blue color (hair and slime) is the only link"
+  ],
+  "sources": [
+   "https://www.ten-sura.com/character/rimuru",
+   "https://www.ten-sura.com/4GfGdAp7/wp-content/themes/tensura_portal/assets/images/character/rimuru/character-image.png?v=6",
+   "https://www.ten-sura.com/4GfGdAp7/wp-content/themes/tensura_portal/assets/images/character/rimuru/character-image_1.png?v=4",
+   "https://en.wikipedia.org/wiki/List_of_That_Time_I_Got_Reincarnated_as_a_Slime_characters",
+   "https://en.wikipedia.org/wiki/That_Time_I_Got_Reincarnated_as_a_Slime"
+  ],
+  "confidence": "high",
+  "note": "Verified from official anime character art (slime and human form in the same image). Which form dominates depends on the season: slime early in season 1, human form more common later."
+ },
+ "M11": {
+  "base": "humanoid creature",
+  "presentation": "A tall, fully bare skeleton with a fanged skull and red glowing points of light in the eye sockets, a glowing red orb floating in the rib cage, and long bony clawed fingers with rings. Wears a hooded, floor-length black and dark-purple robe with gold trim, huge curved white spiked shoulder pieces set with red orbs, a gold collar, and carries an ornate gold staff topped with a cluster of colored gems.",
+  "notOnPage": [
+   "flesh, skin or a human face",
+   "empty dark eye sockets with no glow",
+   "hair or a beard",
+   "crown worn on the skull",
+   "rotting zombie flesh",
+   "plain brown wizard robe"
+  ],
+  "recipeProblems": [
+   "'empty face or glowing eye sockets': the sockets hold red glowing lights, not an empty face",
+   "'restrained black, ivory, and one jewel color' is close but omits the strong purple and gold of the robe; the jewel color is red",
+   "'seal, or throne' are optional props, not design facts (the staff is canonical)"
+  ],
+  "sources": [
+   "https://overlord-anime.com/",
+   "https://overlord-anime.com/assets/character/1c2.webp",
+   "https://en.wikipedia.org/wiki/Overlord_(novel_series)",
+   "https://en.wikipedia.org/wiki/List_of_Overlord_(novel_series)_characters"
+  ],
+  "confidence": "high",
+  "note": "Verified from official anime character art. He sometimes appears in disguise as a warrior in full black plate armor with a red cape; that is not the usual look."
+ },
+ "M12": {
+  "base": "creature",
+  "presentation": "A spider monster, not a person: a white or pale-grey spider body with black and pink markings, eight thin legs, several small red eyes plus two large expressive cartoon eyes on the front of the head, and no human face or torso. Later evolutions grow larger, spikier and armored with purple-pink highlights.",
+  "notOnPage": [
+   "human head or torso on the spider (unless the late half-human form is chosen deliberately)",
+   "realistic hairy tarantula texture",
+   "brown or black spider body",
+   "clothing",
+   "six or ten legs"
+  ],
+  "recipeProblems": [
+   "'A humanlike face is optional' is misleading: the spider form has a cartoon-eyed spider face, never a human face",
+   "'compact abdomen' is only true of the early forms; later forms have a large spiky abdomen"
+  ],
+  "sources": [
+   "https://myanimelist.net/character/136893/Kumoko",
+   "https://myanimelist.net/character/136893/Kumoko/pics",
+   "https://cdn.myanimelist.net/images/characters/2/314231.jpg",
+   "https://cdn.myanimelist.net/images/characters/10/423671.jpg",
+   "https://cdn.myanimelist.net/images/characters/16/473875.jpg",
+   "https://cdn.myanimelist.net/images/characters/3/482637.jpg",
+   "https://en.wikipedia.org/wiki/So_I%27m_a_Spider,_So_What%3F"
+  ],
+  "confidence": "medium",
+  "note": "Verified from MyAnimeList images of the anime (official site not reachable). Late in the story she gains a half-spider form and a human form (white hair, glowing red-pink eyes, very pale skin); the spider form is the usual on-screen look for this archetype. One MAL image is a chibi promo with a pink body, so color ranges from white-grey to pinkish."
+ },
+ "M25": {
+  "base": "humanoid creature",
+  "presentation": "A very tall, broad knight in gleaming white-silver plate armor with gold trim, huge rounded pauldrons, a dark navy cape and a blue-and-white tabard, wielding a large dark-bladed sword; the closed helmet is usually on. Under the helmet the head is a bare white skull with dark empty sockets. A small fluffy green fox often perches on his helmet or shoulder.",
+  "notOnPage": [
+   "flesh, hair or a human face under the helmet",
+   "black or rusted armor",
+   "glowing red eyes",
+   "rotting zombie features",
+   "skeleton visible through gaps in the armor while armored"
+  ],
+  "recipeProblems": [
+   "'pale or dark plate': the armor is pale (white-silver with gold trim); 'dark' is wrong",
+   "'no visible hair while unmasked' is true but odd; the unhelmeted head is simply a bare skull",
+   "'picnic bundle' is an invented comic prop, not a design fact (fine as a gag only)"
+  ],
+  "sources": [
+   "https://skeleton-knight.com/character/",
+   "https://skeleton-knight.com/character/arc",
+   "https://skeleton-knight.com/character/ponta",
+   "https://skeleton-knight.com/wp/wp-content/themes/skeleton-knight_ver2604/img/c1.png",
+   "https://en.wikipedia.org/wiki/Skeleton_Knight_in_Another_World"
+  ],
+  "confidence": "high",
+  "note": "The official site says he normally wears the helmet to hide that he is a skeleton. Wikipedia says the fox perches on his helmet or a pauldron; the fox's green fur is from Wikipedia, not seen in an image. He sometimes covers the armor with a cloak and mask as a disguise."
+ },
+ "M27": {
+  "base": "human",
+  "presentation": "Human face and body of a young woman with pointed elf ears; shoulder-length blonde hair with a red hairband and a pale-blue feather ornament, green or teal eyes, small earrings, and green-and-cream traveling robes with a brown shawl.",
+  "notOnPage": [
+   "very long ears sticking straight out sideways",
+   "silver or green hair",
+   "elderly appearance",
+   "revealing costume"
+  ],
+  "recipeProblems": [
+   "'long ... hair' is wrong for the main anchor: her hair is shoulder-length",
+   "'silver or green hair' unsupported; she is blonde",
+   "'polished staff' not verified",
+   "the anchor list mixes her adopted children, who are not all elves"
+  ],
+  "sources": [
+   "https://myanimelist.net/character/193229",
+   "https://myanimelist.net/character/193229/Cayna/pics",
+   "https://cdn.myanimelist.net/images/characters/7/433941.jpg",
+   "https://cdn.myanimelist.net/images/characters/10/450594.jpg"
+  ],
+  "confidence": "medium",
+  "note": "Only Cayna was verified (two MAL images; no official site found). Skargo, Mai-Mai and Kartatz were not verified; from memory, Kartatz is a dwarf, not an elf (unverified, low confidence). Staff not seen in images."
+ },
+ "P01": {
+  "base": "human",
+  "presentation": "Human face and body with long pointed elf ears; very long pale-blonde hair with braided side locks, a gold circlet with a green gem, blue eyes, and a green-and-gold patterned top with a blue pendant.",
+  "notOnPage": [
+   "green skin",
+   "animal features",
+   "dark skin"
+  ],
+  "recipeProblems": [
+   "'one unmistakable bow' unsupported: canon gives her a sword plus fire and earth magic",
+   "'Leaf-trimmed leather, a short forest cloak, long gloves' unsupported (not visible in sources)"
+  ],
+  "sources": [
+   "https://myanimelist.net/character/171563",
+   "https://myanimelist.net/character/171563/Myura/pics",
+   "https://cdn.myanimelist.net/images/characters/12/409371.jpg"
+  ],
+  "confidence": "high",
+  "note": "Hair, ears, circlet and braids verified from an anime image; weapon from MAL text ('very proficient with a sword'). Costume below the chest not seen."
+ },
+ "P02": {
+  "base": "human",
+  "presentation": "Human face and body with long pointed elf ears; long straight blonde hair with a green headband, green-teal eyes, a curvy figure, and a green dress with a large chest cut-out and a short green cape; carries a bow.",
+  "notOnPage": [
+   "green skin",
+   "animal features",
+   "short hair"
+  ],
+  "recipeProblems": [
+   "'leaf jewelry, ribbons' unsupported (a green headband is what is visible)",
+   "'oversized luggage' is an invented gag prop, not canon",
+   "'slender' build is wrong for this anchor (drawn curvy)",
+   "'more clearly than exposed skin' runs against canon, whose costume is revealing; fine as a deliberate choice but not a design fact"
+  ],
+  "sources": [
+   "https://myanimelist.net/character/140149/Shera_L_Greenwood/pics",
+   "https://cdn.myanimelist.net/images/characters/3/313377.jpg",
+   "https://cdn.myanimelist.net/images/characters/12/387666.jpg",
+   "https://en.wikipedia.org/wiki/How_Not_to_Summon_a_Demon_Lord"
+  ],
+  "confidence": "medium",
+  "note": "Looks verified from MAL anime and manga images. The bow comes from search-result summaries of fan databases (an archer who rarely shows it). In season 1 she wears a metal collar as a plot device; omit it."
+ },
+ "P03": {
+  "base": "human",
+  "presentation": "Human face and body of a youthful-looking woman with long pointed elf ears; very long golden-blonde hair in large curls or drill ringlets with an ahoge, red eyes, and a sleeveless deep-red high-collared top with white detached sleeves.",
+  "notOnPage": [
+   "aged or wrinkled face",
+   "silver hair",
+   "animal features",
+   "ponytail"
+  ],
+  "recipeProblems": [
+   "'ponytail or loose waves' wrong: long curled drill ringlets",
+   "'silver hair' unsupported",
+   "'Weathered fitted armor' not verified (images show a red top with white sleeves)",
+   "'sword and shield' not verified from a primary source",
+   "'wine flask' unsupported"
+  ],
+  "sources": [
+   "https://myanimelist.net/character/115187/Elinalise_Dragonroad",
+   "https://myanimelist.net/character/115187/Elinalise_Dragonroad/pics",
+   "https://cdn.myanimelist.net/images/characters/3/460705.jpg",
+   "https://cdn.myanimelist.net/images/characters/14/647599.jpg"
+  ],
+  "confidence": "medium",
+  "note": "Face, hair and ears verified from two anime images (head and shoulders only). Weapon only from search summaries of a fan 3D-model listing (sword and shield) and a LoRA tag list ('drill hair', 'red eyes'); the official mushokutensei.jp character page returned 403."
+ },
+ "P04": {
+  "base": "human",
+  "presentation": "Human face and body with dark brown skin and long pointed elf ears; long silver-lavender hair in a high ponytail tied with a red ribbon, violet eyes, and a white-and-black breastplate over a red high-collared top.",
+  "notOnPage": [
+   "grey or blue skin",
+   "red evil eyes",
+   "horns or tattoos",
+   "animal features"
+  ],
+  "recipeProblems": [
+   "'heavy sword' only partly verified (a fan wiki summary says a sword nearly as long as she is)",
+   "'forest armor' and 'clan emblem' unsupported"
+  ],
+  "sources": [
+   "https://myanimelist.net/character/164914/Aisha_Udgard",
+   "https://myanimelist.net/character/164914/Aisha_Udgard/pics",
+   "https://cdn.myanimelist.net/images/characters/4/364292.jpg",
+   "https://cdn.myanimelist.net/images/characters/4/433505.jpg"
+  ],
+  "confidence": "high",
+  "note": "Skin, hair, ears, eyes and armor verified from MAL images; the sword detail is from a search summary of a fandom wiki that could not be read."
+ },
+ "P05": {
+  "base": "human",
+  "presentation": "Human face and body of a slim young girl with black cat ears on top of the head (pale inner fur) and a thin black cat tail; black hair, either long with low side tails or a short shoulder-length cut, large green or blue eyes, sometimes a small fang.",
+  "notOnPage": [
+   "cat face, muzzle or whiskers",
+   "fur on the body",
+   "paw hands or claws",
+   "extra human ears at the sides",
+   "panther or tiger head"
+  ],
+  "recipeProblems": [
+   "'white, or tawny hair' unsupported: both anchors have black hair",
+   "'short bob' fits only one anchor; the other has long hair",
+   "'summoning tokens' unverified"
+  ],
+  "sources": [
+   "https://en.wikipedia.org/wiki/How_Not_to_Summon_a_Demon_Lord",
+   "https://myanimelist.net/character/140148/Rem_Galleu/pics",
+   "https://cdn.myanimelist.net/images/characters/6/313378.jpg",
+   "https://cdn.myanimelist.net/images/characters/12/387658.jpg",
+   "https://myanimelist.net/character/156422/Fran",
+   "https://myanimelist.net/character/156422/Fran/pics",
+   "https://cdn.myanimelist.net/images/characters/15/343670.jpg",
+   "https://cdn.myanimelist.net/images/characters/10/490135.jpg"
+  ],
+  "confidence": "medium",
+  "note": "Ears and hair verified for both anchors; a tail is visible only in a manga image of the first anchor. The second anchor's tail was not seen; her weapon is a sentient sword (MAL text). The first anchor wears a metal collar in season 1; omit it."
+ },
+ "P06": {
+  "base": "human",
+  "presentation": "Human face and body with dog or wolf ears on top of the head: either large upright wolf ears (dark, pale inner fur) on a woman with long dark purple-black hair, violet eyes, fangs and faint face markings, or soft floppy dog ears blending into a short brown bob on a small child with blue eyes. A tail is expected but was not confirmed in sources.",
+  "notOnPage": [
+   "dog or wolf muzzle",
+   "fur covering the body",
+   "paw hands",
+   "extra human ears at the sides of the head"
+  ],
+  "recipeProblems": [
+   "'Prominent canine ears' wrong for one anchor (droopy ears that blend into the hair)",
+   "'athletic, sturdy' wrong for one anchor (a small child)",
+   "'chestnut, sandy hair' unsupported",
+   "'sleeveless practical gear, large gloves, spear or oversized blade' not verified",
+   "'bushy tail' not verified"
+  ],
+  "sources": [
+   "https://myanimelist.net/character/194185/Delta",
+   "https://myanimelist.net/character/194185/Delta/pics",
+   "https://cdn.myanimelist.net/images/characters/5/448402.jpg",
+   "https://cdn.myanimelist.net/images/characters/15/563724.jpg",
+   "https://myanimelist.net/character/146626/Pochi/pics",
+   "https://cdn.myanimelist.net/images/characters/4/343189.jpg",
+   "https://cdn.myanimelist.net/images/characters/13/383415.jpg"
+  ],
+  "confidence": "medium",
+  "note": "Head and ears verified from MAL images for both anchors; the two anchors differ a lot in age and build, so the recipe may need to pick one. Tails, outfits and weapons not seen."
+ },
+ "P07": {
+  "base": "dual",
+  "presentation": "Human form (assumed usual on screen): a human face and body with large white furry wolf ears on top of the head, very long silver-white hair, blue eyes, a choker, and a white frilled sleeveless dress. Creature form: a large white-silver wolf.",
+  "notOnPage": [
+   "wolf muzzle on the human form",
+   "fur on the human body",
+   "grey or brown wolf",
+   "werewolf hybrid form"
+  ],
+  "recipeProblems": [
+   "'small ear ... motifs' wrong: the wolf ears are large and clearly visible",
+   "'apron over travel clothes' unsupported (she wears a white dress)",
+   "'ash hair' unsupported"
+  ],
+  "sources": [
+   "https://myanimelist.net/character/199586/Fenrys",
+   "https://myanimelist.net/character/199586/Fenrys/pics",
+   "https://cdn.myanimelist.net/images/characters/5/449147.jpg",
+   "https://cdn.myanimelist.net/images/characters/5/535545.jpg"
+  ],
+  "confidence": "medium",
+  "note": "Human form verified from images. Wolf form only from MAL text ('a white/silver Fang Wolf'). Which form is shown more often is not confirmed by a source."
+ },
+ "P08": {
+  "base": "human",
+  "presentation": "Human face and body with long upright white rabbit ears (pink inside) on top of the head; long pale mint-blue hair with a blue bow, blue eyes, and a revealing blue-and-white outfit (bikini-style top, short frilled skirt, arm bands, thigh-high socks, blue boots); swings a giant hammer.",
+  "notOnPage": [
+   "rabbit face or buck teeth",
+   "fur on the body",
+   "rabbit feet",
+   "extra human ears at the sides",
+   "gauntlets as the main weapon"
+  ],
+  "recipeProblems": [
+   "'travel leathers, scarf, reinforced boots' unsupported: the canon outfit is a revealing blue-and-white costume",
+   "'oversized gauntlets' unsupported; the weapon is a giant hammer",
+   "'pink, or cream hair' unsupported; hair is pale mint-blue"
+  ],
+  "sources": [
+   "https://arifureta.com/character",
+   "https://arifureta.com/wp3/wp-content/themes/arifure3/img/character/mc03.png",
+   "https://en.wikipedia.org/wiki/Arifureta:_From_Commonplace_to_World%27s_Strongest"
+  ],
+  "confidence": "high",
+  "note": "Verified from official anime character art. Hammer from search summaries of anibase.net (direct fetch returned 403). No tail visible in the official art."
+ },
+ "P09": {
+  "base": "human",
+  "presentation": "Human face and body of a young woman with round brown raccoon-dog ears on top of the head and a bushy tail; very long orange-brown hair, red-pink eyes, a cream blouse with a red ribbon, a brown leather breastplate, and a sword (later a katana).",
+  "notOnPage": [
+   "raccoon face, mask markings or muzzle",
+   "fur on the body",
+   "ringed raccoon tail",
+   "extra human ears at the sides",
+   "slave crest or collar"
+  ],
+  "recipeProblems": [
+   "'broad tail' is roughly right but sources say 'bushy'",
+   "'personal cloak' not verified"
+  ],
+  "sources": [
+   "https://myanimelist.net/character/112893/Raphtalia",
+   "https://myanimelist.net/character/112893/Raphtalia/pics",
+   "https://cdn.myanimelist.net/images/characters/9/363562.jpg",
+   "https://cdn.myanimelist.net/images/characters/11/455086.jpg",
+   "https://cdn.myanimelist.net/images/characters/9/387886.jpg",
+   "https://en.wikipedia.org/wiki/List_of_The_Rising_of_the_Shield_Hero_characters"
+  ],
+  "confidence": "high",
+  "note": "Ears, hair, eyes and outfit verified from anime images; the tail is from search summaries of figure reviews (not seen in an image). She is a small child early in the story, then a young woman."
+ },
+ "P10": {
+  "base": "human",
+  "presentation": "Human face and body; orange scale patches at the throat and forearms, often covered by clothing. Practical armor and a long spear.",
+  "notOnPage": [
+   "lizard head or snout",
+   "fully scaled face or body",
+   "reptile skin over the whole body",
+   "clawed reptile feet"
+  ],
+  "recipeProblems": [
+   "visible scales at neck and limbs (scales are small patches at throat and forearms, often covered)",
+   "a substantial tail (unsupported; leads to a lizard-woman)"
+  ],
+  "sources": [],
+  "confidence": "high",
+  "note": "Not re-researched: per the brief, the user verified her appearance from an official image. Tail: not confirmed either way; omit it rather than make it substantial."
+ },
+ "P11": {
+  "base": "human",
+  "presentation": "Human face and body with one black horn rising from the center of the forehead; long purple hair, usually in a high ponytail. Usually wears an open-jacketed purple business suit over a light shirt.",
+  "notOnPage": [
+   "monstrous ogre face",
+   "tusks",
+   "green, red or purple skin",
+   "two horns",
+   "hulking giant body"
+  ],
+  "recipeProblems": [
+   "red or indigo hair (canon is purple)",
+   "a prominent horn (should say: a single horn at the center of the forehead)",
+   "muscular or full-built (unverified; she is about 170 cm and curvy rather than bulky)",
+   "enormous sword (not verified in sources read)",
+   "immaculate clipboard (invented prop)"
+  ],
+  "sources": [
+   "https://mywaifulist.moe/waifu/shion-that-time-i-got-reincarnated-as-a-slime",
+   "https://myanimelist.net/character/131937"
+  ],
+  "confidence": "medium",
+  "note": "Search summaries (anibase, animemanga) say the early ogre form had purple-tinted skin and a thick horn; after evolving to kijin the horn narrowed and skin looks human, though sources disagree on skin tint. The fandom wiki (402) and anibase (403) could not be read directly. Her large sword is from memory, not a read source."
+ },
+ "P12": {
+  "base": "dual",
+  "presentation": "Usual on screen: human form. One look is fully human (long black hair, golden eyes, black kimono, ears slightly pointed); the others have two black horns sweeping backward from the sides of the head, and one shows a reptilian tail. The dragon form is a huge scaled dragon whose scale colour matches the hair.",
+  "notOnPage": [
+   "dragon head or snout on the human form",
+   "scales covering the face or body in human form",
+   "wings on the human form",
+   "reptile skin"
+  ],
+  "recipeProblems": [
+   "adult human form with horns (one anchor has no horns in human form; another is child-shaped, not adult)",
+   "slit-pupil eyes (stated only for the dragon form)",
+   "one scale motif (no scales on the human forms in sources read)",
+   "red, black, or white hair (anchors are black, ginger, lilac)",
+   "formal dress, armored coat (unsupported; kimono and blouse outfits are documented)"
+  ],
+  "sources": [
+   "https://mywaifulist.moe/waifu/tio-klarus-arifureta-from-commonplace-to-world-s-strongest",
+   "https://www.anisearch.com/character/63406,tio-klarus",
+   "https://en.wikipedia.org/wiki/List_of_Arifureta_characters",
+   "https://mywaifulist.moe/waifu/flatorte-i-ve-been-killing-slimes-for-300-years-and-maxed-out-my-level",
+   "https://mywaifulist.moe/waifu/laika"
+  ],
+  "confidence": "medium",
+  "note": "Tio: no source mentions horns on her human form; the Arifureta fan wiki (seen only as a search snippet) says dragonmen look human except slightly pointed ears and dark pointed nails. Laika: short, youthful-looking, ginger bob, two black backward horns, tail hidden when human. Flatorte: adult, lilac hair in side loops, rear-facing horns, reptilian tail visible in human form. Pick one anchor's look per comic instead of blending."
+ },
+ "P13": {
+  "base": "human",
+  "presentation": "Human face and body, small and girl-sized (about 140 cm or shorter); very pale skin and red eyes; long golden-blonde or silver hair. Gothic black dress with a heavy layered skirt and lace, sometimes a parasol.",
+  "notOnPage": [
+   "bat wings",
+   "monstrous face or lamprey mouth",
+   "pointed ears",
+   "claws",
+   "tall adult body"
+  ],
+  "recipeProblems": [
+   "petite or tall adult silhouette (both anchors look like 12 to 14 year old girls)",
+   "black hair (unsupported for both anchors)",
+   "severe formal coat (unsupported)",
+   "antique jewelry (unverified)"
+  ],
+  "sources": [
+   "https://en.wikipedia.org/wiki/List_of_Arifureta_characters",
+   "https://mywaifulist.moe/waifu/yue-arifureta-from-commonplace-to-world-s-strongest",
+   "https://mywaifulist.moe/waifu/shalltear-bloodfallen-overlord"
+  ],
+  "confidence": "high",
+  "note": "Yue: golden-blonde hair with reddish-pink tips, red eyes, looks about 12, 140 cm. Shalltear: silver ponytail with large ribbon, pale skin, crimson eyes, looks about 14, black evening dress with big skirt; parasol confirmed by figure listings in search results. Shalltear's monstrous true form exists but is not her usual look. Both anchors are child-shaped, so the recipe's nonromantic rule applies to the default, not an option."
+ },
+ "P14": {
+  "base": "human",
+  "presentation": "Human face and body with long red hair and red eyes, about 168 cm. Her horns, bat-like wings and tail exist but are normally hidden by a magic hairpin, so she usually looks fully human; when revealed, add small horns, bat wings and a thin tail.",
+  "notOnPage": [
+   "demon face",
+   "red or dark skin",
+   "goat legs",
+   "horns or wings while disguised"
+  ],
+  "recipeProblems": [
+   "pink, purple, or black hair (canon is red)",
+   "small horns or pointed ears (pointed ears unsupported; horns usually hidden)",
+   "staff (unsupported; she fights hand to hand)"
+  ],
+  "sources": [
+   "https://mywaifulist.moe/waifu/sera-black-summoner",
+   "https://anihk.com/en/character/sera-black-summoner",
+   "https://en.wikipedia.org/wiki/Black_Summoner"
+  ],
+  "confidence": "medium",
+  "note": "Horns, bat-like wings, tail and the camouflage hairpin come from search-result snippets of blacksummoner.fandom.com (Sera Baal, Episode 5), which I could not fetch. Clothing not verified. Close-quarters fighting confirmed by anihk."
+ },
+ "P15": {
+  "base": "human",
+  "presentation": "Fully human woman, about 157 cm. Either waist-long translucent blue hair partly tied in a loop with a round clip, blue eyes, blue-and-white outfit with over-knee boots; or long blonde hair with a blue ribbon and a white off-shoulder dress.",
+  "notOnPage": [
+   "halo",
+   "angel wings",
+   "glowing aura over the whole body",
+   "pointed ears"
+  ],
+  "recipeProblems": [
+   "halo-like ornament (unsupported; the ornaments are a round hair clip or a blue ribbon)",
+   "holy staff (not verified in sources read)",
+   "ceremonial clothes (outfits are a blue-white costume and a white dress, not robes)"
+  ],
+  "sources": [
+   "https://mywaifulist.moe/waifu/aqua-konosuba-god-s-blessing-on-this-wonderful-world",
+   "https://mywaifulist.moe/waifu/ristarte"
+  ],
+  "confidence": "high",
+  "note": "Both anchors are goddesses who look entirely human; no divine body traits. Staff and wine cup were not found in read sources."
+ },
+ "P18": {
+  "base": "human",
+  "presentation": "Human child, about 130 to 140 cm. Pale cream-blonde hair in long vertical drill twin tails with pink tips, large blue eyes with butterfly-shaped pupils, a small crown on one side of the head, and a frilly dark pink and white dress.",
+  "notOnPage": [
+   "fairy or butterfly wings",
+   "pointed ears",
+   "glowing translucent body",
+   "adult body"
+  ],
+  "recipeProblems": [
+   "explicitly mature petite form (she is child-shaped)",
+   "silver bob, or very long dark hair (canon is blonde drills)",
+   "key ring (unsupported)",
+   "large book (plausible for a librarian, not verified as a signature prop)"
+  ],
+  "sources": [
+   "https://mywaifulist.moe/waifu/beatrice-re-zero-starting-life-in-another-world"
+  ],
+  "confidence": "high",
+  "note": "Hair, crown, butterfly pupils and dress come from multiple search results (figure listings, ACDB snippets) plus the mywaifulist tags (drill hair, blue eyes, 130 cm); the fandom wiki was not read."
+ },
+ "P26": {
+  "base": "human",
+  "presentation": "Human woman with long jet-black hair, golden eyes with vertical slit pupils, two thick crooked horns at the temples, and a pair of black feathered angel wings growing from the waist. Pure white gown and silky white gloves; black full plate armor in battle.",
+  "notOnPage": [
+   "bat wings",
+   "demon face",
+   "red or dark skin",
+   "tail",
+   "goat legs"
+  ],
+  "recipeProblems": [
+   "white, or violet hair (canon is black)",
+   "horns or dark wings (she has both, always visible)"
+  ],
+  "sources": [
+   "https://myanimelist.net/character/116275"
+  ],
+  "confidence": "high",
+  "note": "Wings are feathered (angel-like), not bat-like."
+ },
+ "P27": {
+  "base": "human",
+  "presentation": "Human face and body with long pointed elf ears; long golden-blonde hair to the waist and emerald green eyes. Wears a black maid uniform with a slave collar at the neck and fights with a bow.",
+  "notOnPage": [
+   "curse markings on skin or hands",
+   "animal ears",
+   "dark elf skin",
+   "fully hidden ears"
+  ],
+  "recipeProblems": [
+   "lavender, or dark hair (canon is blonde)",
+   "partially concealed ears or marked hands (unsupported; the curse is a social stigma, not a mark)",
+   "layered travel clothes, protective gloves, a charm (she wears a maid uniform)"
+  ],
+  "sources": [
+   "https://mywaifulist.moe/waifu/efil-black-summoner",
+   "https://anihk.com/en/character/efil-black-summoner",
+   "https://en.wikipedia.org/wiki/Black_Summoner"
+  ],
+  "confidence": "medium",
+  "note": "Hair, eye colour and pointed ears come from search snippets of blacksummoner.fandom.com and isekai.fandom.com, which I could not fetch. Maid outfit and slave collar read on mywaifulist. She is listed as 16; the recipe's 'adult' needs a decision."
+ },
+ "P28": {
+  "base": "human",
+  "presentation": "Human face and body. One look: dark-skinned man with combed black hair, round glasses over squinting eyes, a striped three-piece suit, and a long silver-plated spiked tail from the lower back. Other look: young woman with long golden-blonde hair, blue eyes and long pointed elf ears, in a black form-fitting bodysuit or dress.",
+  "notOnPage": [
+   "horns",
+   "demon face",
+   "wings",
+   "red skin",
+   "animal head"
+  ],
+  "recipeProblems": [
+   "horns (neither anchor has horns)",
+   "military coat (unsupported)",
+   "pale hair (fine for the elf, but her pointed ears are the missing visible trait)"
+  ],
+  "sources": [
+   "https://myanimelist.net/character/116323",
+   "https://mywaifulist.moe/waifu/demiurge-overlord",
+   "https://myanimelist.net/character/194178",
+   "https://mywaifulist.moe/waifu/alpha-3"
+  ],
+  "confidence": "medium",
+  "note": "Demiurge's silver-plated tail and suit colour (red striped vs orange) come from search snippets (anibase, fan sites), not a page I read. Alpha's long elf ears come from a search snippet of a model page, and the slime bodysuit from a TV Tropes snippet (TV Tropes returned 403). Demiurge has a monstrous demon form, not his usual look."
+ },
+ "P30": {
+  "base": "human",
+  "presentation": "Tall (about 190 cm) pale-skinned man with emerald green hair, often shaved bald, and a red gemstone set in the center of his forehead, frequently covered by a headband. A long scar runs diagonally across his face; brown tribal vest, white trident-like spear.",
+  "notOnPage": [
+   "red skin",
+   "horns",
+   "demon or monstrous face",
+   "third eye drawn as a real eye",
+   "tail"
+  ],
+  "recipeProblems": [
+   "heavily built (unverified; tall is supported)",
+   "gray, or dark hair (canon is green or shaved)",
+   "unusual eyes (unsupported; the distinctive feature is the forehead gem)",
+   "cultural markings (unsupported)"
+  ],
+  "sources": [
+   "https://mywaifulist.moe/waifu/ruijerd-superdia-mushoku-tensei",
+   "https://myanimelist.net/character/111739",
+   "https://en.wikipedia.org/wiki/List_of_Mushoku_Tensei_characters"
+  ],
+  "confidence": "medium",
+  "note": "Green hair, red forehead gem, 190 cm and vest read on mywaifulist. Shaved head with headband, the facial scar and spear colour come from search snippets of the fandom wiki and quotetheanime. The species label 'humanoid_monster' is misleading: he looks human apart from the gem."
+ },
+ "P31": {
+  "base": "human",
+  "presentation": "Short, broad dwarf man with brown hair and a beard, wearing a helmet and armor and carrying a shield; he is a mage despite the warrior gear.",
+  "notOnPage": [
+   "animal features",
+   "giant size",
+   "monstrous face"
+  ],
+  "recipeProblems": [
+   "heavy apron, tool belt (unsupported; he is a mage, not a smith)",
+   "hammer (unsupported)",
+   "gray, or red hair (unverified; brown reported)"
+  ],
+  "sources": [
+   "https://en.wikipedia.org/wiki/Handyman_Saitou_in_Another_World"
+  ],
+  "confidence": "low",
+  "note": "Wikipedia confirms dwarf and arcane mage only. Beard, helmet, armor, shield and brown hair come from a search snippet of animecharactersdatabase tags; the ACDB page returned 503 and the fandom wiki and TV Tropes were blocked."
+ },
+ "P33": {
+  "base": "human",
+  "presentation": "Small fairy girl with long sky-blue hair in twin ponytails and green eyes; cleric outfit. Size and wings unverified.",
+  "notOnPage": [
+   "insect or butterfly wings (unless confirmed)",
+   "palm-sized body (unless confirmed)"
+  ],
+  "recipeProblems": [
+   "palm-sized winged (unverified; ACDB snippet lists her as teenager-coded, and her race shrinks only when offerings stop)",
+   "white, blonde, or pale green hair (reported as blue)",
+   "a coin nearly as large as her face (assumes palm size)"
+  ],
+  "sources": [
+   "https://en.wikipedia.org/wiki/Handyman_Saitou_in_Another_World",
+   "https://www.siliconera.com/handyman-saitou-in-another-world-9-focuses-on-lafanpan/",
+   "https://beneaththetangles.com/2023/01/08/first-impression-handyman-saitou-in-another-world/"
+  ],
+  "confidence": "low",
+  "note": "Read sources confirm a moonlight fairy cleric who must offer gold coins or shrink. Hair and eyes come from search snippets of the fandom wiki and ACDB, both unreadable. Her on-screen size and whether she has wings could not be verified; base 'human' is a guess."
+ },
+ "P34": {
+  "base": "humanoid creature",
+  "presentation": "A tall, hollow suit of dark black plate armor that moves on its own; the face is never shown, only the barred visor of the helmet. Carries a sword and a shield.",
+  "notOnPage": [
+   "skull",
+   "skeleton",
+   "visible face",
+   "glowing eyes"
+  ],
+  "recipeProblems": [
+   "skull (wrong; the armor is empty)",
+   "glowing eye slits (unsupported)",
+   "worn heraldry (unsupported)",
+   "a cape (unsupported)",
+   "heavy sword (a named sword is confirmed, size not)"
+  ],
+  "sources": [
+   "https://mywaifulist.moe/waifu/gerard-fragarach",
+   "https://anihk.com/en/character/gerard-black-summoner",
+   "https://en.wikipedia.org/wiki/Black_Summoner"
+  ],
+  "confidence": "medium",
+  "note": "Hollow armor read on mywaifulist. Black armor, barred helmet, shield and sword come from search snippets (TV Tropes, anime-planet tags, fandom). He later gains a body but keeps the armor on."
+ },
+ "P35": {
+  "base": "dual",
+  "presentation": "Two forms, both common on screen. Bird form: a huge, round, flightless owl-like bird with white plumage (pink as a chick) and a single upright feather crest on the head. Girl form: a human child with long blonde hair, an upright cowlick, blue eyes, a pair of white feathered wings on her back, a white dress with a large blue bow, and a feather-shaped hair clip.",
+  "notOnPage": [
+   "bird head or beak on the girl form",
+   "feathered skin or talons on the girl form",
+   "flying bird pose for the bird form (it runs, it does not fly)",
+   "sleek raptor or chicken anatomy instead of a round owl-like body",
+   "adult body for the girl form"
+  ],
+  "recipeProblems": [
+   "'travel tunic' (girl form wears a white dress with a blue bow)",
+   "'bell or harness identifying the mount function' (not seen in sources read; she pulls a carriage, but no bell or harness was verified)",
+   "'blonde, cream, or pale hair' is loose: canon is blonde",
+   "'clear feather crest' is right only as a single upright feather or cowlick, not a full crest"
+  ],
+  "sources": [
+   "https://en.wikipedia.org/wiki/List_of_The_Rising_of_the_Shield_Hero_characters",
+   "https://www.cbr.com/shield-hero-filolial-race-what-to-know/",
+   "https://quotetheanime.com/rising-of-the-shield-hero/filo-wiki/",
+   "https://www.goodsmile.com/en/product/7055",
+   "https://myanimelist.net/character/112909/Filo"
+  ],
+  "confidence": "medium",
+  "note": "Girl form verified from the official Nendoroid photo (blonde, white wings, white and blue dress, feather clip). Bird-form colours (white, pink as a chick) and owl-like shape come from Wikipedia and a fan wiki; no official bird-form art was read. Official anime site character page returned 404; fandom wiki returned 402."
+ },
+ "P36": {
+  "base": "creature",
+  "presentation": "A small, smooth, translucent dome-shaped blob that sits on the ground, glossy with a highlight on top; the companion slime is pale blue grading to cyan at the base, with two tiny dot eyes and no mouth. Other utility slimes are similar plain translucent blobs in pale blue, white or yellow, with a small symbol or core visible inside instead of a face.",
+  "notOnPage": [
+   "arms, legs or hands",
+   "large anime eyes or a wide mouth",
+   "pointed teardrop shape with a face",
+   "a human or girl form",
+   "opaque or furry body"
+  ],
+  "recipeProblems": [
+   "'blue, green, pink, or amber' (sources show blue, pale blue or white, and yellow; green and pink not seen)",
+   "'simple face' fits only the companion slime (two dot eyes); the other utility slimes in sources show an inner symbol or core, not a face",
+   "'basket, little bag, or carried leaf' (not seen in canon art)"
+  ],
+  "sources": [
+   "https://tondemoskill-anime.com/character/",
+   "https://tondemoskill-anime.com/season2/wp-content/themes/tondemoskill/assets/img/character/main_vernew/chara3_main.png",
+   "https://en.wikipedia.org/wiki/Campfire_Cooking_in_Another_World_with_My_Absurd_Skill",
+   "https://dengekionline.com/articles/42425/",
+   "https://dengekionline.com/articles/42425/images/1/",
+   "https://www.animenewsnetwork.com/review/by-the-grace-of-the-gods/season-1/.174140"
+  ],
+  "confidence": "high",
+  "note": "Companion slime verified from official anime character art (pale blue dome, two dot eyes, small pink heart mark on its side). Utility slimes verified only from the season-1 key visual (pale blue or white and yellow blobs with inner symbols); individual types (acid, poison, healing, metal, bloody) were not seen separately."
+ },
+ "P37": {
+  "base": "creature",
+  "presentation": "An enormous four-legged wolf with a long pointed muzzle and upright ears; long, flowing pale lavender-white fur that streams in flame-like locks along the back and a huge bushy tail, a fluffy white chest ruff, dark red lower legs with black claws, green eyes, and a pale star-shaped mark on the forehead.",
+  "notOnPage": [
+   "human form or human disguise",
+   "standing on hind legs",
+   "armour or saddle",
+   "glowing eyes",
+   "grey, black or brown fur",
+   "multiple tails"
+  ],
+  "recipeProblems": [
+   "'silver, white, gray, or black fur' (canon is pale lavender-white with dark red legs; grey and black are wrong)",
+   "'luminous eyes' (canon eyes are green, not glowing)",
+   "'heavy paws' is loose: legs are slender and dark red with black claws"
+  ],
+  "sources": [
+   "https://tondemoskill-anime.com/character/",
+   "https://tondemoskill-anime.com/season2/wp-content/themes/tondemoskill/assets/img/character/main_vernew/chara2_main.png",
+   "https://myanimelist.net/character/173843",
+   "https://en.wikipedia.org/wiki/Campfire_Cooking_in_Another_World_with_My_Absurd_Skill"
+  ],
+  "confidence": "high",
+  "note": "Verified from official anime character art."
+ },
+ "P38": {
+  "base": "creature",
+  "presentation": "Two small creatures. Dragon: a small upright dragon with a cat-like face, big round blue eyes and two short horns, red-orange scales on head, back, legs and tail, cream belly, large bat wings with cream membranes, small clawed hands and feet, and a long curled tail with a spade tip. Fox: a small white fox with large upright ears, green eyes, two pale dots on the forehead and one large bushy tail; it can also become a girl with fox ears on top of the head, fox tails, blunt bangs and shrine-maiden style robes.",
+  "notOnPage": [
+   "large four-legged dragon",
+   "serpentine dragon",
+   "multiple tails on the small fox form",
+   "coloured fur on the fox (it is white)",
+   "human ears on the girl form alongside the fox ears"
+  ],
+  "recipeProblems": [
+   "'hand-sized' not verified; the dragon is small but no size was given in sources",
+   "'multiple tails' (the small fox form in anime art has one tail; several tails appear only on the girl form in manga art)",
+   "'winged lizard' (the dragon has an upright, cat-faced, childlike build, not a lizard body)",
+   "'sleeping spot on a bag or shoulder' (not seen in sources)"
+  ],
+  "sources": [
+   "https://tondemoskill-anime.com/character/",
+   "https://tondemoskill-anime.com/season2/wp-content/themes/tondemoskill/assets/img/character/main_vernew/chara4_main.png",
+   "https://en.wikipedia.org/wiki/Campfire_Cooking_in_Another_World_with_My_Absurd_Skill",
+   "https://anihk.com/en/character/yuzuha-the-new-gate",
+   "https://myanimelist.net/character/154965/Yuzuha/pictures"
+  ],
+  "confidence": "medium",
+  "note": "Dragon verified from official anime art (high). Fox small form verified from anime-style art on MyAnimeList and anihk (white, green eyes, one tail). Girl form seen only in black-and-white manga art (fox ears, tails, shrine-maiden robes), so its anime colours and tail count are unverified."
+ },
+ "P39": {
+  "base": "creature",
+  "presentation": "A tiny cat, about palm-sized, that stands upright on its hind legs: light grey fur with a white chest, belly and paws, big round blue eyes, a small pink nose, a long thin straight tail, one folded ear with a gold ring through it, and sometimes a purple satchel worn across the body.",
+  "notOnPage": [
+   "glowing wisp or orb form",
+   "fairy or robed humanoid",
+   "wings",
+   "icy blue or gold colouring",
+   "large realistic cat"
+  ],
+  "recipeProblems": [
+   "'glowing wisp, fairy-like avatar, or small robed figure' (canon is a small upright grey cat)",
+   "'white, pale gray, icy blue, or warm gold palette' (canon is light grey and white with blue eyes; icy blue and gold body colours are wrong)",
+   "'contract jewel or repeated emblem' (not seen in canon art read; he wears a gold ear ring and a purple bag)",
+   "'hovering rather than walking' (not verified; official art shows him standing)"
+  ],
+  "sources": [
+   "https://re-zero-anime.jp/tv/character/",
+   "https://re-zero-anime.jp/tv/assets/character/c/3.png",
+   "https://otakumode.com/otapedia/anime/re_zero/rezero_puck",
+   "https://en.wikipedia.org/wiki/List_of_Re:Zero_characters"
+  ],
+  "confidence": "high",
+  "note": "Official site text: grey fur, round eyes, pink nose, small cat form. Whether he usually floats on screen was not verified from a source."
+ },
+ "P45": {
+  "base": "human",
+  "presentation": "Human woman with long pointed elf ears; very long straight blonde hair to the hips with an upright cowlick, teal-green eyes, curvy adult build. Sleeveless green bodice with a white frilled neckline, short white pleated skirt, brown belt, long teal cape and scarf, black elbow-length gloves with white cuffs, brown lace-up boots.",
+  "notOnPage": [
+   "green-tinted skin",
+   "leaf or bark textures on the body",
+   "animal features",
+   "short ears"
+  ],
+  "recipeProblems": [
+   "'pale-green long hair' (canon is blonde)",
+   "'rolled sleeves' (outfit is sleeveless with long black gloves)",
+   "'practical apron and leaf-trimmed work clothes' (no apron or leaf trim in canon art)",
+   "'slender' build option (canon is described as voluptuous)",
+   "tonic flask, sample case and pencil are role props, not canon design"
+  ],
+  "sources": [
+   "https://slime300-anime.com/character/",
+   "https://slime300-anime.com/assets/images/character/art/halkara.png",
+   "https://en.wikipedia.org/wiki/I%27ve_Been_Killing_Slimes_for_300_Years_and_Maxed_Out_My_Level"
+  ],
+  "confidence": "high",
+  "note": "Verified from official anime character art."
+ },
+ "P46": {
+  "base": "human",
+  "presentation": "Human girl of about fifteen with a short blonde bob, green eyes and a small red hair ribbon; navy-purple long-sleeved dress with bell cuffs, white sailor collar and yellow ribbon tie, navy beret, white tights, grey shoes. Her feet fade out, and two small blue ghost flames float beside her head.",
+  "notOnPage": [
+   "fully see-through body",
+   "sheet-ghost shape or wispy tail instead of legs",
+   "pale grey or blue skin",
+   "floating wild hair",
+   "skull or zombie features"
+  ],
+  "recipeProblems": [
+   "'translucent lavender, blue or pale-gray palette' (body is opaque with normal skin and blonde hair; only the clothes are navy and the feet fade)",
+   "'floating hair' (hair is a normal short bob)",
+   "treasured ribbon, memento or assigned chair are role props, not canon design"
+  ],
+  "sources": [
+   "https://slime300-anime.com/character/",
+   "https://slime300-anime.com/assets/images/character/art/rosalie.png",
+   "https://en.wikipedia.org/wiki/I%27ve_Been_Killing_Slimes_for_300_Years_and_Maxed_Out_My_Level"
+  ],
+  "confidence": "high",
+  "note": "Verified from official anime character art. 'Softly fading lower outline' and 'old-fashioned dress' are supported."
+ },
+ "N07": {
+  "base": "human",
+  "presentation": "Human face and body, short and stocky with a barrel chest and thick arms; a full thick beard, often braided, with an ordinary human nose and ears.",
+  "notOnPage": [
+   "animal or goblin face",
+   "pointed ears",
+   "green or grey skin",
+   "child proportions"
+  ],
+  "recipeProblems": [],
+  "sources": [
+   "https://myanimelist.net/stacks/41907"
+  ],
+  "confidence": "medium",
+  "note": "No anchors; general convention (short, stocky, thick beard, metalworking) from a MyAnimeList list of anime dwarves plus search results. Exceptions exist (beardless or bowl-cut dwarves). Recipe matches the convention; beard colours and props are style choices, not errors."
+ },
+ "N24": {
+  "base": "human",
+  "presentation": "Usually a tall human-shaped adult with a human face, marked as non-human by horns on the head and pointed ears, sometimes with grey or dark skin; a fully monstrous body is the less common choice.",
+  "notOnPage": [
+   "animal head",
+   "bat face or snout (unless a monster form is chosen on purpose)"
+  ],
+  "recipeProblems": [
+   "'hidden face' and 'monstrous body' are the less common choices; with the label 'demon' an image model defaults to a monster unless the prompt says 'human face'"
+  ],
+  "sources": [
+   "https://otakuusamagazine.com/what-makes-an-anime-demon-lord-so-lovable/"
+  ],
+  "confidence": "medium",
+  "note": "No anchors; general sources only (demon lords often human-looking; horns and pointed ears as markers came from search summaries of TV Tropes pages, which returned 403 when fetched). The anchored demon king in N26 fits this pattern (human face, horns, pointed ears, grey-purple skin)."
+ },
+ "N25": {
+  "base": "human",
+  "presentation": "Human-shaped adult with a human face, marked as demonic by horns, pointed ears and sometimes unusual skin colour; elegant or theatrical styling. Skeletal or monstrous variants exist but are the exception.",
+  "notOnPage": [
+   "animal head",
+   "snout or muzzle"
+  ],
+  "recipeProblems": [
+   "'skeletal' form is an exception and should be chosen deliberately, not as a default"
+  ],
+  "sources": [
+   "https://otakuusamagazine.com/what-makes-an-anime-demon-lord-so-lovable/"
+  ],
+  "confidence": "medium",
+  "note": "No anchors; general convention only. The recipe is a style brief, not a canon claim."
+ },
+ "N26": {
+  "base": "human",
+  "presentation": "Tall, muscular man with a human face and body, grey-purple skin, long wild white hair, long pointed ears, two dark curved horns rising from the top of the head, red eyes. Dark red cape with a gold-trimmed high collar, spiked shoulder armour, black clawed gauntlets with violet accents, bare muscled chest, a front panel with a red gem, and silver armoured greaves.",
+  "notOnPage": [
+   "tusks",
+   "fur",
+   "scales",
+   "animal or ogre face",
+   "tribal mantle",
+   "staff"
+  ],
+  "recipeProblems": [
+   "'tusks, fur, scales, or imposing ears' (canon has horns and pointed ears only; tusks, fur and scales are wrong)",
+   "'tribal mantle' (wears a regal red cape and armour)",
+   "'ceremonial staff, settlement tokens' (not in canon art)",
+   "'monster chief' framing: he is the demon king, drawn as a horned, human-faced man"
+  ],
+  "sources": [
+   "https://lv2-cheat.com/character/",
+   "https://lv2-cheat.com/wp/wp-content/themes/lv2cheat-v2/img/11.png",
+   "https://lv2-cheat.com/wp/wp-content/themes/lv2cheat-v2/img/PV11-1.jpg",
+   "https://en.wikipedia.org/wiki/Chillin%27_in_Another_World_with_Level_2_Super_Cheat_Powers"
+  ],
+  "confidence": "high",
+  "note": "Verified from official anime character art and a PV still. A fan wiki says he also takes a fully human disguise when travelling; not verified."
+ },
+ "N27": {
+  "base": "human",
+  "presentation": "Fully human-looking divine figures. Seen options: a young woman with long straight lavender hair, blunt bangs, a silver circlet, blue eyes, a white dress and white feathered wings; a very old man with a long white beard and long white eyebrows in white layered robes; a woman with long pink hair, a white gown, a red flower necklace and a sheer teal sash; a boy with a long blonde braid, a laurel leaf in his hair, a white tunic and shorts, and a long striped scarf.",
+  "notOnPage": [
+   "halo",
+   "glowing skin",
+   "animal features"
+  ],
+  "recipeProblems": [
+   "'halo-like ornament' (canon shows a circlet or laurel, no halos)",
+   "'blue' hair not seen; lavender and pink are",
+   "'luminous desk, floating menu, suspiciously bureaucratic ledger' (not in canon art; one goddess was a menu voice before taking a body, but no desk or ledger was seen)"
+  ],
+  "sources": [
+   "https://en.wikipedia.org/wiki/Black_Summoner",
+   "https://myanimelist.net/character/206239",
+   "https://myanimelist.net/character/206239/Melfina/pictures",
+   "https://www.cbr.com/black-summoner-main-anime-cast/",
+   "https://dengekionline.com/articles/42425/",
+   "https://dengekionline.com/articles/42425/images/5/",
+   "https://dengekionline.com/articles/42425/images/6/",
+   "https://dengekionline.com/articles/42425/images/7/"
+  ],
+  "confidence": "high",
+  "note": "Lavender-haired goddess verified from anime screenshots on MyAnimeList (the official Black Summoner site is offline). The three gods verified from official character art published by Dengeki Online. The wings belong to her artificial angel body."
+ },
+ "N28": {
+  "base": "human",
+  "presentation": "Human women. One: very long silver-lavender hair with an upright cowlick and a sunflower ornament, blue eyes, a fitted white dress with high side slits, a gold capelet, cream sleeves and stockings, gold sandals. Two: very long red hair in a high ponytail with a striped orange headwrap, dark skin, yellow eyes, athletic build, black bikini top, short white frilled shorts, a long cream fringed scarf, orange gloves and leg wrap, barefoot.",
+  "notOnPage": [
+   "halo",
+   "wings",
+   "glowing aura",
+   "animal features"
+  ],
+  "recipeProblems": [
+   "'blonde, aqua, or rose hair' (anchors have silver-lavender and red hair; blonde and blue belong to two other goddesses in the same series)",
+   "'flowing divine dress' fits only the wind goddess; the fire goddess wears a bikini top, shorts and scarf",
+   "'ornamental ribbons' (not prominent in canon art)",
+   "offering tray and snack wrappers are gag props, not canon design"
+  ],
+  "sources": [
+   "https://tondemoskill-anime.com/character/",
+   "https://tondemoskill-anime.com/season2/wp-content/themes/tondemoskill/assets/img/character/main_vernew/chara5_main.png",
+   "https://tondemoskill-anime.com/season2/wp-content/themes/tondemoskill/assets/img/character/main_vernew/chara6_main.png",
+   "https://en.wikipedia.org/wiki/Campfire_Cooking_in_Another_World_with_My_Absurd_Skill"
+  ],
+  "confidence": "high",
+  "note": "Verified from official anime character art; Wikipedia confirms silver hair (wind goddess) and red hair with dark skin (fire goddess)."
+ }
+}

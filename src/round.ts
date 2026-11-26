@@ -161,14 +161,14 @@ export async function tracetoonModules(root: string) {
   // required archetype, memes, assigned style), so the bench can't drift from production.
   const optionFor =
     casting?.leadPick && genreFile
-      ? (genrePath: string, seed: string, recentMemes: string[], recentLeads: string[], recentPresets: string[] = [], description = '', cooldown?: Cooldown): Partial<GenreOption> => {
+      ? (genrePath: string, seed: string, recentMemes: string[], recentLeads: string[], recentPresets: string[] = [], description = '', cooldown?: Cooldown, recentLayouts: string[] = []): Partial<GenreOption> => {
           const g = genreFile.parseGenreFile(readFileSync(genrePath, 'utf8')).genre;
           if (!g) return {};
-          let opt = genres.genreOptions([], { pinned: g.id, catalog: [g], seed, recentMemes, recentLeads, recentPresets, ...(cooldown ? { cooldown } : {}) })[0] ?? {};
+          let opt = genres.genreOptions([], { pinned: g.id, catalog: [g], seed, recentMemes, recentLeads, recentPresets, ...(cooldown ? { cooldown } : {}), recentLayouts })[0] ?? {};
           // Round 13 on: an isekai cast's scenes are matched to the PR, as at production's packet step.
           if (genres.withSceneOffers) opt = genres.withSceneOffers([opt], { description }, recentMemes)[0] ?? opt;
-          const { castOffer, memeOffer, assignedStyle, requiredCast, lead, archetypes, isekaiCast, sceneOffer, pitches, memeList } = opt as GenreOption;
-          return { ...(castOffer ? { castOffer, archetypes } : {}), ...(memeOffer ? { memeOffer } : {}), ...(assignedStyle ? { assignedStyle } : {}), ...(requiredCast ? { requiredCast } : {}), ...(lead ? { lead } : {}), ...(isekaiCast ? { isekaiCast } : {}), ...(sceneOffer ? { sceneOffer } : {}), ...(pitches ? { pitches } : {}), ...(memeList ? { memeList } : {}) };
+          const { castOffer, memeOffer, assignedStyle, requiredCast, lead, archetypes, isekaiCast, sceneOffer, pitches, memeList, assignedLayout } = opt as GenreOption;
+          return { ...(castOffer ? { castOffer, archetypes } : {}), ...(memeOffer ? { memeOffer } : {}), ...(assignedStyle ? { assignedStyle } : {}), ...(requiredCast ? { requiredCast } : {}), ...(lead ? { lead } : {}), ...(isekaiCast ? { isekaiCast } : {}), ...(sceneOffer ? { sceneOffer } : {}), ...(pitches ? { pitches } : {}), ...(memeList ? { memeList } : {}), ...(assignedLayout ? { assignedLayout } : {}) };
         }
       : undefined;
   // The misread review (round 11 on): what a finished image could look like at a glance.
@@ -278,8 +278,10 @@ export interface Hold {
   scenes: string[];
   characters: string[];
   memes: string[];
+  /** Round 15 on: the composition family assigned or used. */
+  layouts?: string[];
 }
-export type Cooldown = Hold;
+export type Cooldown = Omit<Hold, 'layouts'>;
 
 /** Tracetoon's per-repo windows (isekai/pitches.ts COOLDOWN): scenarios 10 comics, characters 3, memes 100. */
 const WINDOWS = { scenes: 10, characters: 3, memes: 100 } as const;
@@ -296,6 +298,7 @@ export function benchCooldown(recent: Recent): Cooldown {
       scenes: typeof summary.pitch === 'string' ? [summary.pitch] : [],
       characters: Array.isArray(summary.archetypes) ? (summary.archetypes as string[]) : [],
       memes: typeof summary.meme === 'string' ? [summary.meme] : [],
+      layouts: typeof summary.layoutFamily === 'string' ? [summary.layoutFamily] : [],
     })),
   ];
   return {
@@ -303,6 +306,15 @@ export function benchCooldown(recent: Recent): Cooldown {
     characters: [...new Set(holds.slice(0, WINDOWS.characters).flatMap((h) => h.characters))],
     memes: holds.slice(0, WINDOWS.memes).flatMap((h) => h.memes),
   };
+}
+
+/** The layout families of the newest 3 comics, counting comics in flight (Tracetoon's layouts.ts LAYOUT_COOLDOWN). */
+export function benchLayouts(recent: Recent): string[] {
+  const holds: string[][] = [
+    ...(recent.inFlight ?? []).map((f) => f.hold.layouts ?? []),
+    ...recent.list.map(({ summary }) => (typeof summary.layoutFamily === 'string' ? [summary.layoutFamily] : [])),
+  ];
+  return holds.slice(0, 3).flat();
 }
 /** Point the instructions at the packet's own copy of the diff. */
 function pointAtPacketDiff(caseDir: string, packet: string): void {
@@ -318,6 +330,7 @@ function hold(recent: Recent, key: string, option: Partial<GenreOption>): void {
     scenes: pick ? [pick.pitch.id] : (option.pitches ?? []).map((p) => p.id),
     characters: [...new Set([...(lead ? [lead] : []), ...(pick ? pick.pitch.players : (option.pitches ?? []).flatMap((p) => p.players)).map((p) => p.archetype)])],
     memes: pick?.gag.meme ? [pick.gag.meme] : [],
+    layouts: option.assignedLayout ? [option.assignedLayout] : [],
   };
   const list = recent.inFlight ?? (recent.inFlight = []);
   const at = list.findIndex((f) => f.id === key);
@@ -325,29 +338,25 @@ function hold(recent: Recent, key: string, option: Partial<GenreOption>): void {
   else list.unshift({ id: key, hold: h });
 }
 
-const GAG_SCORES_SCHEMA = {
+/** The blind judge's reply (Tracetoon's isekai/pitches.ts GagJudging): a reading per gag and one ranking. */
+const GAG_JUDGING_SCHEMA = {
   type: 'object',
   additionalProperties: false,
-  required: ['scores'],
+  required: ['gags', 'ranking'],
   properties: {
-    scores: {
+    gags: {
       type: 'array',
       items: {
         type: 'object',
         additionalProperties: false,
-        required: ['gag', 'aboutPr', 'funny', 'veteranAppeal', 'visual', 'note'],
-        properties: {
-          gag: { type: 'string' },
-          aboutPr: { type: 'integer' },
-          funny: { type: 'integer' },
-          veteranAppeal: { type: 'integer' },
-          visual: { type: 'integer' },
-          note: { type: 'string' },
-        },
+        required: ['gag', 'recovered', 'note'],
+        properties: { gag: { type: 'string' }, recovered: { type: 'string' }, note: { type: 'string' } },
       },
     },
+    ranking: { type: 'array', items: { type: 'string' } },
   },
 };
+
 
 /**
  * The brainstorm (round 14 on), as production runs it: the author writes the
@@ -373,14 +382,15 @@ async function brainstorm(a: { c: Case; dir: string; packet: string; o: RoundOpt
     if (!existsSync(gagsFile)) return { stage: 'gags', error: r.error ?? 'no comic-gags.json written' };
   }
   const gags = JSON.parse(readFileSync(gagsFile, 'utf8'));
-  const problems = P.gagProblems(gags, a.option.pitches, a.option.memeList ?? []) as { where: string; problem: string }[];
+  const evidence = ['description.md', 'changes.patch'].map((f) => (existsSync(join(a.c.dir, f)) ? readFileSync(join(a.c.dir, f), 'utf8') : '')).join('\n');
+  const problems = P.gagProblems(gags, a.option.pitches, a.option.memeList ?? [], evidence) as { where: string; problem: string }[];
   if (problems.length) return { stage: 'gags', error: problems.map((p) => `${p.where}: ${p.problem}`).join('; ') };
   let scores = readJson<unknown>(scoresFile);
   for (let attempt = 1; attempt <= 2 && (!scores || P.scoreProblems(scores, gags.gags).length); attempt++) {
     const r = await codexExec({
       prompt: P.gagJudgePrompt({ description: readFileSync(join(a.c.dir, 'description.md'), 'utf8'), gags: gags.gags, pitches: a.option.pitches, memes: a.option.memeList ?? [], out: 'your reply' }),
       cwd: a.dir,
-      schema: GAG_SCORES_SCHEMA,
+      schema: GAG_JUDGING_SCHEMA,
       logDir: join(judgeDir, String(attempt)),
       model: a.o.model,
       noTools: true,
@@ -388,10 +398,10 @@ async function brainstorm(a: { c: Case; dir: string; packet: string; o: RoundOpt
     });
     scores = r.ok ? r.json : undefined;
   }
-  if (!scores || P.scoreProblems(scores, gags.gags).length) return { stage: 'gag-judge', error: 'no valid gag scores after two tries' };
+  if (!scores || P.scoreProblems(scores, gags.gags).length) return { stage: 'gag-judge', error: 'no valid gag judging after two tries' };
   mkdirSync(judgeDir, { recursive: true });
   writeFileSync(scoresFile, JSON.stringify(scores, null, 2) + '\n');
-  const pick = P.pickGag(gags.gags, (scores as { scores: unknown[] }).scores, a.option.pitches);
+  const pick = P.pickGag(gags, scores, a.option.pitches);
   writeFileSync(join(a.dir, 'gag-pick.json'), JSON.stringify(pick, null, 2) + '\n');
   return { pick };
 }
@@ -432,7 +442,7 @@ async function oneComic(c: Case, sample: number, o: RoundOpts, tt: Tt, genreText
       genre: o.genre,
       out: packet,
       checkCommand,
-      ...(tt.pitches ? { gagsCheckCommand: `bun ${join(packet, 'tracetoon-check.js')} comic gags --check --file ${join(packet, 'comic-gags.json')} --context ${join(packet, 'context.json')}` } : {}),
+      ...(tt.pitches ? { gagsCheckCommand: `bun ${join(packet, 'tracetoon-check.js')} comic gags --check --file ${join(packet, 'comic-gags.json')} --context ${join(packet, 'context.json')} --evidence ${join(packet, 'description.md')} ${join(packet, 'changes.patch')}` } : {}),
       recentComics: seen.map((r) => r.summary),
       // The Tracetoon under test rotates casting only if it has casting.ts.
       ...(tt.castHint ? { castHint: tt.castHint(`${basename(o.out)}:${id}:${sample}`) } : {}),
@@ -449,6 +459,7 @@ async function oneComic(c: Case, sample: number, o: RoundOpts, tt: Tt, genreText
               seen.flatMap((r) => (typeof r.summary.castPreset === 'string' ? [r.summary.castPreset] : [])),
               readFileSync(join(c.dir, 'description.md'), 'utf8'),
               cooldown,
+              benchLayouts(recent),
             ),
           };
         const cast = tt.castOffer?.(o.genre, seed);
@@ -481,7 +492,7 @@ async function oneComic(c: Case, sample: number, o: RoundOpts, tt: Tt, genreText
   }
   // A brainstorming comic holds what it drew until it finishes.
   const drawn = readJson<{ genreOptions?: Partial<GenreOption>[] }>(join(packet, 'context.json'))?.genreOptions?.[0];
-  if (drawn?.pitches?.length) hold(recent, `${id}#${sample}`, drawn);
+  if (drawn?.pitches?.length || drawn?.assignedLayout) hold(recent, `${id}#${sample}`, drawn);
 
   // 1b. Brainstorm (round 14 on): gags, a fresh judge, the host's pick; then the author scripts the pick.
   if (!existsSync(comicJson) && drawn?.pitches?.length && !drawn.pick && tt.pitches) {

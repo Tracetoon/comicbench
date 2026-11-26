@@ -1,0 +1,19 @@
+{
+  "name": "r15",
+  "cases": "cases-local",
+  "split": "dev",
+  "samples": 2,
+  "arms": [
+    { "name": "r15-anime", "label": "Brainstorm v2 (PR anchor first, blind ranking judge) + assigned and action-shaped layouts + audited body presentations", "genre": "genres/anime-isekai.md", "skill": ".comicbench-cache/skills/r15", "tracetoon": ".comicbench-cache/tracetoon-r15", "jobs": 12 }
+  ],
+  "references": [
+    { "round": "results/r12-anime", "label": "Isekai cast, no memes (round 12)" }
+  ],
+  "arenas": [["r12-anime", "r15-anime"]],
+  "secondJudge": { "model": "gpt-6.2-astra", "share": 0.3 },
+  "canary": 3,
+  "slots": 24,
+  "judgeSlots": 12,
+  "drawSlots": 24,
+  "reviewTracetoon": ".comicbench-cache/tracetoon-bench"
+}

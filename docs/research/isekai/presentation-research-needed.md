@@ -21,3 +21,7 @@ The audit agents could not read fandom wikis (HTTP 402), TV Tropes, anibase or N
 | M27 elf avatar parent | Is Kartatz (*In the Land of Leadale*) a dwarf or an elf? |
 
 Answers can be pasted back as plain text; the presentation data (`src/comic/isekai/presentation.json` in Tracetoon) will be updated from them.
+
+## Answered (2026-11-26)
+
+All 13 questions were answered by the owner's research agent and applied to `src/comic/isekai/presentation.json` in Tracetoon (branch `comic-presentation`). Ages and canon specifics were left out; only body traits and their placement were used.

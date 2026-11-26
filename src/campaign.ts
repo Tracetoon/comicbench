@@ -88,7 +88,7 @@ export function canaryProblems(s: ComicState): string[] {
     if (script.meme && !memes.has(script.meme)) out.push(`${s.case}#${s.sample}: a meme outside the offer`);
     if (option.sceneOffer?.length && !script.meme) out.push(`${s.case}#${s.sample}: no offered scene used`);
     if (option.pitches?.length && !option.pick) out.push(`${s.case}#${s.sample}: no gag picked`);
-    if (option.pick && script.gag !== option.pick.gag.id) out.push(`${s.case}#${s.sample}: comic is not the picked gag`);
+    if (option.pick && script.gag !== (option.pick.idea ?? option.pick.gag)?.id) out.push(`${s.case}#${s.sample}: comic is not the picked idea`);
     if (option.assignedStyle && script.style !== option.assignedStyle) out.push(`${s.case}#${s.sample}: style ${script.style} instead of ${option.assignedStyle}`);
   }
   return out;

@@ -161,7 +161,7 @@ export async function tracetoonModules(root: string) {
   // required archetype, memes, assigned style), so the bench can't drift from production.
   const optionFor =
     casting?.leadPick && genreFile
-      ? (genrePath: string, seed: string, recentMemes: string[], recentLeads: string[], recentPresets: string[] = [], description = '', cooldown?: Cooldown, recentLayouts: string[] = []): Partial<GenreOption> => {
+      ? (genrePath: string, seed: string, recentMemes: string[], recentLeads: string[], recentPresets: string[] = [], description = '', cooldown?: Cooldown, recentLayouts: string[][] = []): Partial<GenreOption> => {
           const g = genreFile.parseGenreFile(readFileSync(genrePath, 'utf8')).genre;
           if (!g) return {};
           let opt = genres.genreOptions([], { pinned: g.id, catalog: [g], seed, recentMemes, recentLeads, recentPresets, ...(cooldown ? { cooldown } : {}), recentLayouts })[0] ?? {};
@@ -298,7 +298,7 @@ export function benchCooldown(recent: Recent): Cooldown {
       scenes: typeof summary.pitch === 'string' ? [summary.pitch] : [],
       characters: Array.isArray(summary.archetypes) ? (summary.archetypes as string[]) : [],
       memes: typeof summary.meme === 'string' ? [summary.meme] : [],
-      layouts: typeof summary.layoutFamily === 'string' ? [summary.layoutFamily] : [],
+      layouts: typeof summary.layoutSignature === 'string' ? [summary.layoutSignature] : [],
     })),
   ];
   return {
@@ -308,13 +308,12 @@ export function benchCooldown(recent: Recent): Cooldown {
   };
 }
 
-/** The layout families of the newest 3 comics, counting comics in flight (Tracetoon's layouts.ts LAYOUT_COOLDOWN). */
-export function benchLayouts(recent: Recent): string[] {
-  const holds: string[][] = [
+/** The layout signatures of the newest comics, one list per comic, counting comics in flight (Tracetoon's layouts.ts LAYOUT_COOLDOWN). */
+export function benchLayouts(recent: Recent): string[][] {
+  return [
     ...(recent.inFlight ?? []).map((f) => f.hold.layouts ?? []),
-    ...recent.list.map(({ summary }) => (typeof summary.layoutFamily === 'string' ? [summary.layoutFamily] : [])),
-  ];
-  return holds.slice(0, 3).flat();
+    ...recent.list.map(({ summary }) => (typeof summary.layoutSignature === 'string' ? [summary.layoutSignature] : [])),
+  ].slice(0, 3);
 }
 /** Point the instructions at the packet's own copy of the diff. */
 function pointAtPacketDiff(caseDir: string, packet: string): void {
@@ -327,10 +326,10 @@ function hold(recent: Recent, key: string, option: Partial<GenreOption>): void {
   const lead = option.isekaiCast?.lead.archetype;
   const pick = option.pick;
   const h: Hold = {
-    scenes: pick ? [pick.pitch.id] : (option.pitches ?? []).map((p) => p.id),
-    characters: [...new Set([...(lead ? [lead] : []), ...(pick ? pick.pitch.players : (option.pitches ?? []).flatMap((p) => p.players)).map((p) => p.archetype)])],
-    memes: pick?.gag.meme ? [pick.gag.meme] : [],
-    layouts: option.assignedLayout ? [option.assignedLayout] : [],
+    scenes: pick ? (pick.pitch ? [pick.pitch.id] : []) : (option.pitches ?? []).map((p) => p.id),
+    characters: [...new Set([...(lead ? [lead] : []), ...(pick ? pick.pitch?.players ?? [] : (option.pitches ?? []).flatMap((p) => p.players)).map((p) => p.archetype)])],
+    memes: pick?.idea.meme ? [pick.idea.meme] : [],
+    layouts: option.assignedLayout ? Object.values(option.assignedLayout) : [],
   };
   const list = recent.inFlight ?? (recent.inFlight = []);
   const at = list.findIndex((f) => f.id === key);
@@ -338,22 +337,22 @@ function hold(recent: Recent, key: string, option: Partial<GenreOption>): void {
   else list.unshift({ id: key, hold: h });
 }
 
-/** The blind judge's reply (Tracetoon's isekai/pitches.ts GagJudging): a reading per gag and one ranking. */
+/** The blind judge's reply (Tracetoon's isekai/pitches.ts GagJudging): a reading per idea and a ranked shortlist. */
 const GAG_JUDGING_SCHEMA = {
   type: 'object',
   additionalProperties: false,
-  required: ['gags', 'ranking'],
+  required: ['ideas', 'shortlist'],
   properties: {
-    gags: {
+    ideas: {
       type: 'array',
       items: {
         type: 'object',
         additionalProperties: false,
-        required: ['gag', 'recovered', 'note'],
-        properties: { gag: { type: 'string' }, recovered: { type: 'string' }, note: { type: 'string' } },
+        required: ['id', 'recovered', 'note'],
+        properties: { id: { type: 'string' }, recovered: { type: 'string' }, note: { type: 'string' } },
       },
     },
-    ranking: { type: 'array', items: { type: 'string' } },
+    shortlist: { type: 'array', items: { type: 'string' } },
   },
 };
 
@@ -386,9 +385,9 @@ async function brainstorm(a: { c: Case; dir: string; packet: string; o: RoundOpt
   const problems = P.gagProblems(gags, a.option.pitches, a.option.memeList ?? [], evidence) as { where: string; problem: string }[];
   if (problems.length) return { stage: 'gags', error: problems.map((p) => `${p.where}: ${p.problem}`).join('; ') };
   let scores = readJson<unknown>(scoresFile);
-  for (let attempt = 1; attempt <= 2 && (!scores || P.scoreProblems(scores, gags.gags).length); attempt++) {
+  for (let attempt = 1; attempt <= 2 && (!scores || P.scoreProblems(scores, gags.ideas).length); attempt++) {
     const r = await codexExec({
-      prompt: P.gagJudgePrompt({ description: readFileSync(join(a.c.dir, 'description.md'), 'utf8'), gags: gags.gags, pitches: a.option.pitches, memes: a.option.memeList ?? [], out: 'your reply' }),
+      prompt: P.gagJudgePrompt({ description: readFileSync(join(a.c.dir, 'description.md'), 'utf8'), ideas: gags.ideas, pitches: a.option.pitches, memes: a.option.memeList ?? [], out: 'your reply' }),
       cwd: a.dir,
       schema: GAG_JUDGING_SCHEMA,
       logDir: join(judgeDir, String(attempt)),
@@ -398,7 +397,7 @@ async function brainstorm(a: { c: Case; dir: string; packet: string; o: RoundOpt
     });
     scores = r.ok ? r.json : undefined;
   }
-  if (!scores || P.scoreProblems(scores, gags.gags).length) return { stage: 'gag-judge', error: 'no valid gag judging after two tries' };
+  if (!scores || P.scoreProblems(scores, gags.ideas).length) return { stage: 'gag-judge', error: 'no valid judging after two tries' };
   mkdirSync(judgeDir, { recursive: true });
   writeFileSync(scoresFile, JSON.stringify(scores, null, 2) + '\n');
   const pick = P.pickGag(gags, scores, a.option.pitches);

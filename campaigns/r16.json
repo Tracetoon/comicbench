@@ -1,0 +1,20 @@
+{
+  "name": "r16",
+  "cases": "cases-local",
+  "split": "dev",
+  "samples": 2,
+  "arms": [
+    { "name": "r16-plain", "label": "Round 12's single author + tiled grid layouts (assigned signatures, action slants) + audited bodies", "genre": "genres/anime-isekai-plain.md", "skill": ".comicbench-cache/skills/r16", "tracetoon": ".comicbench-cache/tracetoon-r16", "jobs": 6 },
+    { "name": "r16-brainstorm", "label": "20 ideas from the PR (pitches and memes as sparks) + blind shortlist judge + tiled grid layouts + audited bodies", "genre": "genres/anime-isekai.md", "skill": ".comicbench-cache/skills/r16", "tracetoon": ".comicbench-cache/tracetoon-r16", "jobs": 6 }
+  ],
+  "references": [
+    { "round": "results/r12-anime", "label": "Isekai cast, no memes (round 12)" }
+  ],
+  "arenas": [["r12-anime", "r16-plain"], ["r12-anime", "r16-brainstorm"]],
+  "secondJudge": { "model": "gpt-6.2-astra", "share": 0.3 },
+  "canary": 3,
+  "slots": 24,
+  "judgeSlots": 12,
+  "drawSlots": 24,
+  "reviewTracetoon": ".comicbench-cache/tracetoon-bench"
+}

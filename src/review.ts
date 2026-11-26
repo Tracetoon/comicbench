@@ -158,8 +158,9 @@ function armData(round: string, out: string) {
           const ctx = existsSync(join(dir, 'packet', 'context.json')) ? JSON.parse(readFileSync(join(dir, 'packet', 'context.json'), 'utf8')) : undefined;
           const option = ctx?.genreOptions?.[0];
           if (!option?.pitches?.length) return null;
-          const gags = existsSync(join(dir, 'packet', 'comic-gags.json')) ? JSON.parse(readFileSync(join(dir, 'packet', 'comic-gags.json'), 'utf8')).gags : [];
-          return { pitches: option.pitches.map((p: any) => ({ id: p.id, label: p.label, premise: p.premise })), gags, memes: Object.fromEntries((option.memeList ?? []).map((m: any) => [m.id, m.name + ' (' + m.series + ')'])), pick: option.pick ? { gag: option.pick.gag.id, scores: option.pick.scores, judged: option.pick.judged, anchor: option.pick.anchor, recovered: option.pick.recovered } : null, layout: option.assignedLayout ?? null };
+          const file = existsSync(join(dir, 'packet', 'comic-gags.json')) ? JSON.parse(readFileSync(join(dir, 'packet', 'comic-gags.json'), 'utf8')) : {};
+          const gags = (file.ideas ?? file.gags ?? []).map((g: any) => ({ ...g, gag: g.gag ?? g.idea, pitch: g.pitch ?? g.spark ?? '' }));
+          return { pitches: option.pitches.map((p: any) => ({ id: p.id, label: p.label, premise: p.premise })), gags, memes: Object.fromEntries((option.memeList ?? []).map((m: any) => [m.id, m.name + ' (' + m.series + ')'])), pick: option.pick ? { gag: (option.pick.idea ?? option.pick.gag).id, scores: option.pick.scores, judged: option.pick.judged, anchor: option.pick.anchor, recovered: option.pick.recovered } : null, layout: option.assignedLayout ? (typeof option.assignedLayout === 'string' ? option.assignedLayout : Object.entries(option.assignedLayout).map(([n, s]) => n + ': ' + s).join(', ')) : null };
         })(),
         status,
         total: judgment ? comicScore(judgment) : null,
@@ -627,9 +628,9 @@ dialog::backdrop { background: rgba(20,19,15,.7) }
         '<ul class="tight">' + x.brainstorm.pitches.map((p) => '<li><b>' + esc(p.id) + ' · ' + esc(p.label) + ':</b> ' + esc(p.premise) + '</li>').join('') + '</ul>' +
         '<ul class="tight">' + x.brainstorm.gags.map((g) => {
           const sc = x.brainstorm.pick ? (x.brainstorm.pick.scores || []).find((s) => s.gag === g.id) : null;
-          const jd = x.brainstorm.pick ? (x.brainstorm.pick.judged || []).find((j) => j.gag === g.id) : null;
+          const jd = x.brainstorm.pick ? (x.brainstorm.pick.judged || []).find((j) => (j.id ?? j.gag) === g.id) : null;
           const picked = x.brainstorm.pick && x.brainstorm.pick.gag === g.id;
-          return '<li>' + (picked ? '<b>★ ' : '<b>') + esc(g.id) + '</b> (' + esc(g.pitch) + (sc ? ', score ' + sc.total + ': PR ' + sc.aboutPr + ', funny ' + sc.funny + ', veteran ' + sc.veteranAppeal + ', visual ' + sc.visual : '') + (jd ? ', rank ' + jd.rank + ', ' + (jd.matched ? '✓' : '✗') : '') + '): ' + esc(g.gag) + (g.shows ? ' <i>Shows: ' + esc(g.shows) + '</i>' : '') + (jd ? ' <i>Judge read: ' + esc(jd.recovered) + '</i>' : '') + (g.meme ? ' <i>Meme: ' + esc(x.brainstorm.memes[g.meme] || g.meme) + ': ' + esc(g.memeUse || '') + '</i>' : '') + '</li>';
+          return '<li>' + (picked ? '<b>★ ' : '<b>') + esc(g.id) + '</b> (' + esc(g.pitch) + (sc ? ', score ' + sc.total + ': PR ' + sc.aboutPr + ', funny ' + sc.funny + ', veteran ' + sc.veteranAppeal + ', visual ' + sc.visual : '') + (jd ? (jd.rank ? ', shortlist #' + jd.rank : '') + ', ' + (jd.matched ? '✓' : '✗') : '') + '): ' + esc(g.gag) + (g.shows ? ' <i>Shows: ' + esc(g.shows) + '</i>' : '') + (jd ? ' <i>Judge read: ' + esc(jd.recovered) + '</i>' : '') + (g.meme ? ' <i>Meme: ' + esc(x.brainstorm.memes[g.meme] || g.meme) + ': ' + esc(g.memeUse || '') + '</i>' : '') + '</li>';
         }).join('') + '</ul></details>' : '') +
       (x.misread ? '<details><summary>Misread review (' + (x.misread.concern ? 'concern' : 'clear') + ', ' + x.misread.redraws + ' redraw' + (x.misread.redraws === 1 ? '' : 's') + ')</summary><ul class="tight">' +
         (x.misread.reviews || []).flatMap((r, i) => (r.items || []).map((it) => '<li><b>Review ' + (i + 1) + ', panel ' + esc(it.panel) + ' (' + esc(it.likelihood || 'likely') + '):</b> ' + esc(it.what) + ' could read as ' + esc(it.couldReadAs) + '</li>')).join('') +

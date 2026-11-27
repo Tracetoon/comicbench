@@ -195,11 +195,13 @@ if (only !== 'ladder')
     const gs = games[crit]!.filter((g) => !g.source.endsWith(':ladder'));
     if (!gs.length) continue;
     const fit = fitBT(gs);
+    const anchored = gs.some((g) => g.first.startsWith('anchor/') || g.second.startsWith('anchor/'));
     const byRound = Object.fromEntries(
       rounds.map((r) => {
         const its = items.filter((i) => i.round === r);
         const s = roundScore(fit.theta, its, 2000, `${crit}\0${r}`);
-        return [r, { ...s, vsAnchors: Math.round(1000 * vsAnchors(s.mean)) / 10 }];
+        // Without anchor games the scale is relative (0 = the average comic scored), so no "vs real comics".
+        return [r, { ...s, ...(anchored ? { vsAnchors: Math.round(1000 * vsAnchors(s.mean)) / 10 } : {}) }];
       }),
     );
     const ours = items.map((i) => fit.theta[i.id]).filter((x): x is number => x !== undefined);
@@ -219,8 +221,8 @@ mkdirSync(join(ROOT, 'results', 'measures-v2'), { recursive: true });
 writeFileSync(join(ROOT, 'results', 'measures-v2', `${name}.json`), JSON.stringify(report, null, 1));
 
 console.log(`calibration ${JSON.stringify(calibration)}`);
-for (const [crit, r] of Object.entries(report.criteria as Record<string, { spreadSD: number; position: Record<string, number>; familyAgreement: { kappa: number; n: number }; byRound: Record<string, { mean: number; lo: number; hi: number; vsAnchors: number }> }>)) {
+for (const [crit, r] of Object.entries(report.criteria as Record<string, { spreadSD: number; position: Record<string, number>; familyAgreement: { kappa: number; n: number }; byRound: Record<string, { mean: number; lo: number; hi: number; vsAnchors?: number }> }>)) {
   console.log(`\n${crit}: spread SD ${r.spreadSD}; position ${JSON.stringify(r.position)}; codex-claude kappa ${Number.isFinite(r.familyAgreement.kappa) ? r.familyAgreement.kappa.toFixed(2) : '-'} (n ${r.familyAgreement.n})`);
-  for (const [round, s] of Object.entries(r.byRound)) console.log(`  ${round.padEnd(18)} ${s.mean.toFixed(2)} [${s.lo.toFixed(2)}, ${s.hi.toFixed(2)}]  beats an average real comic ${s.vsAnchors}%`);
+  for (const [round, s] of Object.entries(r.byRound)) console.log(`  ${round.padEnd(18)} ${s.mean.toFixed(2)} [${s.lo.toFixed(2)}, ${s.hi.toFixed(2)}]${s.vsAnchors !== undefined ? `  beats an average real comic ${s.vsAnchors}%` : '  (relative: 0 = the average comic scored)'}`);
 }
 void mean;

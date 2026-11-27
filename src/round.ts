@@ -21,7 +21,7 @@ import { basename, dirname, join, resolve } from 'node:path';
 import { caseProblems, loadCases, sha256, type Case } from './cases.ts';
 import { codexCommand, codexExec } from './codex.ts';
 import { writePacket } from './cli.ts';
-import { withSlot } from './gate.ts';
+import { inLane, withSlot } from './gate.ts';
 import type { GenreOption } from './packet.ts';
 import { readGenre } from './genre.ts';
 import {
@@ -542,7 +542,7 @@ async function oneComic(c: Case, sample: number, o: RoundOpts, tt: Tt, genreText
     if (r.sandbox && r.sandbox !== 'workspace-write')
       throw new SandboxError(`Codex ran the author with sandbox ${r.sandbox}, not workspace-write; stopping so no comic is written without its tools.`);
     const log = existsSync(join(dir, 'author', '1', 'codex.log')) ? readFileSync(join(dir, 'author', '1', 'codex.log'), 'utf8') : '';
-    writeFileSync(join(dir, 'author', 'stats.json'), JSON.stringify({ mode: 'sandbox', checkRuns: (log.match(/^exec\s*\n.*tracetoon-check\.js comic check/gm) ?? []).length, readOutsidePacket: /EPERM|facts\.json/.test(log) }) + '\n');
+    writeFileSync(join(dir, 'author', 'stats.json'), JSON.stringify({ mode: 'sandbox', checkRuns: (log.match(/^exec\s*\n.*tracetoon-check\.js['"]? comic check/gm) ?? []).length, readOutsidePacket: /EPERM|facts\.json/.test(log) }) + '\n');
     if (!existsSync(comicJson)) return state({ status: 'error', stage: 'author', error: r.error ?? 'no comic.json written' });
   }
   // inline: every file the packet names is inlined, the author replies with
@@ -629,7 +629,8 @@ async function oneComic(c: Case, sample: number, o: RoundOpts, tt: Tt, genreText
     let m = existsSync(record) ? JSON.parse(readFileSync(record, 'utf8')) : { reviews: [] as unknown[], redraws: 0, concern: false };
     while (m.reviews.length === m.redraws) {
       const image = join(art, readdirSync(art).find((f) => /^page\.(png|jpeg|jpg|webp)$/.test(f))!);
-      const r = await codexExec({ prompt: tt.misread.MISREAD_PROMPT, cwd: dir, images: [image], schema: tt.misread.MISREAD_SCHEMA, logDir: join(dir, 'misread', `review-${m.reviews.length + 1}`), model: o.model });
+      // On the judge lane: a 12-second review shouldn't queue behind every author for text slots (r19 waits averaged 136 s, up to 581 s).
+      const r = await inLane('judge', () => codexExec({ prompt: tt.misread.MISREAD_PROMPT, cwd: dir, images: [image], schema: tt.misread.MISREAD_SCHEMA, logDir: join(dir, 'misread', `review-${m.reviews.length + 1}`), model: o.model }));
       if (!r.ok || !tt.misread.isMisreadReview(r.json)) return state({ status: 'error', stage: 'misread', error: (r.error ?? 'bad misread reply').slice(0, 500) });
       m.reviews.push(r.json);
       m.concern = tt.misread.hasConcern(r.json);

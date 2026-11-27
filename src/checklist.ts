@@ -25,7 +25,7 @@ export const CHECKLIST_VERSION = 7;
  * New questions run as an add-on pass with its own cache (checklist-addon.json),
  * so adding them never re-checks every comic of the reference rounds.
  */
-export const ADDON_VERSION = 7;
+export const ADDON_VERSION = 8;
 
 /** The add-on questions: the main character, and the required archetype by name. */
 export function addonPrompt(o: { lead?: { name: string; details: string; character?: string }; required?: { name: string; details: string }; cast?: { name: string; archetype: string; title: string; core: string; presentation?: string }[]; place?: string; layout?: { described: string; action: number[]; slant?: string | null }; page?: boolean }): string {
@@ -39,6 +39,7 @@ export function addonPrompt(o: { lead?: { name: string; details: string; charact
 - \`layoutFollows\`: ${o.layout ? `the page was asked for this layout: "${o.layout.described}"${o.layout.slant !== undefined ? '. Judge the panel count, the rows and columns and their order, and the rough sizes; ask nothing the layout does not say' : ''}${o.layout.slant === undefined && o.layout.action.length ? `, with panel${o.layout.action.length > 1 ? 's' : ''} ${o.layout.action.join(', ')} as action beats in angled, borderless or breakout frames leaning the way things move` : ''}. Does the drawn page follow it? Present, absent or unclear.` : 'no layout was described: answer inapplicable.'}
 - \`pageFilled\`: ${o.page ? 'inside the page\'s outer margin (a plain border around the page is expected), do the panels fill the area, with no empty or blank regions and no panel or picture overlaid on top of another panel? Present when they do; absent when any region is empty or anything covers a panel.' : 'answer inapplicable.'}
 - \`balloonOrder\`: ${o.page ? 'reading balloons top-left to bottom-right within each panel and panels in their numbered order, is it clear which balloon comes first, and does every reply come after the line it answers? Present when the order is clear and right; absent when a reply reads first or the order is unclear.' : 'answer inapplicable.'}
+- \`lettering\`: ${o.page ? 'is every lettered word on the page (balloons, captions, signs, screens, sound effects) spelled correctly, readable at this size and not cut off by a panel edge? Present when all of it is; absent when any word is garbled, invented, misspelled, cut off or too small to read; name the worst one in the evidence.' : 'answer inapplicable.'}
 - \`slantDrawn\`: ${o.layout?.slant ? `the page asked for exactly one slanted gutter: "${o.layout.slant}"; every other border was asked to stay straight and level. Is that gutter drawn slanted that way? Present, absent or unclear.` : o.layout?.slant === null ? 'every border was asked to stay straight and level: answer inapplicable.' : o.layout?.action.length ? `the gutters beside panel${o.layout.action.length > 1 ? 's' : ''} ${o.layout.action.join(', ')} were asked to slant the way the action moves. Are they drawn slanted? Present, absent or unclear.` : 'no slanted gutters were asked for: answer inapplicable.'}
 - \`placeOnPage\`: ${o.place ? `the comic was set in "${o.place}". Does the page show that one place? Present, absent or unclear.` : 'no place was decided: answer inapplicable.'}
 - \`requiredOnPage\`: ${o.required ? `the comic was required to include this character: "${o.required.name}" (${o.required.details}). Is that character recognisably on the page? Present, absent or unclear.` : 'no required character was assigned: answer inapplicable.'}
@@ -61,8 +62,9 @@ export const ADDON_SCHEMA = {
     pageFilled: { type: 'object', properties: { state: addonState, evidence: { type: 'string' } }, required: ['state', 'evidence'], additionalProperties: false },
     slantDrawn: { type: 'object', properties: { state: addonState, evidence: { type: 'string' } }, required: ['state', 'evidence'], additionalProperties: false },
     balloonOrder: { type: 'object', properties: { state: addonState, evidence: { type: 'string' } }, required: ['state', 'evidence'], additionalProperties: false },
+    lettering: { type: 'object', properties: { state: addonState, evidence: { type: 'string' } }, required: ['state', 'evidence'], additionalProperties: false },
   },
-  required: ['mainCharacter', 'leadMatches', 'requiredOnPage', 'archetypeRead', 'bodyMatches', 'castDistinct', 'placeOnPage', 'layoutFollows', 'pageFilled', 'slantDrawn', 'balloonOrder'],
+  required: ['mainCharacter', 'leadMatches', 'requiredOnPage', 'archetypeRead', 'bodyMatches', 'castDistinct', 'placeOnPage', 'layoutFollows', 'pageFilled', 'slantDrawn', 'balloonOrder', 'lettering'],
   additionalProperties: false,
 };
 export interface Addon {
@@ -78,6 +80,7 @@ export interface Addon {
   pageFilled?: { state: 'present' | 'absent' | 'unclear' | 'inapplicable'; evidence: string };
   slantDrawn?: { state: 'present' | 'absent' | 'unclear' | 'inapplicable'; evidence: string };
   balloonOrder?: { state: 'present' | 'absent' | 'unclear' | 'inapplicable'; evidence: string };
+  lettering?: { state: 'present' | 'absent' | 'unclear' | 'inapplicable'; evidence: string };
   castDistinct?: { state: 'present' | 'absent' | 'unclear' | 'inapplicable'; evidence: string };
   placeOnPage?: { state: 'present' | 'absent' | 'unclear' | 'inapplicable'; evidence: string };
 }
@@ -754,6 +757,11 @@ export function summarize(items: { id: string; checklist: Checklist; script?: an
         })(),
         balloonOrder: (() => {
           const l = withCast.flatMap((i) => (i.addon?.balloonOrder && i.addon.balloonOrder.state !== 'inapplicable' ? [i.addon.balloonOrder] : []));
+          const assessed = l.filter((r) => r.state !== 'unclear');
+          return { observed: assessed.filter((r) => r.state === 'present').length, assessed: assessed.length };
+        })(),
+        lettering: (() => {
+          const l = withCast.flatMap((i) => (i.addon?.lettering && i.addon.lettering.state !== 'inapplicable' ? [i.addon.lettering] : []));
           const assessed = l.filter((r) => r.state !== 'unclear');
           return { observed: assessed.filter((r) => r.state === 'present').length, assessed: assessed.length };
         })(),

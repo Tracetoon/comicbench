@@ -33,7 +33,7 @@ export const SCRIPT_CRITERIA = [
   { id: 'overall', question: 'Overall, which comic would a reviewer rather find at the top of this pull request?' },
 ] as const;
 
-const SCHEMA = {
+export const SCHEMA = {
   type: 'object',
   additionalProperties: false,
   required: ['verdicts'],

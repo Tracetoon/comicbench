@@ -131,9 +131,20 @@ const both = (family: Family, a: Item, b: Item, type: Planned['type'], prompt?: 
 for (const a of anchors) for (const kind of ['nopayoff', 'flat'] as const) for (const f of ['codex', 'claude'] as Family[]) both(f, a, control(a, kind), 'ladder');
 
 const items: Item[] = only === 'ladder' ? [] : rounds.flatMap(comicsOf);
+// The original 18 anchors keep their picks (cached games stay valid); the round-20 families
+// (dev-*, fantasy-*) add `--extra-per-family` picks each from their own seed.
+const isNew = (a: Item) => /^anchor\/(dev|fantasy)-/.test(a.id);
+const original = anchors.filter((a) => !isNew(a));
+const extraPerFamily = Number(arg('--extra-per-family', '1'));
 for (const it of items) {
   const r = rng(`v2-anchors\0${it.id}`);
-  const picks = [...anchors].sort(() => r() - 0.5).slice(0, K);
+  const picks = [...original].sort(() => r() - 0.5).slice(0, K);
+  const rx = rng(`v2-anchors-r20\0${it.id}`);
+  const extra = ['dev', 'fantasy'].flatMap((f) => anchors.filter((a) => a.id.startsWith(`anchor/${f}-`)).sort(() => rx() - 0.5).slice(0, extraPerFamily));
+  for (const a of extra) {
+    both('codex', it, a, 'anchor');
+    if (rx() < claudeShare) both('claude', it, a, 'anchor');
+  }
   for (const a of picks) {
     both('codex', it, a, 'anchor');
     if (r() < claudeShare) both('claude', it, a, 'anchor');
@@ -175,6 +186,11 @@ const run = async (p: Planned): Promise<Reply | null> => {
 const codexPlan = plan.filter((p) => p.family === 'codex');
 const claudePlan = plan.filter((p) => p.family === 'claude');
 console.error(`planned: ${codexPlan.length} codex calls, ${claudePlan.length} claude calls (cached ones are free)`);
+if (process.argv.includes('--dry')) {
+  const fresh = (ps: Planned[]) => ps.filter((p) => !existsSync(join(CACHE, p.family, `${hash(p)}.json`))).length;
+  console.log(`uncached: ${fresh(codexPlan)} codex, ${fresh(claudePlan)} claude`);
+  process.exit(0);
+}
 let done = 0;
 const tick = () => ++done % 50 === 0 && console.error(`  ${done}/${plan.length}`);
 const [codexReplies, claudeReplies] = await Promise.all([

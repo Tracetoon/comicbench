@@ -1,0 +1,20 @@
+{
+  "name": "r19",
+  "cases": "cases-local",
+  "split": "dev",
+  "samples": 2,
+  "arms": [
+    { "name": "r19-plain", "label": "Round 18 + no spider, vending machine or military prodigy leads + uniform gutters + host-assigned adventure settings (no office parody) + PR-matched staples + PR anchor in the payoff panel + counts-first layout sentence", "genre": "genres/anime-isekai-plain.md", "skill": ".comicbench-cache/skills/r19", "tracetoon": ".comicbench-cache/tracetoon-r19", "jobs": 12 }
+  ],
+  "references": [
+    { "round": "results/r12-anime", "label": "Isekai cast, no memes (round 12)" },
+    { "round": "results/r18-plain", "label": "Comic-standard layouts and staples (round 18)" }
+  ],
+  "arenas": [["r12-anime", "r19-plain"], ["r18-plain", "r19-plain"]],
+  "secondJudge": { "model": "gpt-6.2-astra", "share": 0.3 },
+  "canary": 3,
+  "slots": 24,
+  "judgeSlots": 12,
+  "drawSlots": 24,
+  "reviewTracetoon": ".comicbench-cache/tracetoon-bench"
+}

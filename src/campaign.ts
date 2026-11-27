@@ -84,7 +84,7 @@ export function canaryProblems(s: ComicState): string[] {
     if (option.castOffer && personas.some((p) => !offered.has(p))) out.push(`${s.case}#${s.sample}: a persona outside the cast offer`);
     // Round 13 on, an isekai cast's offer is \`sceneOffer\`, and using one is required.
     // Round 14 on, an isekai comic's meme comes from its `memeList`, attached to the picked gag.
-    const memes = new Set([...(option.memeOffer ?? []), ...(option.sceneOffer ?? []), ...(option.memeList ?? [])].map((m: { id: string }) => m.id));
+    const memes = new Set([...(option.memeOffer ?? []), ...(option.sceneOffer ?? []), ...(option.memeList ?? []), ...(option.tropeOffer ?? [])].map((m: { id: string }) => m.id));
     if (script.meme && !memes.has(script.meme)) out.push(`${s.case}#${s.sample}: a meme outside the offer`);
     if (option.sceneOffer?.length && !script.meme) out.push(`${s.case}#${s.sample}: no offered scene used`);
     if (option.pitches?.length && !option.pick) out.push(`${s.case}#${s.sample}: no gag picked`);

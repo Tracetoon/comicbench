@@ -25,7 +25,7 @@ export const CHECKLIST_VERSION = 7;
  * New questions run as an add-on pass with its own cache (checklist-addon.json),
  * so adding them never re-checks every comic of the reference rounds.
  */
-export const ADDON_VERSION = 5;
+export const ADDON_VERSION = 6;
 
 /** The add-on questions: the main character, and the required archetype by name. */
 export function addonPrompt(o: { lead?: { name: string; details: string; character?: string }; required?: { name: string; details: string }; cast?: { name: string; archetype: string; title: string; core: string; presentation?: string }[]; place?: string; layout?: { described: string; action: number[] }; page?: boolean }): string {
@@ -37,7 +37,8 @@ export function addonPrompt(o: { lead?: { name: string; details: string; charact
 - \`bodyMatches\`: ${o.cast?.some((c) => c.presentation) ? `for each character below, is the body drawn as described: the base body and only the traits listed? A human-presenting character drawn with an animal head, snout or full-body scales or fur is absent. One entry per character, in this order:\n${o.cast.filter((c) => c.presentation).map((c) => `  - ${c.name}: ${c.presentation}`).join('\n')}` : 'no bodies were described: return an empty list.'}
 - \`castDistinct\`: ${o.cast?.length ? 'do the characters on the page differ clearly in silhouette (outline, hair shape, outfit, prop)? Present when each reads as a different person at a glance.' : 'answer inapplicable.'}
 - \`layoutFollows\`: ${o.layout ? `the page was asked for this layout: "${o.layout.described}"${o.layout.action.length ? `, with panel${o.layout.action.length > 1 ? 's' : ''} ${o.layout.action.join(', ')} as action beats in angled, borderless or breakout frames leaning the way things move` : ''}. Does the drawn page follow it? Present, absent or unclear.` : 'no layout was described: answer inapplicable.'}
-- \`pageFilled\`: ${o.page ? 'is the whole page used: panels fill it edge to edge, with no empty or blank areas and no panel overlaid on top of another? Present when it is; absent when any area is empty or any panel covers another.' : 'answer inapplicable.'}
+- \`pageFilled\`: ${o.page ? 'inside the page\'s outer margin (a plain border around the page is expected), do the panels fill the area, with no empty or blank regions and no panel or picture overlaid on top of another panel? Present when they do; absent when any region is empty or anything covers a panel.' : 'answer inapplicable.'}
+- \`balloonOrder\`: ${o.page ? 'reading balloons top-left to bottom-right within each panel and panels in their numbered order, is it clear which balloon comes first, and does every reply come after the line it answers? Present when the order is clear and right; absent when a reply reads first or the order is unclear.' : 'answer inapplicable.'}
 - \`slantDrawn\`: ${o.layout?.action.length ? `the gutters beside panel${o.layout.action.length > 1 ? 's' : ''} ${o.layout.action.join(', ')} were asked to slant the way the action moves. Are they drawn slanted? Present, absent or unclear.` : 'no slanted gutters were asked for: answer inapplicable.'}
 - \`placeOnPage\`: ${o.place ? `the comic was set in "${o.place}". Does the page show that one place? Present, absent or unclear.` : 'no place was decided: answer inapplicable.'}
 - \`requiredOnPage\`: ${o.required ? `the comic was required to include this character: "${o.required.name}" (${o.required.details}). Is that character recognisably on the page? Present, absent or unclear.` : 'no required character was assigned: answer inapplicable.'}
@@ -59,8 +60,9 @@ export const ADDON_SCHEMA = {
     layoutFollows: { type: 'object', properties: { state: addonState, evidence: { type: 'string' } }, required: ['state', 'evidence'], additionalProperties: false },
     pageFilled: { type: 'object', properties: { state: addonState, evidence: { type: 'string' } }, required: ['state', 'evidence'], additionalProperties: false },
     slantDrawn: { type: 'object', properties: { state: addonState, evidence: { type: 'string' } }, required: ['state', 'evidence'], additionalProperties: false },
+    balloonOrder: { type: 'object', properties: { state: addonState, evidence: { type: 'string' } }, required: ['state', 'evidence'], additionalProperties: false },
   },
-  required: ['mainCharacter', 'leadMatches', 'requiredOnPage', 'archetypeRead', 'bodyMatches', 'castDistinct', 'placeOnPage', 'layoutFollows', 'pageFilled', 'slantDrawn'],
+  required: ['mainCharacter', 'leadMatches', 'requiredOnPage', 'archetypeRead', 'bodyMatches', 'castDistinct', 'placeOnPage', 'layoutFollows', 'pageFilled', 'slantDrawn', 'balloonOrder'],
   additionalProperties: false,
 };
 export interface Addon {
@@ -75,6 +77,7 @@ export interface Addon {
   /** Round 16 on: no empty areas or overlaid panels; slanted gutters drawn where asked. */
   pageFilled?: { state: 'present' | 'absent' | 'unclear' | 'inapplicable'; evidence: string };
   slantDrawn?: { state: 'present' | 'absent' | 'unclear' | 'inapplicable'; evidence: string };
+  balloonOrder?: { state: 'present' | 'absent' | 'unclear' | 'inapplicable'; evidence: string };
   castDistinct?: { state: 'present' | 'absent' | 'unclear' | 'inapplicable'; evidence: string };
   placeOnPage?: { state: 'present' | 'absent' | 'unclear' | 'inapplicable'; evidence: string };
 }
@@ -550,6 +553,39 @@ export function brainstormSummary(dirs: string[]) {
  * to the 4-panel grid (a wide opener, a middle pair, a wide closer), whether
  * each comic used its assigned layout, and how its action beats were framed.
  */
+/**
+ * Tropes (round 18 on): the isekai staples and memes each comic was offered,
+ * which it built on, and how often any one came back.
+ */
+export function tropeSummary(dirs: string[]) {
+  const rows = dirs.flatMap((d) => {
+    const ctx = readJson(join(d, 'packet', 'context.json')) as { genreOptions?: { tropeOffer?: { kind: string; id: string }[] }[] } | undefined;
+    const offer = ctx?.genreOptions?.[0]?.tropeOffer;
+    if (!offer?.length) return [];
+    const script = readJson(join(d, 'packet', 'comic.json')) as { meme?: string } | undefined;
+    const used = offer.find((t) => t.id === script?.meme);
+    return [{ offer, used }];
+  });
+  if (!rows.length) return undefined;
+  const count = (xs: string[]) => {
+    const m: Record<string, number> = {};
+    for (const x of xs) m[x] = (m[x] ?? 0) + 1;
+    return m;
+  };
+  const used = rows.flatMap((r) => (r.used ? [r.used] : []));
+  const offeredStaples = count(rows.flatMap((r) => r.offer.filter((t) => t.kind === 'staple').map((t) => t.id)));
+  const usedStaples = count(used.filter((t) => t.kind === 'staple').map((t) => t.id));
+  return {
+    comics: rows.length,
+    used: used.length,
+    usedStaples: Object.values(usedStaples).reduce((a, b) => a + b, 0),
+    usedMemes: used.filter((t) => t.kind === 'meme').length,
+    distinctStaplesOffered: Object.keys(offeredStaples).length,
+    staplesUsed: usedStaples,
+    mostRepeatedStaple: Object.entries(usedStaples).sort((a, b) => b[1] - a[1])[0] ?? null,
+  };
+}
+
 export function layoutSummary(dirs: string[]) {
   const ACTION = ['slanted', 'shattered', 'burst', 'diagonal'];
   const rows = dirs.flatMap((d) => {
@@ -561,7 +597,9 @@ export function layoutSummary(dirs: string[]) {
     const a = ctx?.genreOptions?.[0]?.assignedLayout;
     const assigned = typeof a === 'string' ? a : a?.[String(panels)];
     const used = script.composition.family === 'grid' ? script.composition.signature ?? 'grid' : script.composition.family;
-    return [{ family: used, panels, assigned, motions }];
+    const sent = existsSync(join(d, 'art', 'prompt.txt')) ? readFileSync(join(d, 'art', 'prompt.txt'), 'utf8') : '';
+    const slants = /straight and level except two/.test(sent) ? 2 : /straight and level except one/.test(sent) ? 1 : /straight and level\./.test(sent) ? 0 : -1;
+    return [{ family: used, panels, assigned, motions, slants }];
   });
   if (!rows.length) return undefined;
   const counts: Record<string, number> = {};
@@ -578,6 +616,8 @@ export function layoutSummary(dirs: string[]) {
     followedAssigned: withAssigned.filter((r) => r.family === r.assigned).length,
     tookActionLayout: withAssigned.filter((r) => r.family !== r.assigned && ACTION.includes(r.family)).length,
     assigned: withAssigned.length,
+    slantsPerPage: { none: rows.filter((r) => r.slants === 0).length, one: rows.filter((r) => r.slants === 1).length, two: rows.filter((r) => r.slants === 2).length, unknown: rows.filter((r) => r.slants < 0).length },
+    tallRight: rows.filter((r) => /^cols:[2-3]/.test(r.family)).length,
     panelMotion: { still: rows.reduce((n, r) => n + r.motions.filter((m) => m === 'still').length, 0), move: action.filter((m) => m === 'move').length, impact: action.filter((m) => m === 'impact').length, unmarked: rows.reduce((n, r) => n + r.motions.filter((m) => m === 'none').length, 0) },
   };
 }
@@ -709,6 +749,11 @@ export function summarize(items: { id: string; checklist: Checklist; script?: an
         archetypeRead: { observed: reads.filter((r) => r.state === 'present').length, assessed: reads.filter((r) => r.state !== 'unclear').length, rate: reads.filter((r) => r.state !== 'unclear').length ? reads.filter((r) => r.state === 'present').length / reads.filter((r) => r.state !== 'unclear').length : null },
         pageFilled: (() => {
           const l = withCast.flatMap((i) => (i.addon?.pageFilled && i.addon.pageFilled.state !== 'inapplicable' ? [i.addon.pageFilled] : []));
+          const assessed = l.filter((r) => r.state !== 'unclear');
+          return { observed: assessed.filter((r) => r.state === 'present').length, assessed: assessed.length };
+        })(),
+        balloonOrder: (() => {
+          const l = withCast.flatMap((i) => (i.addon?.balloonOrder && i.addon.balloonOrder.state !== 'inapplicable' ? [i.addon.balloonOrder] : []));
           const assessed = l.filter((r) => r.state !== 'unclear');
           return { observed: assessed.filter((r) => r.state === 'present').length, assessed: assessed.length };
         })(),
@@ -887,7 +932,7 @@ async function checklistImpl(o: { round: string; model?: string; jobs?: number; 
     const offer = context?.genreOptions?.[0]?.castOffer as CastOfferLike | undefined;
     const option = context?.genreOptions?.[0];
     const scenes = option?.sceneOffer as SceneLike[] | undefined;
-    const offers = ((option?.memeOffer ?? scenes) as { id: string }[] | undefined)?.map((m) => m.id);
+    const offers = ((option?.memeOffer ?? option?.tropeOffer ?? scenes) as { id: string }[] | undefined)?.map((m) => m.id);
     const addon = readJson(join(j.dir, 'checklist-addon.json'))?.addon as Addon | undefined;
     const misread = readJson(join(j.dir, 'art', 'misread.json')) as { reviews: unknown[]; redraws: number; concern: boolean } | undefined;
     const leadAxis = (option?.lead ?? option?.castOffer?.personas?.find((p: { lead?: boolean }) => p.lead))?.role as string | undefined;
@@ -899,7 +944,8 @@ async function checklistImpl(o: { round: string; model?: string; jobs?: number; 
   const done = jobs.filter((j) => current.has(j.id)).map((j) => j.dir);
   const brainstorm = brainstormSummary(done);
   const layouts = layoutSummary(done);
-  const summary = { checklistVersion: CHECKLIST_VERSION, rubricVersion: RUBRIC_VERSION, model, round: basename(o.round), planned: order.length, ...summarize(items, order), ...(brainstorm ? { brainstorm } : {}), ...(layouts ? { layouts } : {}), errors };
+  const tropes = tropeSummary(done);
+  const summary = { checklistVersion: CHECKLIST_VERSION, rubricVersion: RUBRIC_VERSION, model, round: basename(o.round), planned: order.length, ...summarize(items, order), ...(brainstorm ? { brainstorm } : {}), ...(layouts ? { layouts } : {}), ...(tropes ? { tropes } : {}), errors };
   writeFileSync(join(o.round, 'checklist.json'), JSON.stringify(summary, null, 2) + '\n');
   return summary;
 }

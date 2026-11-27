@@ -167,8 +167,8 @@ export async function tracetoonModules(root: string) {
           let opt = genres.genreOptions([], { pinned: g.id, catalog: [g], seed, recentMemes, recentLeads, recentPresets, ...(cooldown ? { cooldown } : {}), recentLayouts })[0] ?? {};
           // Round 13 on: an isekai cast's scenes are matched to the PR, as at production's packet step.
           if (genres.withSceneOffers) opt = genres.withSceneOffers([opt], { description }, recentMemes)[0] ?? opt;
-          const { castOffer, memeOffer, assignedStyle, requiredCast, lead, archetypes, isekaiCast, sceneOffer, pitches, memeList, assignedLayout } = opt as GenreOption;
-          return { ...(castOffer ? { castOffer, archetypes } : {}), ...(memeOffer ? { memeOffer } : {}), ...(assignedStyle ? { assignedStyle } : {}), ...(requiredCast ? { requiredCast } : {}), ...(lead ? { lead } : {}), ...(isekaiCast ? { isekaiCast } : {}), ...(sceneOffer ? { sceneOffer } : {}), ...(pitches ? { pitches } : {}), ...(memeList ? { memeList } : {}), ...(assignedLayout ? { assignedLayout } : {}) };
+          const { castOffer, memeOffer, assignedStyle, requiredCast, lead, archetypes, isekaiCast, sceneOffer, pitches, memeList, assignedLayout, tropeOffer } = opt as GenreOption;
+          return { ...(castOffer ? { castOffer, archetypes } : {}), ...(memeOffer ? { memeOffer } : {}), ...(assignedStyle ? { assignedStyle } : {}), ...(requiredCast ? { requiredCast } : {}), ...(lead ? { lead } : {}), ...(isekaiCast ? { isekaiCast } : {}), ...(sceneOffer ? { sceneOffer } : {}), ...(pitches ? { pitches } : {}), ...(memeList ? { memeList } : {}), ...(assignedLayout ? { assignedLayout } : {}), ...(tropeOffer ? { tropeOffer } : {}) };
         }
       : undefined;
   // The misread review (round 11 on): what a finished image could look like at a glance.
@@ -280,31 +280,38 @@ export interface Hold {
   memes: string[];
   /** Round 15 on: the composition family assigned or used. */
   layouts?: string[];
+  /** Round 18 on: the lead, and the staples offered or used. */
+  leads?: string[];
+  staples?: string[];
 }
 export type Cooldown = Omit<Hold, 'layouts'>;
 
 /** Tracetoon's per-repo windows (isekai/pitches.ts COOLDOWN): scenarios 10 comics, characters 3, memes 100. */
-const WINDOWS = { scenes: 10, characters: 3, memes: 100 } as const;
+const WINDOWS = { scenes: 10, characters: 3, memes: 100, leads: 10, staples: 10 } as const;
 
 /**
  * The cooldown for the next comic in a round run in parallel: comics in flight
  * count as the newest (each one comic in every window, with all it drew),
  * then the finished comics, newest first, as production reads a repo's history.
  */
-export function benchCooldown(recent: Recent): Cooldown {
+export function benchCooldown(recent: Recent, stapleIds: Set<string> = new Set()): Cooldown {
   const holds: Hold[] = [
     ...(recent.inFlight ?? []).map((f) => f.hold),
     ...recent.list.map(({ summary }) => ({
       scenes: typeof summary.pitch === 'string' ? [summary.pitch] : [],
       characters: Array.isArray(summary.archetypes) ? (summary.archetypes as string[]) : [],
-      memes: typeof summary.meme === 'string' ? [summary.meme] : [],
+      memes: typeof summary.meme === 'string' && !stapleIds.has(summary.meme) ? [summary.meme] : [],
       layouts: typeof summary.layoutSignature === 'string' ? [summary.layoutSignature] : [],
+      leads: typeof summary.lead === 'string' ? [summary.lead] : [],
+      staples: typeof summary.meme === 'string' && stapleIds.has(summary.meme) ? [summary.meme] : [],
     })),
   ];
   return {
     scenes: holds.slice(0, WINDOWS.scenes).flatMap((h) => h.scenes),
     characters: [...new Set(holds.slice(0, WINDOWS.characters).flatMap((h) => h.characters))],
     memes: holds.slice(0, WINDOWS.memes).flatMap((h) => h.memes),
+    leads: holds.slice(0, WINDOWS.leads).flatMap((h) => h.leads ?? []),
+    staples: holds.slice(0, WINDOWS.staples).flatMap((h) => h.staples ?? []),
   };
 }
 
@@ -328,8 +335,10 @@ function hold(recent: Recent, key: string, option: Partial<GenreOption>): void {
   const h: Hold = {
     scenes: pick ? (pick.pitch ? [pick.pitch.id] : []) : (option.pitches ?? []).map((p) => p.id),
     characters: [...new Set([...(lead ? [lead] : []), ...(pick ? pick.pitch?.players ?? [] : (option.pitches ?? []).flatMap((p) => p.players)).map((p) => p.archetype)])],
-    memes: pick?.idea.meme ? [pick.idea.meme] : [],
+    memes: [...(pick?.idea.meme ? [pick.idea.meme] : []), ...(option.tropeOffer ?? []).filter((t) => t.kind === 'meme').map((t) => t.id)],
     layouts: option.assignedLayout ? Object.values(option.assignedLayout) : [],
+    leads: lead ? [lead] : [],
+    staples: (option.tropeOffer ?? []).filter((t) => t.kind === 'staple').map((t) => t.id),
   };
   const list = recent.inFlight ?? (recent.inFlight = []);
   const at = list.findIndex((f) => f.id === key);
@@ -435,7 +444,7 @@ async function oneComic(c: Case, sample: number, o: RoundOpts, tt: Tt, genreText
     const seen = recent.list.slice(0, RECENT_COUNT);
     writeFileSync(join(dir, 'recent.json'), JSON.stringify(seen.map((r) => r.id)) + '\n');
     // Round 14 on: per-repo cooldowns, with comics in flight counted as the newest.
-    const cooldown = tt.pitches ? benchCooldown(recent) : undefined;
+    const cooldown = tt.pitches ? benchCooldown(recent, new Set(((tt.pitches.STAPLES ?? []) as { id: string }[]).map((s) => s.id))) : undefined;
     const packetArgs = {
       skillFiles: [join(o.skill, 'SKILL.md')],
       genre: o.genre,
@@ -491,7 +500,7 @@ async function oneComic(c: Case, sample: number, o: RoundOpts, tt: Tt, genreText
   }
   // A brainstorming comic holds what it drew until it finishes.
   const drawn = readJson<{ genreOptions?: Partial<GenreOption>[] }>(join(packet, 'context.json'))?.genreOptions?.[0];
-  if (drawn?.pitches?.length || drawn?.assignedLayout) hold(recent, `${id}#${sample}`, drawn);
+  if (drawn?.pitches?.length || drawn?.assignedLayout || drawn?.tropeOffer) hold(recent, `${id}#${sample}`, drawn);
 
   // 1b. Brainstorm (round 14 on): gags, a fresh judge, the host's pick; then the author scripts the pick.
   if (!existsSync(comicJson) && drawn?.pitches?.length && !drawn.pick && tt.pitches) {

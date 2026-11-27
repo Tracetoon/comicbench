@@ -120,7 +120,8 @@ export function parseAuthorReply(text: string): { design: unknown; comic: unknow
 }
 
 function readJson<T>(path: string): T | undefined {
-  return existsSync(path) ? (JSON.parse(readFileSync(path, 'utf8')) as T) : undefined;
+  // Authors on Windows PowerShell write a UTF-8 byte-order mark by default.
+  return existsSync(path) ? (JSON.parse(readFileSync(path, 'utf8').replace(/^﻿/, '')) as T) : undefined;
 }
 
 function checkRuntime(tracetoon: string) {
@@ -590,7 +591,7 @@ async function oneComic(c: Case, sample: number, o: RoundOpts, tt: Tt, genreText
     }
     writeFileSync(join(dir, 'check.json'), check.stdout.toString() || check.stderr.toString());
   }
-  const script = JSON.parse(readFileSync(comicJson, 'utf8'));
+  const script = JSON.parse(readFileSync(comicJson, 'utf8').replace(/^﻿/, ''));
   // Later comics in this arm see this one among their recentComics.
   try {
     recent.list.unshift({ id: `${id}#${sample}`, summary: tt.comicSummary(script) });
@@ -938,7 +939,7 @@ export async function runRound(o: RoundOpts) {
   const scripts = tasks
     .map((t) => ({ id: `${t.c.meta.id}#${t.sample}`, file: join(o.out, 'comics', t.c.meta.id, String(t.sample), 'packet', 'comic.json') }))
     .filter((s) => existsSync(s.file))
-    .map((s) => ({ id: s.id, script: JSON.parse(readFileSync(s.file, 'utf8')) }));
+    .map((s) => ({ id: s.id, script: JSON.parse(readFileSync(s.file, 'utf8').replace(/^﻿/, '')) }));
   const setFile = join(o.out, 'set.json');
   let set = readJson<SetJudgment>(setFile);
   if (!set && scripts.length > 1) {

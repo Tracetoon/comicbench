@@ -1,0 +1,20 @@
+{
+  "name": "r17",
+  "cases": "cases-local",
+  "split": "dev",
+  "samples": 2,
+  "arms": [
+    { "name": "r17-plain", "label": "Round 12's single author + tiled grid layouts (3–4 panels, three-across rarer, at most 2 action beats) + audited bodies (no species labels)", "genre": "genres/anime-isekai-plain.md", "skill": ".comicbench-cache/skills/r17", "tracetoon": ".comicbench-cache/tracetoon-r17", "jobs": 12 }
+  ],
+  "references": [
+    { "round": "results/r12-anime", "label": "Isekai cast, no memes (round 12)" },
+    { "round": "results/r16-plain", "label": "Plain + grid layouts (round 16)" }
+  ],
+  "arenas": [["r12-anime", "r17-plain"], ["r16-plain", "r17-plain"]],
+  "secondJudge": { "model": "gpt-6.2-astra", "share": 0.3 },
+  "canary": 3,
+  "slots": 24,
+  "judgeSlots": 12,
+  "drawSlots": 24,
+  "reviewTracetoon": ".comicbench-cache/tracetoon-bench"
+}

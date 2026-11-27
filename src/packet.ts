@@ -49,6 +49,8 @@ export interface GenreOption {
   assignedLayout?: Record<string, string>;
   /** Three isekai staples or memes the comic may build on (Tracetoon's isekai/pitches.ts tropeOffer). */
   tropeOffer?: { kind: 'staple' | 'meme'; id: string; name: string; what?: string; allusion?: string; cues?: string[]; jokeHandles?: string[] }[];
+  /** Round 19: where the isekai comic happens (Tracetoon's isekai/settings.ts settingPick). */
+  assignedSetting?: { id: string; label: string; examples: string[] };
   /** Round 13: three anime gag scenes this isekai cast can perform, matched to the PR (Tracetoon's isekai/memeMatch.ts isekaiMemeOffer). */
   sceneOffer?: {
     id: string;
@@ -237,7 +239,12 @@ Read these packet files (they sit next to this one):
   A genre's \`tropeOffer\` holds three genre staples or memes veteran fans know
   (the summoning ceremony, the appraisal crystal, the status window…). If one
   fits this PR's joke, build on it: draw its \`cues\` so it reads at a glance,
-  never name a series, and set \`meme\` to its id. Use none when none fits.` : ''}${input.genres.some((g) => g.assignedLayout) ? `
+  never name a series, and set \`meme\` to its id. Use none when none fits.` : ''}${input.genres.some((g) => g.assignedSetting) ? `
+  A genre's \`assignedSetting\` is where this comic happens if you choose that
+  genre: \`place\` is one concrete spot there (its \`examples\` are ideas), and
+  \`setting\` is its id. No office parody: no desks, counters, archives,
+  paperwork, forms or clerks. The PR's change plays out as an adventure
+  (a fight, a trap, a quest, a journey), not as bureaucracy.` : ''}${input.genres.some((g) => g.assignedLayout) ? `
   A genre's \`assignedLayout\` gives this comic's page structure for each
   panel count, e.g. {"3": "rows:1-2", "4": "cols:1-3", "5": "rows:2-1-2"}.
   Decide how many panels the story needs, then set \`composition\` to

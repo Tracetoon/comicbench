@@ -15,7 +15,12 @@ judges score it. The design is in [docs/plan.md](docs/plan.md).
 - **Bump `RUBRIC_VERSION` whenever the judging prompt's meaning changes.**
   Runs compare only when their manifests match on the rubric version, the
   judges, the Tracetoon runtime and the image route.
-- **Judging is fully AI.** Never use human ratings.
+- **Judging is fully AI.** Our comics are scored only by AI judges: human
+  ratings never score them, and the owner's notes never become scores.
+  External, published human-rated datasets (e.g. crowd-ranked captions) and
+  openly licensed human-made comics may calibrate and validate the judges.
+  Keep downloaded calibration data under `.comicbench-cache/calib/`; never
+  commit it.
 - **Report honestly.** Keep failed or inconclusive results on record.
 - **Never commit downloaded cases or `results/`.** Tests fake every model
   and image call.

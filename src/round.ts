@@ -161,14 +161,14 @@ export async function tracetoonModules(root: string) {
   // required archetype, memes, assigned style), so the bench can't drift from production.
   const optionFor =
     casting?.leadPick && genreFile
-      ? (genrePath: string, seed: string, recentMemes: string[], recentLeads: string[], recentPresets: string[] = [], description = '', cooldown?: Cooldown, recentLayouts: string[][] = []): Partial<GenreOption> => {
+      ? (genrePath: string, seed: string, recentMemes: string[], recentLeads: string[], recentPresets: string[] = [], description = '', cooldown?: Cooldown, recentLayouts: string[][] = [], recentSettings: string[] = []): Partial<GenreOption> => {
           const g = genreFile.parseGenreFile(readFileSync(genrePath, 'utf8')).genre;
           if (!g) return {};
-          let opt = genres.genreOptions([], { pinned: g.id, catalog: [g], seed, recentMemes, recentLeads, recentPresets, ...(cooldown ? { cooldown } : {}), recentLayouts })[0] ?? {};
+          let opt = genres.genreOptions([], { pinned: g.id, catalog: [g], seed, recentMemes, recentLeads, recentPresets, ...(cooldown ? { cooldown } : {}), recentLayouts, recentSettings, prText: description })[0] ?? {};
           // Round 13 on: an isekai cast's scenes are matched to the PR, as at production's packet step.
           if (genres.withSceneOffers) opt = genres.withSceneOffers([opt], { description }, recentMemes)[0] ?? opt;
-          const { castOffer, memeOffer, assignedStyle, requiredCast, lead, archetypes, isekaiCast, sceneOffer, pitches, memeList, assignedLayout, tropeOffer } = opt as GenreOption;
-          return { ...(castOffer ? { castOffer, archetypes } : {}), ...(memeOffer ? { memeOffer } : {}), ...(assignedStyle ? { assignedStyle } : {}), ...(requiredCast ? { requiredCast } : {}), ...(lead ? { lead } : {}), ...(isekaiCast ? { isekaiCast } : {}), ...(sceneOffer ? { sceneOffer } : {}), ...(pitches ? { pitches } : {}), ...(memeList ? { memeList } : {}), ...(assignedLayout ? { assignedLayout } : {}), ...(tropeOffer ? { tropeOffer } : {}) };
+          const { castOffer, memeOffer, assignedStyle, requiredCast, lead, archetypes, isekaiCast, sceneOffer, pitches, memeList, assignedLayout, tropeOffer, assignedSetting } = opt as GenreOption;
+          return { ...(castOffer ? { castOffer, archetypes } : {}), ...(memeOffer ? { memeOffer } : {}), ...(assignedStyle ? { assignedStyle } : {}), ...(requiredCast ? { requiredCast } : {}), ...(lead ? { lead } : {}), ...(isekaiCast ? { isekaiCast } : {}), ...(sceneOffer ? { sceneOffer } : {}), ...(pitches ? { pitches } : {}), ...(memeList ? { memeList } : {}), ...(assignedLayout ? { assignedLayout } : {}), ...(tropeOffer ? { tropeOffer } : {}), ...(assignedSetting ? { assignedSetting } : {}) };
         }
       : undefined;
   // The misread review (round 11 on): what a finished image could look like at a glance.
@@ -283,8 +283,10 @@ export interface Hold {
   /** Round 18 on: the lead, and the staples offered or used. */
   leads?: string[];
   staples?: string[];
+  /** Round 19 on: the adventure setting assigned. */
+  settings?: string[];
 }
-export type Cooldown = Omit<Hold, 'layouts'>;
+export type Cooldown = Omit<Hold, 'layouts' | 'settings'>;
 
 /** Tracetoon's per-repo windows (isekai/pitches.ts COOLDOWN): scenarios 10 comics, characters 3, memes 100. */
 const WINDOWS = { scenes: 10, characters: 3, memes: 100, leads: 10, staples: 10 } as const;
@@ -322,6 +324,15 @@ export function benchLayouts(recent: Recent): string[][] {
     ...recent.list.map(({ summary }) => (typeof summary.layoutSignature === 'string' ? [summary.layoutSignature] : [])),
   ].slice(0, 3);
 }
+/** The adventure settings of the newest comics, counting comics in flight (Tracetoon's settings.ts SETTING_COOLDOWN). */
+export function benchSettings(recent: Recent): string[] {
+  return [
+    ...(recent.inFlight ?? []).map((f) => f.hold.settings?.[0]),
+    ...recent.list.map(({ summary }) => (typeof summary.setting === 'string' ? summary.setting : undefined)),
+  ]
+    .slice(0, 3)
+    .filter((x): x is string => !!x);
+}
 /** Point the instructions at the packet's own copy of the diff. */
 function pointAtPacketDiff(caseDir: string, packet: string): void {
   const ins = join(packet, 'instructions.md');
@@ -339,6 +350,7 @@ function hold(recent: Recent, key: string, option: Partial<GenreOption>): void {
     layouts: option.assignedLayout ? Object.values(option.assignedLayout) : [],
     leads: lead ? [lead] : [],
     staples: (option.tropeOffer ?? []).filter((t) => t.kind === 'staple').map((t) => t.id),
+    settings: option.assignedSetting ? [option.assignedSetting.id] : [],
   };
   const list = recent.inFlight ?? (recent.inFlight = []);
   const at = list.findIndex((f) => f.id === key);
@@ -468,6 +480,7 @@ async function oneComic(c: Case, sample: number, o: RoundOpts, tt: Tt, genreText
               readFileSync(join(c.dir, 'description.md'), 'utf8'),
               cooldown,
               benchLayouts(recent),
+              benchSettings(recent),
             ),
           };
         const cast = tt.castOffer?.(o.genre, seed);

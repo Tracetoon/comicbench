@@ -15,7 +15,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { askJudge, pool, type Family } from '../src/judge-family.ts';
-import { fitBT, rng, type Game } from '../src/measures-v2.ts';
+import { fitBT, rng, roundScore, type Game } from '../src/measures-v2.ts';
 
 const ROOT = join(import.meta.dir, '..');
 const arg = (k: string, d: string) => (process.argv.includes(k) ? process.argv[process.argv.indexOf(k) + 1]! : d);
@@ -89,7 +89,8 @@ function items(round: string): Item[] {
   const out: Item[] = [];
   for (const c of readdirSync(root))
     for (const n of readdirSync(join(root, c))) {
-      const f = join(root, c, n, 'art', 'comic.json');
+      // Drawn rounds keep the script in art/; script-only rounds (--stop-after check) in packet/.
+      const f = [join(root, c, n, 'art', 'comic.json'), join(root, c, n, 'packet', 'comic.json')].find(existsSync) ?? '';
       if (existsSync(f)) out.push({ id: `${round}/${c}#${n}`, case: c, text: scriptText(JSON.parse(readFileSync(f, 'utf8').replace(/^﻿/, ''))) });
     }
   return out;
@@ -123,7 +124,7 @@ if (import.meta.main) {
     return r.json;
   });
 
-  const v2 = JSON.parse(readFileSync(join(ROOT, v2File), 'utf8')) as { criteria: Record<string, { comics: Record<string, number> }> };
+  const v2 = (existsSync(join(ROOT, v2File)) ? JSON.parse(readFileSync(join(ROOT, v2File), 'utf8')) : { criteria: {} }) as { criteria: Record<string, { comics: Record<string, number> }> };
   const pearson = (xs: [number, number][]) => {
     const mx = xs.reduce((s, [x]) => s + x, 0) / xs.length, my = xs.reduce((s, [, y]) => s + y, 0) / xs.length;
     let sxy = 0, sxx = 0, syy = 0;
@@ -148,9 +149,15 @@ if (import.meta.main) {
       of++;
       if (Math.sign(fit.theta[p.first.id]! - fit.theta[p.second.id]!) === Math.sign(d)) agree++;
     }
-    report[c.id] = { games: games.length, comics: both.length, pearsonWithPage: Math.round(pearson(both) * 100) / 100, clearPairAgreement: of ? Math.round((1000 * agree) / of) / 10 : null, clearPairs: of, position: Math.round(fit.position[`${family}:script`]! * 100) / 100 };
+    // Per round (arm): mean script score with a case-bootstrap CI, and win rate against the first round listed.
+    const byRound = Object.fromEntries(rounds.map((r) => {
+      const its = all.filter((i) => i.id.startsWith(`${r}/`)).map((i) => ({ id: i.id, case: i.case }));
+      const sc = roundScore(fit.theta, its, 2000, `${c.id}\0${r}`);
+      return [r, { mean: Math.round(sc.mean * 100) / 100, lo: Math.round(sc.lo * 100) / 100, hi: Math.round(sc.hi * 100) / 100 }];
+    }));
+    report[c.id] = { byRound, games: games.length, comics: both.length, pearsonWithPage: Math.round(pearson(both) * 100) / 100, clearPairAgreement: of ? Math.round((1000 * agree) / of) / 10 : null, clearPairs: of, position: Math.round(fit.position[`${family}:script`]! * 100) / 100 };
   }
   mkdirSync(join(ROOT, 'results', 'measures-v2'), { recursive: true });
-  writeFileSync(join(ROOT, 'results', 'measures-v2', `script-judge-${family}.json`), JSON.stringify(report, null, 1));
+  writeFileSync(join(ROOT, 'results', 'measures-v2', `script-judge-${arg('--name', family)}.json`), JSON.stringify(report, null, 1));
   console.log(JSON.stringify(report, null, 1));
 }

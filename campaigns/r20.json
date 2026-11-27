@@ -1,0 +1,20 @@
+{
+  "name": "r20",
+  "cases": "cases-local",
+  "split": "dev",
+  "samples": 2,
+  "arms": [
+    { "name": "s20-A", "label": "Round 19 + quick fixes (control): payoff anchor a warning, leadLook documented, BOM-tolerant", "genre": "genres/anime-isekai-plain.md", "skill": ".comicbench-cache/skills/r20", "tracetoon": ".comicbench-cache/tracetoon-r20", "jobs": 4 },
+    { "name": "s20-J", "label": "Control + joke rules (the payoff reinterprets the change; one repeated setup; payoff of 8 words or fewer)", "genre": "genres/anime-isekai-r20-J.md", "skill": ".comicbench-cache/skills/r20", "tracetoon": ".comicbench-cache/tracetoon-r20", "jobs": 4 },
+    { "name": "s20-P", "label": "Joke rules + carry the PR in-world (the change stated plainly, the command named, fantasy documents allowed)", "genre": "genres/anime-isekai-r20-P.md", "skill": ".comicbench-cache/skills/r20", "tracetoon": ".comicbench-cache/tracetoon-r20", "jobs": 4 }
+  ],
+  "references": [
+    { "round": "results/r19-plain", "label": "Adventure settings (round 19)" }
+  ],
+  "arenas": [],
+  "canary": 3,
+  "slots": 16,
+  "judgeSlots": 6,
+  "drawSlots": 16,
+  "reviewTracetoon": ".comicbench-cache/tracetoon-bench"
+}

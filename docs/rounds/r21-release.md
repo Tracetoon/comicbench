@@ -54,3 +54,23 @@ Round 20's control (A) was the release candidate: round 19 plus the quick fixes.
   - the staple changes.
 
   Some are owner decisions that stay. Comparing round 18 with round 19 on the same PRs is the next experiment.
+
+## Released: Tracetoon 1.0.0-rc.53 (2026-11-28)
+
+The release candidate shipped as 1.0.0-rc.53 (Tracetoon #244, then the release PR #245), with the production two-draft selection on by default.
+
+### Sealed validation (41 held-out PRs, never tuned against; 2 drafts each)
+
+| | Dev (release config, 20 PRs) | Sealed (41 PRs) |
+| --- | --- | --- |
+| Funnier | −3.04 [−3.80, −2.27] · fantasy strips 32% | −3.11 [−3.68, −2.58] · fantasy strips 30% |
+| Overall | −3.51 | −3.39 |
+| Craft | 0.93 | 1.00 |
+| Medium | 3.21 | 2.84 |
+
+- **No overfitting to the dev PRs:** the sealed scores match dev on every criterion.
+- **Picking the better draft on unseen PRs:**
+  - The page judge (the shipped design) captured 51% of the best-possible humor gain (+0.55 logit), against 69–75% on dev.
+  - The script judge captured 11%.
+  - So the two-draft gain is real but smaller than dev suggested.
+- **Scope:** Codex judges only; no PR-context games, because each sealed PR has comics from one round only.

@@ -3,7 +3,7 @@
 **Date:** 2026-11-28
 **Follows:** `docs/rounds/r19-evaluation.md` (the seven research paths)
 **Scored with:** measures v2, now with three anchor families: developer (xkcd, Geek&Poke), fantasy (Pepper&Carrot, Mini Fantasy Theater) and classic (1916–1924 newspaper strips). It also has PR-context games for "about this PR" and veteran appeal.
-**Codex scores only:** Claude's second-family games are rate-limited, and agreement will be added when they finish.
+**Judges:** the scores come from Codex games; Claude re-judged a seeded sample, which agrees on 79–90% of comparisons (see "Second judge family").
 
 ## What ran
 
@@ -70,8 +70,10 @@
 
 1. **Writing joke rules does not make jokes funnier.**
    - The r19 study found that the funniest comics end on a line that reinterprets the PR's mechanism. That was correlation.
-   - As a rule (J), it lowered humor at both stages: script −2.9 logits against the control, page −0.7.
+   - As a rule (J), it made no detectable difference on the page: −4.60 [−5.43, −3.84] against the control's −3.93 [−4.74, −3.11], with overlapping CIs. Claude, on its sample, even slightly preferred J on humor (9/34 vs 4/44 wins against real comics).
+   - At the script stage J lost clearly (−2.9 logits), but that came from the script judge rewarding quirk endings, not from the page.
    - Like the last-panel anchor rule, a craft rule gets compliance, not wit.
+   - *(Corrected after the Claude check: an earlier draft said the rules lowered humor on the page too.)*
 2. **Stating the PR plainly makes comics clearly about the PR and much less funny.**
    - P is the most recognizable round yet (+1.36 vs −1.07 for the control, CIs apart).
    - It is the least funny and the lowest overall.
@@ -102,9 +104,26 @@
 4. **Measure against the fantasy family for humor and our own rounds for craft;** keep the developer family as a ceiling.
 5. **Find out why r19 and r20 lost humor against r18** (fantasy family 55% → 40% → 29%). Compare r18 with r19 on the same PRs: the adventure settings and the staple changes are the suspects.
 
+## Second judge family (Claude)
+
+A seeded 10% sample of round 20's anchor games (126 games), plus the existing 318 Claude games on rounds 12–19:
+
+| Criterion | Round 20 agreement (kappa) | Rounds 12–19 agreement (kappa) |
+| --- | --- | --- |
+| Funnier | 83% (0.65) | 82% (0.64) |
+| Craft | 90% (0.81) | 81% (0.62) |
+| Medium | 79% (0.59) | 80% (0.59) |
+| Overall | 87% (0.75) | 79% (0.57) |
+
+- Both families agree about four comparisons in five, round after round.
+- **On the arm results:**
+  - Claude confirms P as the weakest on overall (0/48 wins against real comics) and humor (1/48).
+  - It does not support J being below the control (see finding 1).
+- **Not yet covered by Claude:** the PR-context games (about this PR, veteran appeal).
+
 ## Caveats
 
-- **One judge family:** Codex only until Claude's games complete.
+- **Second family:** Claude covers a 10% sample of round 20 and has no PR-context games yet.
 - **Anchor style:** each new family comes from one artist, so the judge may partly track house style.
 - **Sample size:** 20 dev cases; the sealed split is untouched.
 - **About this PR and veteran appeal** are relative scales, with no real-comic anchor.

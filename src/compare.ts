@@ -16,7 +16,7 @@ function judgments(round: string): ComicJudgment[] {
   const dir = join(round, 'judgments');
   if (!existsSync(dir)) return [];
   return readdirSync(dir).flatMap((c) =>
-    readdirSync(join(dir, c)).map((f) => JSON.parse(readFileSync(join(dir, c, f), 'utf8')) as ComicJudgment),
+    readdirSync(join(dir, c)).map((f) => JSON.parse(readFileSync(join(dir, c, f), 'utf8').replace(/^\uFEFF/, '')) as ComicJudgment),
   );
 }
 

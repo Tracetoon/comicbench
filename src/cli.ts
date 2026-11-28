@@ -115,7 +115,7 @@ export function scoreRun(runDir: string) {
   const judgments: ComicJudgment[] = [];
   for (const c of readdirSync(dir, { withFileTypes: true }).filter((e) => e.isDirectory()))
     for (const f of readdirSync(join(dir, c.name)).filter((n) => n.endsWith('.json'))) {
-      const j = JSON.parse(readFileSync(join(dir, c.name, f), 'utf8')) as ComicJudgment;
+      const j = JSON.parse(readFileSync(join(dir, c.name, f), 'utf8').replace(/^\uFEFF/, '')) as ComicJudgment;
       j.case ??= c.name;
       j.sample ??= Number(f.replace(/\.json$/, ''));
       const bad = judgmentProblems(j);
@@ -123,7 +123,7 @@ export function scoreRun(runDir: string) {
       judgments.push(j);
     }
   const setPath = join(runDir, 'set.json');
-  const set = existsSync(setPath) ? (JSON.parse(readFileSync(setPath, 'utf8')) as SetJudgment) : undefined;
+  const set = existsSync(setPath) ? (JSON.parse(readFileSync(setPath, 'utf8').replace(/^\uFEFF/, '')) as SetJudgment) : undefined;
   const r = { rubricVersion: RUBRIC_VERSION, ...report(judgments, set), respect: respectRates(judgments) };
   writeFileSync(join(runDir, 'report.json'), JSON.stringify(r, null, 2) + '\n');
   return r;
@@ -367,7 +367,7 @@ if (import.meta.main) {
       if (!specFile) throw new Error('usage: comicbench campaign <spec.json> [--slots 24] [--judge-slots 12] [--draw-slots 24] [--canary 3] [--keep-awake off]');
       const { runCampaign } = await import('./campaign.ts');
       const r = await runCampaign({
-        spec: JSON.parse(readFileSync(resolve(specFile), 'utf8')),
+        spec: JSON.parse(readFileSync(resolve(specFile), 'utf8').replace(/^\uFEFF/, '')),
         ...(flags.get('slots')?.[0] ? { slots: Number(flags.get('slots')![0]) } : {}),
         ...(flags.get('judge-slots')?.[0] ? { judgeSlots: Number(flags.get('judge-slots')![0]) } : {}),
         ...(flags.get('draw-slots')?.[0] ? { drawSlots: Number(flags.get('draw-slots')![0]) } : {}),

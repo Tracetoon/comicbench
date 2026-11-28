@@ -85,7 +85,7 @@ const mean = (xs: number[]) => (xs.length ? xs.reduce((s, x) => s + x, 0) / xs.l
 
 /** The round's drawn comics: id, case dir, art and the primary judgment. */
 export function drawnComics(round: string) {
-  const manifest = JSON.parse(readFileSync(join(round, 'manifest.json'), 'utf8'));
+  const manifest = JSON.parse(readFileSync(join(round, 'manifest.json'), 'utf8').replace(/^\uFEFF/, ''));
   const cases = new Map(loadCases(manifest.casesDir).map((c) => [c.meta.id, c]));
   const out: { id: string; dir: string; caseDir: string; full: string; w760: string; w360: string; script: any }[] = [];
   const comics = join(round, 'comics');
@@ -104,7 +104,7 @@ export function drawnComics(round: string) {
         full: join(art, page),
         w760: join(art, 'page-760.png'),
         w360: join(art, 'page-360.png'),
-        script: JSON.parse(readFileSync(join(dir, 'packet', 'comic.json'), 'utf8')),
+        script: JSON.parse(readFileSync(join(dir, 'packet', 'comic.json'), 'utf8').replace(/^\uFEFF/, '')),
       });
     }
   return { manifest, comics: out };
@@ -114,8 +114,8 @@ function judged(dir: string): Scored | undefined {
   const b = join(dir, 'blind.json');
   const c = join(dir, 'context.json');
   if (!existsSync(b) || !existsSync(c)) return undefined;
-  const blind = JSON.parse(readFileSync(b, 'utf8'));
-  const context = JSON.parse(readFileSync(c, 'utf8'));
+  const blind = JSON.parse(readFileSync(b, 'utf8').replace(/^\uFEFF/, ''));
+  const context = JSON.parse(readFileSync(c, 'utf8').replace(/^\uFEFF/, ''));
   return {
     scores: Object.fromEntries([...Object.entries(blind.scores), ...Object.entries(context.scores)].map(([k, v]: [string, any]) => [k, v?.score ?? null])),
     gates: { punchUp: blind.punchUp.pass === true, factualIntegrity: context.factualIntegrity.pass === true, ...(typeof blind.respect?.pass === 'boolean' ? { respect: blind.respect.pass } : {}) },

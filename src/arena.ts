@@ -228,7 +228,7 @@ async function pool<T>(items: T[], jobs: number, fn: (t: T) => Promise<void>) {
   await Promise.all(Array.from({ length: jobs }, async () => { for (let t = queue.shift(); t; t = queue.shift()) await fn(t); }));
 }
 
-const readJson = (f: string) => (existsSync(f) ? JSON.parse(readFileSync(f, 'utf8')) : undefined);
+const readJson = (f: string) => (existsSync(f) ? JSON.parse(readFileSync(f, 'utf8').replace(/^\uFEFF/, '')) : undefined);
 
 /** One judge's two orders of a pair, cached under dir/ab and dir/ba. */
 export async function judgePair(o: { dir: string; a: ArenaComic; b: ArenaComic; prompt: string; model?: string }) {

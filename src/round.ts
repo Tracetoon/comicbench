@@ -402,7 +402,7 @@ async function brainstorm(a: { c: Case; dir: string; packet: string; o: RoundOpt
       throw new SandboxError(`Codex ran the author with sandbox ${r.sandbox}, not workspace-write; stopping so no comic is written without its tools.`);
     if (!existsSync(gagsFile)) return { stage: 'gags', error: r.error ?? 'no comic-gags.json written' };
   }
-  const gags = JSON.parse(readFileSync(gagsFile, 'utf8'));
+  const gags = JSON.parse(readFileSync(gagsFile, 'utf8').replace(/^\uFEFF/, ''));
   const evidence = ['description.md', 'changes.patch'].map((f) => (existsSync(join(a.c.dir, f)) ? readFileSync(join(a.c.dir, f), 'utf8') : '')).join('\n');
   const problems = P.gagProblems(gags, a.option.pitches, a.option.memeList ?? [], evidence) as { where: string; problem: string }[];
   if (problems.length) return { stage: 'gags', error: problems.map((p) => `${p.where}: ${p.problem}`).join('; ') };
@@ -520,7 +520,7 @@ async function oneComic(c: Case, sample: number, o: RoundOpts, tt: Tt, genreText
   if (!existsSync(comicJson) && drawn?.pitches?.length && !drawn.pick && tt.pitches) {
     const picked = await brainstorm({ c, dir, packet, o, tt, option: drawn });
     if ('error' in picked) return state({ status: 'error', stage: picked.stage, error: picked.error });
-    const args = JSON.parse(readFileSync(join(dir, 'packet-args.json'), 'utf8'));
+    const args = JSON.parse(readFileSync(join(dir, 'packet-args.json'), 'utf8').replace(/^\uFEFF/, ''));
     writePacket(c.dir, { ...args, option: { ...args.option, pick: picked.pick } });
     pointAtPacketDiff(c.dir, packet);
     hold(recent, `${id}#${sample}`, { ...drawn, pick: picked.pick });
@@ -627,7 +627,7 @@ async function oneComic(c: Case, sample: number, o: RoundOpts, tt: Tt, genreText
   // 4b. The misread review, as production runs it: a likely misreading is redrawn (up to twice) with things to avoid.
   if (tt.misread) {
     const record = join(art, 'misread.json');
-    let m = existsSync(record) ? JSON.parse(readFileSync(record, 'utf8')) : { reviews: [] as unknown[], redraws: 0, concern: false };
+    let m = existsSync(record) ? JSON.parse(readFileSync(record, 'utf8').replace(/^\uFEFF/, '')) : { reviews: [] as unknown[], redraws: 0, concern: false };
     while (m.reviews.length === m.redraws) {
       const image = join(art, readdirSync(art).find((f) => /^page\.(png|jpeg|jpg|webp)$/.test(f))!);
       // On the judge lane: a 12-second review shouldn't queue behind every author for text slots (r19 waits averaged 136 s, up to 581 s).

@@ -23,7 +23,7 @@ export interface RoundManifest {
 }
 
 export function readRoundManifest(round: string): RoundManifest {
-  const manifest = JSON.parse(readFileSync(join(round, 'manifest.json'), 'utf8')) as RoundManifest;
+  const manifest = JSON.parse(readFileSync(join(round, 'manifest.json'), 'utf8').replace(/^\uFEFF/, '')) as RoundManifest;
   if (manifest.schema !== 'comicbench.round/v2' || manifest.rubricVersion !== RUBRIC_VERSION) {
     throw new Error(`${round} uses an older or unsupported round manifest. Open its recorded review to see historical results.`);
   }
@@ -36,7 +36,7 @@ export function readRoundManifest(round: string): RoundManifest {
  * fields every version has are guaranteed.
  */
 export function readAnyManifest(round: string): Partial<RoundManifest> & { schema: string; name: string; casesDir: string; cases: { id: string }[] } {
-  const manifest = JSON.parse(readFileSync(join(round, 'manifest.json'), 'utf8'));
+  const manifest = JSON.parse(readFileSync(join(round, 'manifest.json'), 'utf8').replace(/^\uFEFF/, ''));
   return { ...manifest, cases: Array.isArray(manifest.cases) ? manifest.cases : [] };
 }
 

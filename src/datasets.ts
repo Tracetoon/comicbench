@@ -33,7 +33,7 @@ export function defaultDatasetDir(d: DatasetRelease): string {
 export function datasetProblems(dir: string, d: DatasetRelease): string[] {
   const file = join(dir, 'MANIFEST.json');
   if (!existsSync(file)) return ['MANIFEST.json is missing'];
-  const m = JSON.parse(readFileSync(file, 'utf8')) as { id: string; version: string; cases: number; files: { path: string; sha256: string }[] };
+  const m = JSON.parse(readFileSync(file, 'utf8').replace(/^\uFEFF/, '')) as { id: string; version: string; cases: number; files: { path: string; sha256: string }[] };
   const out: string[] = [];
   if (m.id !== d.id || m.version !== d.version) out.push(`manifest is ${m.id}@${m.version}, not ${d.id}@${d.version}`);
   if (m.cases !== d.cases) out.push(`manifest lists ${m.cases} cases, the registry ${d.cases}`);

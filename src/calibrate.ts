@@ -84,8 +84,8 @@ function judgedFrom(dir: string, phone?: boolean): Judged | undefined {
   const b = join(dir, 'blind.json');
   const c = join(dir, 'context.json');
   if (!existsSync(b) || !existsSync(c)) return undefined;
-  const blind = JSON.parse(readFileSync(b, 'utf8'));
-  const context = JSON.parse(readFileSync(c, 'utf8'));
+  const blind = JSON.parse(readFileSync(b, 'utf8').replace(/^\uFEFF/, ''));
+  const context = JSON.parse(readFileSync(c, 'utf8').replace(/^\uFEFF/, ''));
   const gates: Record<string, boolean> = { punchUp: blind.punchUp.pass === true, factualIntegrity: context.factualIntegrity.pass === true };
   if (phone !== undefined) gates.phoneLegibility = phone;
   return {
@@ -131,7 +131,7 @@ export async function runCalibration(o: { round: string; tracetoon: string; case
   const genreText = readFileSync(manifest.genre.path, 'utf8');
   // First samples that passed every gate: a gated original can't show a drop.
   const eligible = comics.filter((c) => c.id.endsWith('#1')).filter((c) => {
-    const j = JSON.parse(readFileSync(join(o.round, 'judgments', c.id.split('#')[0]!, '1.json'), 'utf8'));
+    const j = JSON.parse(readFileSync(join(o.round, 'judgments', c.id.split('#')[0]!, '1.json'), 'utf8').replace(/^\uFEFF/, ''));
     return Object.values(j.gates).every(Boolean);
   });
   const chosen = sampleIds(eligible.map((c) => c.id), (o.cases ?? 5) / Math.max(1, eligible.length), `calibrate:${manifest.name}`);
@@ -161,7 +161,7 @@ export async function runCalibration(o: { round: string; tracetoon: string; case
         }
         writeFileSync(scriptFile, JSON.stringify(variant, null, 2) + '\n');
       }
-      const variant = JSON.parse(readFileSync(scriptFile, 'utf8'));
+      const variant = JSON.parse(readFileSync(scriptFile, 'utf8').replace(/^\uFEFF/, ''));
       const art = join(dir, 'art');
       let page = existsSync(art) ? readdirSync(art).find((f) => /^page\.(png|jpeg|jpg|webp)$/.test(f)) : undefined;
       if (!page && control.id === 'tiny') {
@@ -183,7 +183,7 @@ export async function runCalibration(o: { round: string; tracetoon: string; case
       const sheet = control.id === 'offStyle' ? { ...variant, style: c.script.style, styleFamily: c.script.styleFamily } : variant;
       const j = await judgeComic({ caseDir: c.caseDir, script: sheet, art: files, judgeDir: join(dir, 'judge'), genreText, tt, model: o.model, skipPhone: control.id !== 'tiny' });
       if ('error' in j) throw new Error(`${j.stage}: ${j.error}`);
-      const origJudgment = JSON.parse(readFileSync(join(o.round, 'judgments', c.id.split('#')[0]!, '1.json'), 'utf8'));
+      const origJudgment = JSON.parse(readFileSync(join(o.round, 'judgments', c.id.split('#')[0]!, '1.json'), 'utf8').replace(/^\uFEFF/, ''));
       const orig = judgedFrom(join(c.dir, 'judge'), origJudgment.gates.phoneLegibility)!;
       const v = judgedFrom(join(dir, 'judge'), control.id === 'tiny' ? j.gates.phoneLegibility : undefined)!;
       row.hit = control.hit(orig, v);
@@ -265,11 +265,11 @@ export function drift(reference: Record<string, number | null>[], now: Record<st
 export async function checkAnchors(o: { dir: string; tracetoon: string; label: string; model?: string; jobs?: number }) {
   const { tracetoonModules, judgeComic } = await import('./round.ts');
   const tt = await tracetoonModules(o.tracetoon);
-  const file = JSON.parse(readFileSync(join(o.dir, 'anchors.json'), 'utf8'));
+  const file = JSON.parse(readFileSync(join(o.dir, 'anchors.json'), 'utf8').replace(/^\uFEFF/, ''));
   const genreText = readFileSync(file.genre, 'utf8');
   await pool(file.items as any[], o.jobs ?? 3, async (it) => {
     const dir = join(o.dir, it.id.replace('#', '-'));
-    const script = JSON.parse(readFileSync(join(dir, 'comic.json'), 'utf8'));
+    const script = JSON.parse(readFileSync(join(dir, 'comic.json'), 'utf8').replace(/^\uFEFF/, ''));
     const page = readdirSync(join(dir, 'art')).find((f: string) => /^page\./.test(f))!;
     const art = { full: join(dir, 'art', page), w760: join(dir, 'art', 'page-760.png'), w360: join(dir, 'art', 'page-360.png') };
     await judgeComic({ caseDir: it.caseDir, script, art, judgeDir: join(dir, `check-${o.label}`), genreText, tt, model: o.model, skipPhone: true });
@@ -319,7 +319,7 @@ export async function runPairwiseCalibration(o: { round: string; tracetoon: stri
       const art = join(dir, 'art');
       let page = existsSync(art) ? readdirSync(art).find((f) => /^page\.(png|jpe?g|webp)$/.test(f)) : undefined;
       if (!page) {
-        await tt.draw(JSON.parse(readFileSync(join(dir, 'comic.json'), 'utf8')), art, { provider: 'codex' });
+        await tt.draw(JSON.parse(readFileSync(join(dir, 'comic.json'), 'utf8').replace(/^\uFEFF/, '')), art, { provider: 'codex' });
         page = readdirSync(art).find((f) => /^page\.(png|jpe?g|webp)$/.test(f));
         if (!page) throw new Error('no page image');
       }

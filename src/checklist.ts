@@ -809,7 +809,7 @@ export function summarize(items: { id: string; checklist: Checklist; script?: an
 async function readPageRole(dir: string, image: string, imageHash: string, model?: string) {
   const file = join(dir, 'checklist', 'page-role.json');
   const key = sha256(JSON.stringify([CHECKLIST_VERSION, model, imageHash, PAGE_ROLE_PROMPT]));
-  const cached = existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')) : undefined;
+  const cached = existsSync(file) ? JSON.parse(readFileSync(file, 'utf8').replace(/^\uFEFF/, '')) : undefined;
   if (cached?.key === key && isPageRole(cached.role)) return cached.role;
   const reply = await codexExec({
     prompt: PAGE_ROLE_PROMPT, cwd: dir, images: [image], schema: PAGE_ROLE_SCHEMA,
@@ -835,7 +835,7 @@ export async function checkComics(o: { round: string; model?: string; jobs?: num
   return (await checklistImpl(o)) as { errors: string[]; checked: number };
 }
 
-const readJson = (f: string) => (existsSync(f) ? JSON.parse(readFileSync(f, 'utf8')) : undefined);
+const readJson = (f: string) => (existsSync(f) ? JSON.parse(readFileSync(f, 'utf8').replace(/^\uFEFF/, '')) : undefined);
 
 /** The add-on pass for one comic, cached by its own key in checklist-addon.json. */
 async function addonFor(t: { id: string; dir: string; image: string }, script: any, model: string | undefined) {
@@ -913,7 +913,7 @@ async function checklistImpl(o: { round: string; model?: string; jobs?: number; 
           const pageRole = parsed ? await readPageRole(t.dir, t.image, imageHash, model) : undefined;
           const prompt = checklistPrompt(script, design, pageRole);
           const key = sha256(JSON.stringify([CHECKLIST_VERSION, RUBRIC_VERSION, manifest.runtimeHash, model, imageHash, prompt]));
-          if (existsSync(file) && JSON.parse(readFileSync(file, 'utf8')).key === key) {
+          if (existsSync(file) && JSON.parse(readFileSync(file, 'utf8').replace(/^\uFEFF/, '')).key === key) {
             await addonFor(t, parsed, model);
             current.add(t.id);
             continue;
@@ -938,8 +938,8 @@ async function checklistImpl(o: { round: string; model?: string; jobs?: number; 
   const items = jobs.flatMap((j) => {
     const f = join(j.dir, 'checklist.json');
     if (!current.has(j.id)) return [];
-    const script = existsSync(join(j.dir, 'packet', 'comic.json')) ? JSON.parse(readFileSync(join(j.dir, 'packet', 'comic.json'), 'utf8')) : undefined;
-    const context = existsSync(join(j.dir, 'packet', 'context.json')) ? JSON.parse(readFileSync(join(j.dir, 'packet', 'context.json'), 'utf8')) : undefined;
+    const script = existsSync(join(j.dir, 'packet', 'comic.json')) ? JSON.parse(readFileSync(join(j.dir, 'packet', 'comic.json'), 'utf8').replace(/^\uFEFF/, '')) : undefined;
+    const context = existsSync(join(j.dir, 'packet', 'context.json')) ? JSON.parse(readFileSync(join(j.dir, 'packet', 'context.json'), 'utf8').replace(/^\uFEFF/, '')) : undefined;
     const offer = context?.genreOptions?.[0]?.castOffer as CastOfferLike | undefined;
     const option = context?.genreOptions?.[0];
     const scenes = option?.sceneOffer as SceneLike[] | undefined;
@@ -950,7 +950,7 @@ async function checklistImpl(o: { round: string; model?: string; jobs?: number; 
     const isekai = option?.isekaiCast as { preset: { id: string }; lead: { archetype: string } } | undefined;
     const lint = readJson(join(j.dir, 'art', 'prompt-lint.json')) as string[] | undefined;
     const required = (option?.requiredCast ?? option?.castOffer?.personas?.find((p: { required?: boolean }) => p.required))?.id as string | undefined;
-    return [{ id: j.id, checklist: JSON.parse(readFileSync(f, 'utf8')) as Checklist, script, ...(offer ? { offer } : {}), ...(offers ? { offers } : {}), ...(scenes ? { scenes } : {}), ...(required ? { required } : {}), ...(addon ? { addon } : {}), ...(misread ? { misread } : {}), ...(leadAxis ? { leadAxis } : {}), ...(isekai ? { preset: isekai.preset.id } : {}), ...(lint ? { lint } : {}) }];
+    return [{ id: j.id, checklist: JSON.parse(readFileSync(f, 'utf8').replace(/^\uFEFF/, '')) as Checklist, script, ...(offer ? { offer } : {}), ...(offers ? { offers } : {}), ...(scenes ? { scenes } : {}), ...(required ? { required } : {}), ...(addon ? { addon } : {}), ...(misread ? { misread } : {}), ...(leadAxis ? { leadAxis } : {}), ...(isekai ? { preset: isekai.preset.id } : {}), ...(lint ? { lint } : {}) }];
   });
   const done = jobs.filter((j) => current.has(j.id)).map((j) => j.dir);
   const brainstorm = brainstormSummary(done);

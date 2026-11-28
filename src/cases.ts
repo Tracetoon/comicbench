@@ -53,7 +53,7 @@ export function caseProblems(dir: string): string[] {
   if (!existsSync(metaPath)) return ['case.json is missing'];
   let meta: CaseMeta;
   try {
-    meta = JSON.parse(readFileSync(metaPath, 'utf8'));
+    meta = JSON.parse(readFileSync(metaPath, 'utf8').replace(/^\uFEFF/, ''));
   } catch (e) {
     return [`case.json is not JSON: ${(e as Error).message}`];
   }
@@ -72,7 +72,7 @@ export function caseProblems(dir: string): string[] {
     if (meta.sha256?.[f] !== sha256(readFileSync(path))) out.push(`${f} does not match its sha256`);
   }
   try {
-    const facts = JSON.parse(readFileSync(join(dir, 'facts.json'), 'utf8'));
+    const facts = JSON.parse(readFileSync(join(dir, 'facts.json'), 'utf8').replace(/^\uFEFF/, ''));
     if (typeof facts !== 'object' || facts === null) out.push('facts.json must be an object');
   } catch {
     if (existsSync(join(dir, 'facts.json'))) out.push('facts.json is not JSON');
@@ -87,7 +87,7 @@ export function loadCases(root: string): Case[] {
     .filter((e) => e.isDirectory() && existsSync(join(root, e.name, 'case.json')))
     .map((e) => ({
       dir: join(root, e.name),
-      meta: JSON.parse(readFileSync(join(root, e.name, 'case.json'), 'utf8')) as CaseMeta,
+      meta: JSON.parse(readFileSync(join(root, e.name, 'case.json'), 'utf8').replace(/^\uFEFF/, '')) as CaseMeta,
     }))
     .sort((a, b) => a.meta.id.localeCompare(b.meta.id));
 }

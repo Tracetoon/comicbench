@@ -65,7 +65,7 @@ const drawn = (round: string, id: string) => {
   return existsSync(join(round, 'comics', c, n, 'art', 'page.png'));
 };
 
-const readJson = (f: string) => (existsSync(f) ? JSON.parse(readFileSync(f, 'utf8')) : undefined);
+const readJson = (f: string) => (existsSync(f) ? JSON.parse(readFileSync(f, 'utf8').replace(/^\uFEFF/, '')) : undefined);
 
 /** Problems with one drawn comic that mean the run is broken, for the canary. */
 export function canaryProblems(s: ComicState): string[] {

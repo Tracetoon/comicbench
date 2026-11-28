@@ -22,7 +22,7 @@ import { BEAT_CHOICES, CONFLICT_KINDS, FRAME_FEATURES, MEDIUM_ITEMS, REPRESENTAT
 
 const readJson = <T = any>(f: string): T | undefined => {
   try {
-    return existsSync(f) ? (JSON.parse(readFileSync(f, 'utf8')) as T) : undefined;
+    return existsSync(f) ? (JSON.parse(readFileSync(f, 'utf8').replace(/^\uFEFF/, '')) as T) : undefined;
   } catch {
     return undefined;
   }
@@ -152,13 +152,13 @@ function armData(round: string, out: string) {
         case: cid,
         sample: Number(n),
         imagePrompt: existsSync(join(dir, 'art', 'prompt.txt')) ? readFileSync(join(dir, 'art', 'prompt.txt'), 'utf8').slice(0, 20000) : null,
-        misread: existsSync(join(dir, 'art', 'misread.json')) ? JSON.parse(readFileSync(join(dir, 'art', 'misread.json'), 'utf8')) : null,
+        misread: existsSync(join(dir, 'art', 'misread.json')) ? JSON.parse(readFileSync(join(dir, 'art', 'misread.json'), 'utf8').replace(/^\uFEFF/, '')) : null,
         // Round 14 on: the brainstorm (pitches, gags with their scores, the pick).
         brainstorm: (() => {
-          const ctx = existsSync(join(dir, 'packet', 'context.json')) ? JSON.parse(readFileSync(join(dir, 'packet', 'context.json'), 'utf8')) : undefined;
+          const ctx = existsSync(join(dir, 'packet', 'context.json')) ? JSON.parse(readFileSync(join(dir, 'packet', 'context.json'), 'utf8').replace(/^\uFEFF/, '')) : undefined;
           const option = ctx?.genreOptions?.[0];
           if (!option?.pitches?.length) return null;
-          const file = existsSync(join(dir, 'packet', 'comic-gags.json')) ? JSON.parse(readFileSync(join(dir, 'packet', 'comic-gags.json'), 'utf8')) : {};
+          const file = existsSync(join(dir, 'packet', 'comic-gags.json')) ? JSON.parse(readFileSync(join(dir, 'packet', 'comic-gags.json'), 'utf8').replace(/^\uFEFF/, '')) : {};
           const gags = (file.ideas ?? file.gags ?? []).map((g: any) => ({ ...g, gag: g.gag ?? g.idea, pitch: g.pitch ?? g.spark ?? '' }));
           return { pitches: option.pitches.map((p: any) => ({ id: p.id, label: p.label, premise: p.premise })), gags, memes: Object.fromEntries((option.memeList ?? []).map((m: any) => [m.id, m.name + ' (' + m.series + ')'])), pick: option.pick ? { gag: (option.pick.idea ?? option.pick.gag).id, scores: option.pick.scores, judged: option.pick.judged, anchor: option.pick.anchor, recovered: option.pick.recovered } : null, layout: option.assignedLayout ? (typeof option.assignedLayout === 'string' ? option.assignedLayout : Object.entries(option.assignedLayout).map(([n, s]) => n + ': ' + s).join(', ')) : null };
         })(),

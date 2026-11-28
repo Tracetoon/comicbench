@@ -127,9 +127,9 @@ export async function runScriptAudit(o: { a: string; b: string; out: string; job
           return `### ${file}\n${file === 'changes.patch' && value.length > 40_000 ? value.slice(0, 40_000) + '\n[diff truncated]' : value}`;
         }).join('\n\n');
         const sources = [as, bs].map(({ dir }) => {
-          const script = JSON.parse(readFileSync(join(dir, 'packet', 'comic.json'), 'utf8'));
+          const script = JSON.parse(readFileSync(join(dir, 'packet', 'comic.json'), 'utf8').replace(/^\uFEFF/, ''));
           const designFile = join(dir, 'packet', 'comic-design.json');
-          const design = existsSync(designFile) ? JSON.parse(readFileSync(designFile, 'utf8')) : null;
+          const design = existsSync(designFile) ? JSON.parse(readFileSync(designFile, 'utf8').replace(/^\uFEFF/, '')) : null;
           return {
             input: JSON.stringify({ design, script }),
             design,
@@ -143,7 +143,7 @@ export async function runScriptAudit(o: { a: string; b: string; out: string; job
         mkdirSync(dir, { recursive: true });
         const file = join(dir, 'verdict.json');
         const key = sha256(JSON.stringify([VERSION, A.rubricVersion, A.model, input]));
-        const cached = existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')) : undefined;
+        const cached = existsSync(file) ? JSON.parse(readFileSync(file, 'utf8').replace(/^\uFEFF/, '')) : undefined;
         let value: Verdict | undefined = cached?.key === key ? cached.value : undefined;
         if (!value) {
           const reply = await codexExec({

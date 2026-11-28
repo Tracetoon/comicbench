@@ -1,0 +1,16 @@
+{
+  "name": "release-sealed",
+  "cases": "cases-local",
+  "split": "sealed",
+  "samples": 2,
+  "arms": [
+    { "name": "release-sealed", "label": "Release configuration (round 20 control: assigned adventure settings, office check, staples on) on the 43 held-out sealed PRs; selection measured by picking within each pair", "genre": "genres/anime-isekai-plain.md", "skill": ".comicbench-cache/skills/r21", "tracetoon": ".comicbench-cache/tracetoon-r21", "jobs": 6 }
+  ],
+  "references": [],
+  "arenas": [],
+  "canary": 3,
+  "slots": 8,
+  "judgeSlots": 3,
+  "drawSlots": 12,
+  "reviewTracetoon": ".comicbench-cache/tracetoon-bench"
+}

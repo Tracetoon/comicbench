@@ -173,6 +173,8 @@ type Reply = { first?: string; second?: string; verdicts: Record<string, { winne
 const run = async (p: Planned): Promise<Reply | null> => {
   const file = join(CACHE, p.family, `${hash(p)}.json`);
   if (existsSync(file)) return JSON.parse(readFileSync(file, 'utf8')).reply as Reply;
+  // --cached-only: fit on the games already judged (a seeded sample stays a fair sample).
+  if (process.argv.includes('--cached-only')) return null;
   const reply = await askJudge({ family: p.family, prompt: p.prompt ?? PROMPT, images: [p.first.image, p.second.image], schema: p.type === 'pr' ? PR_SCHEMA : SCHEMA, logDir: join(CACHE, p.family, 'logs', hash(p)) });
   if (!reply.ok) {
     console.error(`${p.family} ${p.first.id} vs ${p.second.id}: ${reply.error}`);
@@ -278,7 +280,12 @@ if (only !== 'ladder')
       spreadSD: Math.round(sd(ours) * 100) / 100,
       position: Object.fromEntries(Object.entries(fit.position).map(([k, v]) => [k, Math.round(v * 100) / 100])),
       positionLock: lockBySource,
-      familyAgreement: familyKappa(gs.filter((g) => g.source.endsWith(':anchor')), 'codex', 'claude'),
+      familyAgreement: familyKappa(gs.filter((g) => /:(anchor|pr)$/.test(g.source)), 'codex', 'claude'),
+      // Per round: games where a comic of that round took part, so a partial Claude sample shows its coverage.
+      familyAgreementByRound: Object.fromEntries(rounds.map((r) => {
+        const k = familyKappa(gs.filter((g) => /:(anchor|pr)$/.test(g.source) && (g.first.startsWith(`${r}/`) || g.second.startsWith(`${r}/`))), 'codex', 'claude');
+        return [r, { kappa: Number.isFinite(k.kappa) ? Math.round(k.kappa * 100) / 100 : null, agree: Number.isFinite(k.agree) ? Math.round(k.agree * 100) : null, n: k.n }];
+      })),
       byRound,
       anchors: Object.fromEntries(anchors.map((a) => [a.id, Math.round((fit.theta[a.id] ?? NaN) * 100) / 100])),
       comics: Object.fromEntries(items.map((i) => [i.id, Math.round((fit.theta[i.id] ?? NaN) * 100) / 100])),

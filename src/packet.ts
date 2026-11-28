@@ -53,6 +53,8 @@ export interface GenreOption {
   assignedSetting?: { id: string; label: string; examples: string[] };
   /** Round 20: three settings to choose from (Tracetoon genre option `settings: choose`). */
   settingOffer?: { id: string; label: string; examples: string[] }[];
+  /** Round 21: no assigned setting, but no office places or office parody (genre option `settings: free`). */
+  adventureOnly?: boolean;
   /** Round 13: three anime gag scenes this isekai cast can perform, matched to the PR (Tracetoon's isekai/memeMatch.ts isekaiMemeOffer). */
   sceneOffer?: {
     id: string;
@@ -246,7 +248,10 @@ Read these packet files (they sit next to this one):
   genre: \`place\` is one concrete spot there (its \`examples\` are ideas), and
   \`setting\` is its id. No office parody: no desks, counters, archives,
   paperwork, forms or clerks. The PR's change plays out as an adventure
-  (a fight, a trap, a quest, a journey), not as bureaucracy.` : ''}${input.genres.some((g) => g.settingOffer?.length) ? `
+  (a fight, a trap, a quest, a journey), not as bureaucracy.` : ''}${input.genres.some((g) => g.adventureOnly) ? `
+  A genre marked \`adventureOnly\` leaves the place to you: choose where this
+  PR's moment plays out most naturally in the fantasy world. No office parody:
+  no desks, counters, archives, paperwork, forms or clerks.` : ''}${input.genres.some((g) => g.settingOffer?.length) ? `
   A genre's \`settingOffer\` holds three adventure settings: choose the one
   where this PR's moment plays out most naturally, set \`setting\` to its id,
   and make \`place\` one concrete spot there (its \`examples\` are ideas). No

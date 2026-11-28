@@ -1,0 +1,19 @@
+{
+  "name": "r21",
+  "cases": "cases-local",
+  "split": "dev",
+  "samples": 2,
+  "arms": [
+    { "name": "r21-free", "label": "Release candidate (round 20 control) with no assigned setting; the office check stays", "genre": "genres/anime-isekai-r21-free.md", "skill": ".comicbench-cache/skills/r21", "tracetoon": ".comicbench-cache/tracetoon-r21", "jobs": 6 },
+    { "name": "r21-command", "label": "Release candidate with the PR's command or product named among the anchor terms", "genre": "genres/anime-isekai-r21-command.md", "skill": ".comicbench-cache/skills/r21", "tracetoon": ".comicbench-cache/tracetoon-r21", "jobs": 6 }
+  ],
+  "references": [
+    { "round": "results/s20-A", "label": "Release candidate: round 19 + quick fixes (round 20 control)" }
+  ],
+  "arenas": [],
+  "canary": 3,
+  "slots": 12,
+  "judgeSlots": 4,
+  "drawSlots": 16,
+  "reviewTracetoon": ".comicbench-cache/tracetoon-bench"
+}
